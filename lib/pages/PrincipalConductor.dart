@@ -19,7 +19,7 @@ class PrincipalConductor extends StatelessWidget {
         centerTitle: true,
         title: Image.asset(
           'assets/logoRT.png',
-          height: 90, // Ajusta el tamaño como prefieras
+          height: 90,
         ),
         actions: [
           IconButton(
@@ -36,7 +36,6 @@ class PrincipalConductor extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 32),
-
             const Text(
               'Bienvenido al servicio de conductor de RaiTec',
               textAlign: TextAlign.center,
@@ -45,89 +44,89 @@ class PrincipalConductor extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-
             const SizedBox(height: 40),
 
             // Botón 1
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Acción para "Mi información"
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 4,
-                ),
-                child: const Text(
-                  'Mi información',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+            buildButton('Mi información', () {
+              // Acción para "Mi información"
+            }),
+
             const SizedBox(height: 24),
 
             // Botón 2
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Acción para "Mi vehículo"
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 4,
-                ),
-                child: const Text(
-                  'Mi vehículo',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+            buildButton('Mi vehículo', () {
+              // Acción para "Mi vehículo"
+            }),
+
             const SizedBox(height: 24),
 
             // Botón 3
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Acción para "Mis rutas"
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 4,
+            buildButton('Mis rutas', () {
+              // Acción para "Mis rutas"
+            }),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.lightBlue,
+        elevation: 8,
+        child: SizedBox(
+          height: 70,
+          child: Stack(
+            children: [
+              // Ícono de Home centrado
+              Align(
+                alignment: Alignment.center,
+                child: IconButton(
+                  icon: const Icon(Icons.home, size: 42, color: Colors.white),
+                  onPressed: () {
+                    // Acción de Home
+                  },
                 ),
-                child: const Text(
-                  'Mis rutas',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+              ),
+
+              // Ícono de Perfil a la derecha
+              Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: IconButton(
+                    icon: const Icon(Icons.account_circle,
+                        size: 42, color: Colors.white),
+                    onPressed: () {
+                      // Acción de perfil
+                    },
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Botón reutilizable
+  Widget buildButton(String text, VoidCallback onPressed) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 4,
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
