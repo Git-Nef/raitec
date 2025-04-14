@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:raitec/pages/ISConductores.dart';
+import 'package:raitec/pages/PrincipalConductor.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const ISConductores(),
+      home: const PrincipalConductor(),
     );
   }
 }
