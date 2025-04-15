@@ -47,9 +47,47 @@ class InfoVehiculo extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Logo
-            Image.asset('assets/logoRT.png', height: 90),
+            const SizedBox(height: 12),
+
+            // Texto llamativo
+            const Text(
+              '¿No tienes ningún vehículo registrado? Llena el siguiente formulario',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueAccent,
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Botón bonito
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  // Acción para registrar vehículo
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 4,
+                ),
+                child: const Text(
+                  'Registrar Vehículo',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
             const SizedBox(height: 24),
 
             _infoFila(context, ['Marca del Coche', 'Modelo', 'Año'],
