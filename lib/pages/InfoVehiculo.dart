@@ -35,14 +35,6 @@ class InfoVehiculo extends StatelessWidget {
           'assets/logoRT.png',
           height: 90,
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.black),
-            onPressed: () {
-              // Acción para notificaciones
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -140,6 +132,20 @@ class InfoVehiculo extends StatelessWidget {
           height: 70,
           child: Stack(
             children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back,
+                        size: 42, color: Colors.white),
+                    onPressed: () {
+                      // Acción de perfil
+                    },
+                  ),
+                ),
+              ),
+
               // Ícono de Home centrado
               Align(
                 alignment: Alignment.center,
