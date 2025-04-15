@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:raitec/pages/ISConductores.dart';
+import 'package:raitec/pages/InfoVehiculo.dart';
 import 'package:raitec/pages/PrincipalConductor.dart';
 
 void main() {
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const PrincipalConductor(),
+      home: const InfoVehiculo(),
     );
   }
 }
