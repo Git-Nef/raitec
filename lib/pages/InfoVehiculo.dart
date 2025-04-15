@@ -20,14 +20,30 @@ class InfoVehiculo extends StatelessWidget {
     };
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Información del Vehículo',
-            style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 2,
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: Colors.black),
+          onPressed: () {
+            // Acción para abrir el menú
+          },
+        ),
+        centerTitle: true,
+        title: Image.asset(
+          'assets/logoRT.png',
+          height: 90,
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_none, color: Colors.black),
+            onPressed: () {
+              // Acción para notificaciones
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -75,7 +91,44 @@ class InfoVehiculo extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 32),
           ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.lightBlue,
+        elevation: 8,
+        child: SizedBox(
+          height: 70,
+          child: Stack(
+            children: [
+              // Ícono de Home centrado
+              Align(
+                alignment: Alignment.center,
+                child: IconButton(
+                  icon: const Icon(Icons.home, size: 42, color: Colors.white),
+                  onPressed: () {
+                    // Acción de Home
+                  },
+                ),
+              ),
+
+              // Ícono de Perfil a la derecha
+              Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: IconButton(
+                    icon: const Icon(Icons.account_circle,
+                        size: 42, color: Colors.white),
+                    onPressed: () {
+                      // Acción de perfil
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
