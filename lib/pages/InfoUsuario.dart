@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:raitec/DataType/data.dart';
 
-class InformacionUsuarioScreen extends StatelessWidget {
-  const InformacionUsuarioScreen({super.key});
+class InfoUsuario extends StatelessWidget {
+  const InfoUsuario({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,8 @@ class InformacionUsuarioScreen extends StatelessWidget {
             // Tarjeta con info
             Card(
               elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -68,7 +69,8 @@ class InformacionUsuarioScreen extends StatelessWidget {
                     filaInfo('Teléfono', estudiante.telefono),
                     filaInfo('Nacionalidad', estudiante.nacionalidad),
                     filaInfo('Fecha de Nacimiento', estudiante.fechaNacimiento),
-                    filaInfo('Teléfono Emergencia', estudiante.telefonoEmergencia),
+                    filaInfo(
+                        'Teléfono Emergencia', estudiante.telefonoEmergencia),
 
                     const SizedBox(height: 16),
 

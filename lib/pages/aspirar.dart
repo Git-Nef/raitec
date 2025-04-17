@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class DocumentUploadScreen extends StatelessWidget {
-  const DocumentUploadScreen({super.key});
+class Aspirar extends StatelessWidget {
+  const Aspirar({super.key});
 
   @override
   Widget build(BuildContext context) {

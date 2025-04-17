@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class InformacionCostosScreen extends StatelessWidget {
-  const InformacionCostosScreen({super.key});
+class InfoCostos extends StatelessWidget {
+  const InfoCostos({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,10 +16,12 @@ class InformacionCostosScreen extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Icon(Icons.arrow_back_ios_new, size: 28, color: Colors.blueGrey),
+              const Icon(Icons.arrow_back_ios_new,
+                  size: 28, color: Colors.blueGrey),
               const Icon(Icons.home_filled, size: 30, color: Colors.blueAccent),
               CircleAvatar(
-                backgroundImage: NetworkImage('https://example.com/user-photo.jpg'), // URL de ejemplo para la foto del usuario
+                backgroundImage: NetworkImage(
+                    'https://example.com/user-photo.jpg'), // URL de ejemplo para la foto del usuario
               ),
             ],
           ),
@@ -52,7 +54,8 @@ class InformacionCostosScreen extends StatelessWidget {
             // Tarjeta con info de costos
             Card(
               elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
