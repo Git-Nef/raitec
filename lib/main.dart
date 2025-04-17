@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:raitec/pages/splashscreen.dart';
+import 'package:raitec/pages/Splashcreen.dart';
 
 void main() {
   runApp(MyApp());

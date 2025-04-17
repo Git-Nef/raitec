@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:raitec/pages/informacionusuarioscreen.dart';
+import 'package:raitec/pages/InfoUsuario.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
