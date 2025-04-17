@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:raitec/pages/InicioSesion.dart';
-import 'package:raitec/pages/aspirar.dart';
+import 'package:raitec/pages/principalUsuarios.dart';
 import 'package:raitec/pages/registro.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -22,7 +22,7 @@ class _MySplashScreen extends State<SplashScreen> {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (BuildContext context) {
-              return DocumentUploadScreen();
+              return PrincipalUsuarios();
             },
           ),
         );
