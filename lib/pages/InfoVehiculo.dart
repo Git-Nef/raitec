@@ -32,7 +32,7 @@ class InfoVehiculo extends StatelessWidget {
         ),
         centerTitle: true,
         title: Image.asset(
-          'assets/logoRT.png',
+          'assets/LogoPantallas.png',
           height: 90,
         ),
       ),
