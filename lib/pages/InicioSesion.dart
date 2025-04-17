@@ -23,7 +23,7 @@ class InicioSesion extends StatelessWidget {
             children: [
               // Imagen con mayor tamaño
               Image.asset(
-                'assets/logoRT.png',
+                'assets/LogoPantallas.png',
                 height: 180,
               ),
               const SizedBox(height: 40),

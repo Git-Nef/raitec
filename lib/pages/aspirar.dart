@@ -15,7 +15,7 @@ class DocumentUploadScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  'assets/logoRT.png',
+                  'assets/LogoPantallas.png',
                   height: 140,
                 ),
                 const SizedBox(height: 40),
