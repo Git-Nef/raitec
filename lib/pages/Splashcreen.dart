@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:raitec/pages/home.dart';
-import 'package:raitec/pages/informacionusuarioscreen.dart';
+import 'package:raitec/pages/InfoUsuario.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -17,7 +16,7 @@ class _MySplashScreen extends State<SplashScreen> {
     super.initState();
     Timer(
       const Duration(seconds: 5), // Se agregó const para optimización
-          () {
+      () {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (BuildContext context) {
