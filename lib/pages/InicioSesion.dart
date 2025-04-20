@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:raitec/pages/ISConductores.dart';
+import 'package:raitec/pages/Registro.dart';
+import 'package:raitec/pages/principalUsuarios.dart';
 
 class InicioSesion extends StatelessWidget {
   const InicioSesion({super.key});
@@ -85,6 +88,11 @@ class InicioSesion extends StatelessWidget {
                     final clave = claveController.text;
                     final nip = nipController.text;
                     print('Clave: $clave, NIP: $nip');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PrincipalUsuarios()),
+                    );
                   },
                   child: const Text(
                     'Iniciar Sesión',
@@ -112,6 +120,10 @@ class InicioSesion extends StatelessWidget {
                   ),
                   onPressed: () {
                     print('Crear Cuenta presionado');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Registro()),
+                    );
                   },
                   child: const Text(
                     'Crear Cuenta',
@@ -151,6 +163,10 @@ class InicioSesion extends StatelessWidget {
                   ),
                   onPressed: () {
                     print('Identifícate presionado');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ISConductores()),
+                    );
                   },
                   child: const Text(
                     'Identifícate',

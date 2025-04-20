@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:raitec/pages/InfoUsuario.dart';
+import 'package:raitec/pages/InfoVehiculo.dart';
 
 class PrincipalConductor extends StatelessWidget {
   const PrincipalConductor({super.key});
@@ -49,6 +51,10 @@ class PrincipalConductor extends StatelessWidget {
             // Botón 1
             buildButton('Mi información', () {
               // Acción para "Mi información"
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => InfoUsuario()),
+              );
             }),
 
             const SizedBox(height: 24),
@@ -56,6 +62,10 @@ class PrincipalConductor extends StatelessWidget {
             // Botón 2
             buildButton('Mi vehículo', () {
               // Acción para "Mi vehículo"
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => InfoVehiculo()),
+              );
             }),
 
             const SizedBox(height: 24),
