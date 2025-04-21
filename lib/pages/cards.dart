@@ -1,183 +1,146 @@
 import 'package:flutter/material.dart';
 
 class Cards extends StatelessWidget {
-  final List<Map<String, dynamic>> rutas = [
-    {
-      'ruta': 'RUTA: GUSTAVO DÍAZ ORDAZ',
-      'conductor': 'Luis Ángel Maldonado Reyes',
-      'email': 'luisangel@rutas.edu.mx',
-      'telefono': '618-222-5009',
-      'horario': 'Lunes a Jueves de 13:00 PM a 14:00 PM',
-      'precio': 30
-    },
-    {
-      'ruta': 'RUTA: COLINAS DEL SALITITO',
-      'conductor': 'Luis Enrique García Madrigal',
-      'email': 'luisegm@rutas.edu.mx',
-      'telefono': '618-323-5009',
-      'horario': '7:00 AM - 10:00 AM',
-      'precio': 15
-    },
-    {
-      'ruta': 'RUTA: BOSQUES DEL VALLE',
-      'conductor': 'José Manuel Ibarra Sánchez',
-      'email': 'joseibarra@rutas.edu.mx',
-      'telefono': '618-113-5090',
-      'horario': '7:00 AM - 10:00 AM',
-      'precio': 27
-    },
-    {
-      'ruta': 'RUTA: JARDINES',
-      'conductor': 'Martín Dorian Arroyo',
-      'email': 'martinarroyo@rutas.edu.mx',
-      'telefono': '618-999-1212',
-      'horario': '7:00 AM - 10:00 AM',
-      'precio': 100
-    },
-    {
-      'ruta': 'RUTA: JOYAS DEL VALLE',
-      'conductor': 'Jorge Ramírez Duarte',
-      'email': 'jorgeramirez@rutas.edu.mx',
-      'telefono': '618-103-9090',
-      'horario': '7:00 AM - 10:00 AM',
-      'precio': 53
-    },
-  ];
-
-  final Color raitecBlue = const Color(0xFF0D66D0);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Color(0xFFF6F8FC),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0,
+        elevation: 1,
         centerTitle: true,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
+        title: Image.asset(
+          'assets/logoRT.png', // Asegúrate de tener este logo
+          height: 40,
+        ),
+        iconTheme: IconThemeData(color: Colors.black87),
+      ),
+      drawer: Drawer(), // Si ya tienes un Drawer personalizado
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/logoRT.png', // Asegúrate que el logo esté en esa ruta
-              height: 30,
+            Text(
+              '¿No tienes ninguna ruta registrada?\nLlena el siguiente formulario.',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+                height: 1.4,
+              ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(width: 10),
-            ShaderMask(
-              shaderCallback: (bounds) => LinearGradient(
-                colors: [
-                  raitecBlue,
-                  Colors.deepPurple,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ).createShader(bounds),
-              child: const Text(
-                'Rutas Disponibles',
+            SizedBox(height: 20),
+
+            // BOTÓN AZUL RAI-TEC CON TEXTO BLANCO LEGIBLE
+            ElevatedButton(
+              onPressed: () {
+                // Acción para registrar ruta
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF0D66D0), // Azul RaiTec
+                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 6,
+              ),
+              child: Text(
+                'REGISTRAR RUTA',
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white, // El shader lo sobreescribe
+                  color: Colors.white, // Texto blanco visible
                   letterSpacing: 1.2,
+                ),
+              ),
+            ),
+
+            SizedBox(height: 35),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'TUS RUTAS',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+            SizedBox(height: 15),
+
+            // CARD DE RUTA
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              elevation: 4,
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage: AssetImage('assets/foto_usuario.png'),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'RUTA: GUSTAVO DÍAZ ORDAZ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Color(0xFF0D66D0), // Azul RaiTec
+                            ),
+                          ),
+                          SizedBox(height: 6),
+                          Text('Luis Angel Maldonado Reyes',
+                              style: TextStyle(fontSize: 14)),
+                          Text('21041298@utdurango.edu.mx',
+                              style: TextStyle(fontSize: 13)),
+                          Text('(+52) 618-322-5070',
+                              style: TextStyle(fontSize: 13)),
+                          Text(
+                            'Lunes a Jueves de 13:00 P.M a 14:00 P.M',
+                            style: TextStyle(fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ],
         ),
       ),
-      body: ListView.builder(
-        itemCount: rutas.length,
-        itemBuilder: (context, index) {
-          final ruta = rutas[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            elevation: 6,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    ruta['ruta'],
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: raitecBlue,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _infoRow(Icons.person, ruta['conductor'], Colors.blueGrey),
-                  _infoRow(Icons.email, ruta['email'], Colors.redAccent),
-                  _infoRow(Icons.phone, ruta['telefono'], Colors.green),
-                  _infoRow(Icons.schedule, ruta['horario'], Colors.orange),
-                  const Divider(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '\$${ruta['precio']} MXN',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.map, color: raitecBlue),
-                          const SizedBox(width: 6),
-                          const Icon(Icons.location_on, color: Colors.redAccent),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+
+      // MENÚ INFERIOR PROFESIONAL
       bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        color: raitecBlue,
+        shape: CircularNotchedRectangle(),
+        elevation: 8,
+        color: Colors.white,
+        notchMargin: 8,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Icon(Icons.arrow_back, color: Colors.white),
-              Icon(Icons.home, color: Colors.white),
-              Icon(Icons.search, color: Colors.white),
+            children: [
+              Icon(Icons.arrow_back_ios_new, size: 24, color: Colors.black54),
+              Icon(Icons.home_filled, size: 28, color: Color(0xFF0D66D0)),
+              CircleAvatar(
+                backgroundImage: AssetImage('assets/foto_usuario.png'),
+                radius: 18,
+              ),
             ],
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: raitecBlue,
-        onPressed: () {},
-        child: const Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    );
-  }
-
-  Widget _infoRow(IconData icon, String text, Color iconColor) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: iconColor),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(fontSize: 14),
-            ),
-          ),
-        ],
       ),
     );
   }
