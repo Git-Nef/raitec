@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:raitec/pages/PrincipalConductor.dart';
 
 class ISConductores extends StatelessWidget {
   const ISConductores({super.key});
@@ -85,6 +86,10 @@ class ISConductores extends StatelessWidget {
                     final clave = claveController.text;
                     final nip = nipController.text;
                     print('Clave: $clave, NIP: $nip');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => PrincipalConductor()),
+                    );
                   },
                   child: const Text(
                     'Iniciar Sesión',

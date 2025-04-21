@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:raitec/pages/InicioSesion.dart';
+import 'package:raitec/pages/aspirar.dart';
 
 class Registro extends StatelessWidget {
   const Registro({super.key});
@@ -116,6 +118,10 @@ class Registro extends StatelessWidget {
                     final nip = nipController.text;
                     final confirmNip = confirmNipController.text;
                     print('Número de Control: $controlNumber, NIP: $nip, Confirmar NIP: $confirmNip');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => InicioSesion()),
+                    );
                   },
                   child: const Text(
                     'REGISTRARME',
@@ -143,6 +149,10 @@ class Registro extends StatelessWidget {
                   ),
                   onPressed: () {
                     print('Ya tengo una cuenta presionado');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => InicioSesion()),
+                    );
                   },
                   child: const Text(
                     'YA TENGO UNA CUENTA',
@@ -182,6 +192,10 @@ class Registro extends StatelessWidget {
                   ),
                   onPressed: () {
                     print('Elaborar Petición presionado');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DocumentUploadScreen()),
+                    );
                   },
                   child: const Text(
                     'ELABORAR PETICIÓN',
