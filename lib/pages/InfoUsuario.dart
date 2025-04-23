@@ -35,7 +35,7 @@ class InfoUsuario extends StatelessWidget {
             // Logo
             Center(
               child: Image.network(
-                'https://upload.wikimedia.org/wikipedia/commons/4/44/RAITEC_logo.png',
+                'assets/logoAppbar.png',
                 height: 90,
               ),
             ),
