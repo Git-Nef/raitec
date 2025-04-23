@@ -10,8 +10,8 @@ class MisRutas extends StatelessWidget {
         elevation: 1,
         centerTitle: true,
         title: Image.asset(
-          'assets/logo_raitec.png',
-          height: 40,
+          'assets/logoAppbar.png',
+          height: 120,
         ),
         iconTheme: const IconThemeData(color: Colors.black87),
       ),
