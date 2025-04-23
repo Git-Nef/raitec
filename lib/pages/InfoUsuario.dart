@@ -34,9 +34,9 @@ class InfoUsuario extends StatelessWidget {
           children: [
             // Logo
             Center(
-              child: Image.network(
+              child: Image.asset(
                 'assets/logoAppbar.png',
-                height: 90,
+                height: 150,
               ),
             ),
             const SizedBox(height: 20),
