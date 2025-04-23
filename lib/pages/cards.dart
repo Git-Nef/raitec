@@ -128,7 +128,8 @@ class Cards extends StatelessWidget {
                         children: [
                           Icon(Icons.map, color: raitecBlue),
                           const SizedBox(width: 6),
-                          const Icon(Icons.location_on, color: Colors.redAccent),
+                          const Icon(Icons.location_on,
+                              color: Colors.redAccent),
                         ],
                       ),
                     ],
