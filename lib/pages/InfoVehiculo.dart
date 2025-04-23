@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:raitec/pages/InfoUsuario.dart';
+import 'package:raitec/pages/misrutas.dart';
+import 'package:raitec/pages/PrincipalUsuario.dart';
+import 'package:raitec/pages/Registro.dart';
+import 'package:raitec/pages/ISConductores.dart';
 
 class InfoVehiculo extends StatelessWidget {
   const InfoVehiculo({super.key});
@@ -24,16 +29,108 @@ class InfoVehiculo extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
-          onPressed: () {
-            // Acción para abrir el menú
-          },
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu, color: Colors.black),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
         ),
         centerTitle: true,
         title: Image.asset(
           'assets/LogoPantallas.png',
           height: 90,
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Menú',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Image.asset(
+                    'assets/LogoPantallas.png',
+                    height: 60,
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Mi información'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoUsuario()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.directions_car),
+              title: const Text('Mi vehículo'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoVehiculo()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.map),
+              title: const Text('Mis rutas'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MisRutas()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Principal Usuario'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PrincipalUsuario()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.app_registration),
+              title: const Text('Registro'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Registro()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.drive_eta),
+              title: const Text('Identifícate'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ISConductores()),
+                );
+              },
+            ),
+          ],
         ),
       ),
       body: SingleChildScrollView(

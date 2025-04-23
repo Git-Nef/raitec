@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:raitec/pages/InicioSesion.dart';
+import 'package:raitec/pages/aspirar.dart';
 
 class Registro extends StatelessWidget {
   const Registro({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController controlNumberController = TextEditingController();
+    final TextEditingController controlNumberController =
+        TextEditingController();
     final TextEditingController nipController = TextEditingController();
     final TextEditingController confirmNipController = TextEditingController();
 
@@ -24,8 +27,8 @@ class Registro extends StatelessWidget {
             children: [
               // Logo
               Image.asset(
-                'assets/logoRaitec.png', // Replace with the actual path to the RAITEC logo
-                height: 120,
+                'assets/IconLogo.png', // Replace with the actual path to the RAITEC logo
+                height: 150,
               ),
               const SizedBox(height: 40),
 
@@ -115,7 +118,12 @@ class Registro extends StatelessWidget {
                     final controlNumber = controlNumberController.text;
                     final nip = nipController.text;
                     final confirmNip = confirmNipController.text;
-                    print('Número de Control: $controlNumber, NIP: $nip, Confirmar NIP: $confirmNip');
+                    print(
+                        'Número de Control: $controlNumber, NIP: $nip, Confirmar NIP: $confirmNip');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => InicioSesion()),
+                    );
                   },
                   child: const Text(
                     'REGISTRARME',
@@ -143,6 +151,10 @@ class Registro extends StatelessWidget {
                   ),
                   onPressed: () {
                     print('Ya tengo una cuenta presionado');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => InicioSesion()),
+                    );
                   },
                   child: const Text(
                     'YA TENGO UNA CUENTA',
@@ -182,6 +194,10 @@ class Registro extends StatelessWidget {
                   ),
                   onPressed: () {
                     print('Elaborar Petición presionado');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Aspirar()),
+                    );
                   },
                   child: const Text(
                     'ELABORAR PETICIÓN',

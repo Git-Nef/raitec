@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:raitec/pages/InfoUsuario.dart';
+import 'package:raitec/pages/misrutas.dart';
+import 'package:raitec/pages/InfoVehiculo.dart';
+import 'package:raitec/pages/PrincipalUsuario.dart';
+import 'package:raitec/pages/Registro.dart';
+import 'package:raitec/pages/ISConductores.dart';
 
 class PrincipalConductor extends StatelessWidget {
   const PrincipalConductor({super.key});
@@ -10,11 +16,13 @@ class PrincipalConductor extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.black),
-          onPressed: () {
-            // Acción para abrir el menú
-          },
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu, color: Colors.black),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
         ),
         centerTitle: true,
         title: Image.asset(
@@ -29,6 +37,96 @@ class PrincipalConductor extends StatelessWidget {
             },
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Menú',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Image.asset(
+                    'assets/LogoPantallas.png',
+                    height: 60,
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Mi información'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoUsuario()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.directions_car),
+              title: const Text('Mi vehículo'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoVehiculo()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.map),
+              title: const Text('Mis rutas'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MisRutas()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Principal Usuario'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PrincipalUsuario()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.app_registration),
+              title: const Text('Registro'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Registro()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.drive_eta),
+              title: const Text('Identifícate'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ISConductores()),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -48,21 +146,30 @@ class PrincipalConductor extends StatelessWidget {
 
             // Botón 1
             buildButton('Mi información', () {
-              // Acción para "Mi información"
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => InfoUsuario()),
+              );
             }),
 
             const SizedBox(height: 24),
 
             // Botón 2
             buildButton('Mi vehículo', () {
-              // Acción para "Mi vehículo"
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => InfoVehiculo()),
+              );
             }),
 
             const SizedBox(height: 24),
 
             // Botón 3
             buildButton('Mis rutas', () {
-              // Acción para "Mis rutas"
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MisRutas()),
+              );
             }),
           ],
         ),
