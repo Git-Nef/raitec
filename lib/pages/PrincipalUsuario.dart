@@ -35,8 +35,8 @@ class PrincipalUsuario extends StatelessWidget {
                   const SizedBox(height: 10),
                   Center(
                     child: Image.asset(
-                      'assets/logoRT.png',
-                      height: 100,
+                      'assets/SplashScreen.png',
+                      height: 180,
                     ),
                   ),
                   const SizedBox(height: 12),

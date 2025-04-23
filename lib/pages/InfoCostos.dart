@@ -33,9 +33,9 @@ class InfoCostos extends StatelessWidget {
           children: [
             // Logo
             Center(
-              child: Image.network(
-                'https://upload.wikimedia.org/wikipedia/commons/4/44/RAITEC_logo.png',
-                height: 90,
+              child: Image.asset(
+                'assets/SplashScreen.png',
+                height: 160,
               ),
             ),
             const SizedBox(height: 20),

@@ -58,7 +58,7 @@ class RutasOfrecidas extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Image.asset(
-              'assets/logoRT.png', // Asegúrate que el logo esté en esa ruta
+              'assets/logoAppbar.png', // Asegúrate que el logo esté en esa ruta
               height: 30,
             ),
             const SizedBox(width: 10),

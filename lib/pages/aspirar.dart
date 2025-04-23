@@ -15,8 +15,8 @@ class Aspirar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  'assets/LogoPantallas.png',
-                  height: 140,
+                  'assets/SplashScreen.png',
+                  height: 260,
                 ),
                 const SizedBox(height: 40),
                 const Icon(Icons.download, size: 60, color: Colors.grey),

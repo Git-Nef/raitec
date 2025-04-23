@@ -27,8 +27,8 @@ class Registro extends StatelessWidget {
             children: [
               // Logo
               Image.asset(
-                'assets/logoRaitec.png', // Replace with the actual path to the RAITEC logo
-                height: 120,
+                'assets/IconLogo.png', // Replace with the actual path to the RAITEC logo
+                height: 150,
               ),
               const SizedBox(height: 40),
 

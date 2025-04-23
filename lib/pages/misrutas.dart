@@ -15,8 +15,8 @@ class MisRutas extends StatelessWidget {
         elevation: 1,
         centerTitle: true,
         title: Image.asset(
-          'assets/LogoPantallas.png',
-          height: 90,
+          'assets/logoAppbar.png',
+          height: 140,
         ),
         iconTheme: const IconThemeData(color: Colors.black87),
       ),
