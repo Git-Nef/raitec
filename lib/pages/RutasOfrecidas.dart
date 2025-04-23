@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Cards extends StatelessWidget {
+class RutasOfrecidas extends StatelessWidget {
   final List<Map<String, dynamic>> rutas = [
     {
       'ruta': 'RUTA: GUSTAVO DÍAZ ORDAZ',
