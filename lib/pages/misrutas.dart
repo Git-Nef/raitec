@@ -38,7 +38,8 @@ class MisRutas extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0D66D0),
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -123,10 +124,13 @@ class MisRutas extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 6),
-                  Text('Luis Angel Maldonado Reyes', style: TextStyle(fontSize: 14)),
-                  Text('21041298@utdurango.edu.mx', style: TextStyle(fontSize: 13)),
+                  Text('Luis Angel Maldonado Reyes',
+                      style: TextStyle(fontSize: 14)),
+                  Text('21041298@utdurango.edu.mx',
+                      style: TextStyle(fontSize: 13)),
                   Text('(+52) 618-322-5070', style: TextStyle(fontSize: 13)),
-                  Text('Lunes a Jueves de 13:00 P.M a 14:00 P.M', style: TextStyle(fontSize: 13)),
+                  Text('Lunes a Jueves de 13:00 P.M a 14:00 P.M',
+                      style: TextStyle(fontSize: 13)),
                 ],
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:raitec/pages/InfoUsuario.dart';
+import 'package:raitec/pages/misrutas.dart';
 
 import 'InfoVehiculo.dart';
 
@@ -71,7 +72,10 @@ class PrincipalConductor extends StatelessWidget {
 
             // Botón 3
             buildButton('Mis rutas', () {
-              // Acción para "Mis rutas"
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MisRutas()),
+              );
             }),
           ],
         ),
