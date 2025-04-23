@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class PrincipalUsuarios extends StatelessWidget {
-  const PrincipalUsuarios({super.key});
+class PrincipalUsuario extends StatelessWidget {
+  const PrincipalUsuario({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +73,8 @@ class PrincipalUsuarios extends StatelessWidget {
                     ),
                     CircleAvatar(
                       radius: 22,
-                      backgroundImage: AssetImage('assets/user.jpg'), // tu imagen de usuario
+                      backgroundImage:
+                          AssetImage('assets/user.jpg'), // tu imagen de usuario
                     ),
                   ],
                 ),

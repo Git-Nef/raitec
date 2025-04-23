@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:raitec/pages/Aspirar.dart';
 import 'package:raitec/pages/InicioSesion.dart';
+import 'package:raitec/pages/aspirar.dart';
 
 class Registro extends StatelessWidget {
   const Registro({super.key});
