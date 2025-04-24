@@ -88,6 +88,7 @@ class InicioSesion extends StatelessWidget {
                     final clave = claveController.text;
                     final nip = nipController.text;
                     print('Clave: $clave, NIP: $nip');
+                    print('HOLAA');
                     Navigator.push(
                       context,
                       MaterialPageRoute(
