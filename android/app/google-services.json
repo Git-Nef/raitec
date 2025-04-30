@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "642236091367",
+    "project_id": "sm25-a97d5",
+    "storage_bucket": "sm25-a97d5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642236091367:android:fdbc79c2c756add1474b42",
+        "android_client_info": {
+          "package_name": "com.example.bdatosbasico"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": ""
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642236091367:android:3691c9fe15dd9396474b42",
+        "android_client_info": {
+          "package_name": "com.example.raitec"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": ""
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642236091367:android:79041745e1181dd8474b42",
+        "android_client_info": {
+          "package_name": "com.example.wifi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": ""
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
