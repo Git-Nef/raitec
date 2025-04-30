@@ -1,21 +1,73 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:raitec/pages/FirestoreService.dart';
+import 'package:raitec/pages/InicioSesion.dart';
+import 'package:raitec/pages/aspirar.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Registro extends StatelessWidget {
+class Registro extends StatefulWidget {
   const Registro({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final TextEditingController controlNumberController = TextEditingController();
-    final TextEditingController nipController = TextEditingController();
-    final TextEditingController confirmNipController = TextEditingController();
+  State<Registro> createState() => _RegistroState();
+}
 
+class _RegistroState extends State<Registro> {
+  final _formKey = GlobalKey<FormState>();
+  final firestore = FirestoreService();
+
+  final _numControl = TextEditingController();
+  final _nip = TextEditingController();
+  final _confirmNip = TextEditingController();
+  final _nombre = TextEditingController();
+  final _edad = TextEditingController();
+  final _carrera = TextEditingController();
+  final _direccion = TextEditingController();
+  final _telefono = TextEditingController();
+  final _nacionalidad = TextEditingController();
+  final _fechaNacimiento = TextEditingController();
+  final _telefonoEmergencia = TextEditingController();
+
+  String? fotografiaUrl;
+  String? firmaUrl;
+
+  Future<void> seleccionarImagen(bool desdeCamara, String tipo) async {
+    final picker = ImagePicker();
+    final XFile? imagen = await picker.pickImage(
+      source: desdeCamara ? ImageSource.camera : ImageSource.gallery,
+      imageQuality: 75,
+    );
+
+    if (imagen == null) return;
+
+    final nombreArchivo = '$tipo-${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final ref =
+        FirebaseStorage.instance.ref().child('usuarios/$tipo/$nombreArchivo');
+
+    await ref.putFile(File(imagen.path));
+    final url = await ref.getDownloadURL();
+
+    setState(() {
+      if (tipo == 'foto') {
+        fotografiaUrl = url;
+      } else {
+        firmaUrl = url;
+      }
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Imagen de $tipo subida correctamente')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: const Text(''),
-      ),
+      appBar: AppBar(elevation: 0, backgroundColor: Colors.white),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -24,7 +76,7 @@ class Registro extends StatelessWidget {
             children: [
               // Logo
               Image.asset(
-                'assets/LogoPantallas.png', // Replace with the actual path to the RAITEC logo
+                'assets/logoRaitec.png', // Replace with the actual path to the RAITEC logo
                 height: 120,
               ),
               const SizedBox(height: 40),
@@ -109,94 +161,112 @@ class Registro extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 4,
                   ),
-                  onPressed: () {
-                    final controlNumber = controlNumberController.text;
-                    final nip = nipController.text;
-                    final confirmNip = confirmNipController.text;
-                    print('Número de Control: $controlNumber, NIP: $nip, Confirmar NIP: $confirmNip');
+                  onPressed: () async {
+                    try {
+                      await firestore.crearUsuario(
+                        _numControl.text.trim(),
+                        {
+                          'numControl': _numControl.text.trim(),
+                          'nip': _nip.text.trim(),
+                          'nombre': _nombre.text.trim(),
+                          'edad': int.tryParse(_edad.text.trim()) ?? 0,
+                          'carrera': _carrera.text.trim(),
+                          'direccion': _direccion.text.trim(),
+                          'telefono': _telefono.text.trim(),
+                          'nacionalidad': _nacionalidad.text.trim(),
+                          'fechaNacimiento': _fechaNacimiento.text.trim(),
+                          'telefonoEmergencia': _telefonoEmergencia.text.trim(),
+                          'fotografiaUrl': fotografiaUrl ?? '',
+                          'firmaUrl': firmaUrl ?? '',
+                          'esConductor': false,
+                        },
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Usuario registrado')),
+                      );
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const InicioSesion()),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: \$e')),
+                      );
+                    }
                   },
-                  child: const Text(
-                    'REGISTRARME',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: const Text('REGISTRARME',
+                      style: TextStyle(fontSize: 18, color: Colors.white)),
                 ),
-              ),
-              const SizedBox(height: 16),
-
-              // Botón Ya tengo una cuenta
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 4,
-                  ),
+                const SizedBox(height: 16),
+                TextButton(
                   onPressed: () {
-                    print('Ya tengo una cuenta presionado');
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const InicioSesion()));
                   },
-                  child: const Text(
-                    'YA TENGO UNA CUENTA',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: const Text('¿Ya tienes cuenta? Inicia sesión'),
                 ),
-              ),
-              const SizedBox(height: 24),
-
-              // Texto informativo
-              const Text(
-                '¿QUIERES FORMAR PARTE DE\nLA PLANTILLA DE CONDUCTORES?',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-
-              // Botón Elaborar Petición
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 4,
-                  ),
+                const SizedBox(height: 24),
+                const Text('¿Quieres ser conductor?',
+                    style: TextStyle(fontSize: 16)),
+                OutlinedButton(
                   onPressed: () {
-                    print('Elaborar Petición presionado');
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (_) => const Aspirar()));
                   },
-                  child: const Text(
-                    'ELABORAR PETICIÓN',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  child: const Text('Elaborar Petición'),
                 ),
-              ),
-            ],
+                const SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _input(String label, TextEditingController controller,
+      {bool obscure = false, TextInputType keyboard = TextInputType.text}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: TextFormField(
+        controller: controller,
+        obscureText: obscure,
+        keyboardType: keyboard,
+        decoration: InputDecoration(
+          labelText: label,
+          filled: true,
+          fillColor: const Color(0xFFF0F0F0),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      ),
+    );
+  }
+
+  Widget _botonesImagen(String titulo, String tipo) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(titulo, style: const TextStyle(fontWeight: FontWeight.bold)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            OutlinedButton.icon(
+              onPressed: () => seleccionarImagen(true, tipo),
+              icon: const Icon(Icons.camera_alt),
+              label: const Text('Cámara'),
+            ),
+            OutlinedButton.icon(
+              onPressed: () => seleccionarImagen(false, tipo),
+              icon: const Icon(Icons.image),
+              label: const Text('Galería'),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
