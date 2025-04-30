@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:raitec/pages/InicioSesion.dart';
-import 'package:raitec/pages/principalUsuarios.dart';
 import 'package:raitec/pages/registro.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -22,7 +20,7 @@ class _MySplashScreen extends State<SplashScreen> {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (BuildContext context) {
-              return PrincipalUsuarios();
+              return Registro();
             },
           ),
         );
@@ -35,7 +33,7 @@ class _MySplashScreen extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
-        child: Image.asset('assets/SplashScreen.png'),
+        child: Image.asset('assets/SplashScreenR.png'),
       ),
     );
   }
