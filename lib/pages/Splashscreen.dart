@@ -23,7 +23,7 @@ class _MySplashScreen extends State<SplashScreen> {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (BuildContext context) {
-              return RutasOfrecidas();
+              return InicioSesion();
             },
           ),
         );
