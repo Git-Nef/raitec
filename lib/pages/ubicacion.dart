@@ -6,7 +6,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 
 class Ubicacion extends StatefulWidget {
-  const Ubicacion({super.key});
+  final LatLng destino;
+  final String? nombreRuta;
+
+  const Ubicacion({super.key, required this.destino, this.nombreRuta});
 
   @override
   State<Ubicacion> createState() => _UbicacionState();
@@ -14,7 +17,6 @@ class Ubicacion extends StatefulWidget {
 
 class _UbicacionState extends State<Ubicacion> {
   GoogleMapController? _mapController;
-  final LatLng destino = const LatLng(24.04303129543229, -104.69710006029678);
   final Location _location = Location();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
@@ -42,10 +44,13 @@ class _UbicacionState extends State<Ubicacion> {
 
   void _mostrarNotificacionLlegada() async {
     const AndroidNotificationDetails androidDetails =
-    AndroidNotificationDetails('canal_ruta', 'Llegada a destino',
-        importance: Importance.max,
-        priority: Priority.high,
-        ticker: 'Llegaste al destino');
+    AndroidNotificationDetails(
+      'canal_ruta',
+      'Llegada a destino',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'Llegaste al destino',
+    );
 
     const NotificationDetails generalNotificationDetails =
     NotificationDetails(android: androidDetails);
@@ -104,7 +109,7 @@ class _UbicacionState extends State<Ubicacion> {
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI", // Reemplaza con tu API key
       PointLatLng(origenActual.latitude, origenActual.longitude),
-      PointLatLng(destino.latitude, destino.longitude),
+      PointLatLng(widget.destino.latitude, widget.destino.longitude),
     );
 
     if (result.points.isNotEmpty) {
@@ -127,7 +132,7 @@ class _UbicacionState extends State<Ubicacion> {
         _marcadores.add(
           Marker(
             markerId: const MarkerId("destino"),
-            position: destino,
+            position: widget.destino,
             infoWindow: const InfoWindow(title: "Destino"),
           ),
         );
@@ -139,8 +144,8 @@ class _UbicacionState extends State<Ubicacion> {
     final double distancia = Geolocator.distanceBetween(
       actual.latitude,
       actual.longitude,
-      destino.latitude,
-      destino.longitude,
+      widget.destino.latitude,
+      widget.destino.longitude,
     );
 
     if (distancia <= 20 && !_notificado) {
@@ -152,10 +157,12 @@ class _UbicacionState extends State<Ubicacion> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Ruta Dinámica en Tiempo Real')),
+      appBar: AppBar(
+        title: Text(widget.nombreRuta ?? 'Ruta en tiempo real'),
+      ),
       body: GoogleMap(
         initialCameraPosition: CameraPosition(
-          target: _ubicacionActual ?? destino,
+          target: _ubicacionActual ?? widget.destino,
           zoom: 14,
         ),
         onMapCreated: (controller) => _mapController = controller,

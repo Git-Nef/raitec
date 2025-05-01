@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'ubicacion.dart'; // Asegúrate de importar tu clase Ubicacion
 
 class RutasOfrecidas extends StatelessWidget {
   final List<Map<String, dynamic>> rutas = [
@@ -8,7 +10,9 @@ class RutasOfrecidas extends StatelessWidget {
       'email': 'luisangel@rutas.edu.mx',
       'telefono': '618-222-5009',
       'horario': 'Lunes a Jueves de 13:00 PM a 14:00 PM',
-      'precio': 30
+      'precio': 30,
+      'lat': 24.0409364620994,
+      'lng': -104.69581942452406,
     },
     {
       'ruta': 'RUTA: COLINAS DEL SALITITO',
@@ -16,7 +20,9 @@ class RutasOfrecidas extends StatelessWidget {
       'email': 'luisegm@rutas.edu.mx',
       'telefono': '618-323-5009',
       'horario': '7:00 AM - 10:00 AM',
-      'precio': 15
+      'precio': 15,
+      'lat': 24.040085364260186,
+      'lng': -104.69360344795389,
     },
     {
       'ruta': 'RUTA: BOSQUES DEL VALLE',
@@ -24,7 +30,9 @@ class RutasOfrecidas extends StatelessWidget {
       'email': 'joseibarra@rutas.edu.mx',
       'telefono': '618-113-5090',
       'horario': '7:00 AM - 10:00 AM',
-      'precio': 27
+      'precio': 27,
+      'lat': 24.045638670770572,
+      'lng': -104.69519865601404,
     },
     {
       'ruta': 'RUTA: JARDINES',
@@ -32,7 +40,9 @@ class RutasOfrecidas extends StatelessWidget {
       'email': 'martinarroyo@rutas.edu.mx',
       'telefono': '618-999-1212',
       'horario': '7:00 AM - 10:00 AM',
-      'precio': 100
+      'precio': 100,
+      'lat': 24.051578966219676,
+      'lng': -104.6935010460035,
     },
     {
       'ruta': 'RUTA: JOYAS DEL VALLE',
@@ -40,7 +50,9 @@ class RutasOfrecidas extends StatelessWidget {
       'email': 'jorgeramirez@rutas.edu.mx',
       'telefono': '618-103-9090',
       'horario': '7:00 AM - 10:00 AM',
-      'precio': 53
+      'precio': 53,
+      'lat': 24.04303129543229,
+      'lng': -104.69710006029678,
     },
   ];
 
@@ -58,16 +70,13 @@ class RutasOfrecidas extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Image.asset(
-              'assets/logoAppbar.png', // Asegúrate que el logo esté en esa ruta
+              'assets/logoAppbar.png',
               height: 30,
             ),
             const SizedBox(width: 10),
             ShaderMask(
               shaderCallback: (bounds) => LinearGradient(
-                colors: [
-                  raitecBlue,
-                  Colors.deepPurple,
-                ],
+                colors: [raitecBlue, Colors.deepPurple],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ).createShader(bounds),
@@ -76,7 +85,7 @@ class RutasOfrecidas extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white, // El shader lo sobreescribe
+                  color: Colors.white,
                   letterSpacing: 1.2,
                 ),
               ),
@@ -112,6 +121,28 @@ class RutasOfrecidas extends StatelessWidget {
                   _infoRow(Icons.email, ruta['email'], Colors.redAccent),
                   _infoRow(Icons.phone, ruta['telefono'], Colors.green),
                   _infoRow(Icons.schedule, ruta['horario'], Colors.orange),
+                  const SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Ubicacion(
+                            destino: LatLng(ruta['lat'], ruta['lng']),
+                          ),
+                        ),
+                      );
+                    },
+                    icon: Icon(Icons.map, color: raitecBlue),
+                    label: const Text("Ver ruta en mapa"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: raitecBlue,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      elevation: 3,
+                    ),
+                  ),
                   const Divider(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
