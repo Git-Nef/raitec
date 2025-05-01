@@ -38,6 +38,9 @@ dependencies:
   firebase_storage: ^12.4.4
   cloud_firestore: ^5.6.5
   image_picker: ^1.0.7
+  google_maps_flutter: ^2.5.0
+  flutter_polyline_points: ^1.0.0
+  location: ^5.0.3
 
 dev_dependencies:
   flutter_test:
