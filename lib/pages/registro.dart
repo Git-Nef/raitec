@@ -75,8 +75,8 @@ class _RegistroState extends State<Registro> {
             key: _formKey,
             child: Column(
               children: [
-                Image.asset('assets/logoRaitec.png', height: 100),
-                const SizedBox(height: 24),
+                Image.asset('assets/logoAppbar.png', height: 165),
+                const SizedBox(height: 10),
                 const Text('Registro de Usuario',
                     style:
                         TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
@@ -90,7 +90,13 @@ class _RegistroState extends State<Registro> {
                 _input('Dirección', _direccion),
                 _input('Teléfono', _telefono, keyboard: TextInputType.phone),
                 _input('Nacionalidad', _nacionalidad),
-                _input('Fecha de Nacimiento (YYYY-MM-DD)', _fechaNacimiento),
+                GestureDetector(
+                  onTap: _seleccionarFechaNacimiento,
+                  child: AbsorbPointer(
+                    child: _input(
+                        'Fecha de Nacimiento (YYYY-MM-DD)', _fechaNacimiento),
+                  ),
+                ),
                 _input('Tel. Emergencia', _telefonoEmergencia,
                     keyboard: TextInputType.phone),
                 const SizedBox(height: 16),
@@ -215,5 +221,20 @@ class _RegistroState extends State<Registro> {
         ),
       ],
     );
+  }
+
+  Future<void> _seleccionarFechaNacimiento() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _fechaNacimiento.text =
+            '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+      });
+    }
   }
 }
