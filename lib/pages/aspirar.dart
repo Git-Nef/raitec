@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:raitec/pages/RegistrarVehiculo.dart';
 
 class Aspirar extends StatelessWidget {
   const Aspirar({super.key});
@@ -40,7 +41,39 @@ class Aspirar extends StatelessWidget {
                 _uploadButton('SUBIR LICENCIA DE CONDUCIR'),
                 _uploadButton('SUBIR COMPROBANTE DE DOMICILIO'),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const RegistrarVehiculo(numControl: '20201234'),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.indigo,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'INFORMACIÓN DEL VEHÍCULO',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
