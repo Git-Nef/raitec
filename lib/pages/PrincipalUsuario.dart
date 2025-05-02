@@ -3,9 +3,11 @@ import 'package:raitec/pages/InfoCostos.dart';
 import 'package:raitec/pages/InfoUsuario.dart';
 import 'package:raitec/pages/InicioSesion.dart';
 import 'package:raitec/pages/MisRutas.dart';
+import 'package:raitec/pages/aspirar.dart';
 
 class PrincipalUsuario extends StatelessWidget {
-  const PrincipalUsuario({super.key});
+  final String numControl;
+  const PrincipalUsuario({super.key, required this.numControl});
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +81,27 @@ class PrincipalUsuario extends StatelessWidget {
                       );
                     },
                   ),
+                  const SizedBox(height: 24),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '¿Quieres ser conductor?',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  buildBoton(
+                    'Elaborar Petición',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Aspirar(numControl: numControl),
+                        ),
+                      );
+                    },
+                  ),
                   const Spacer(),
                   buildBoton(
                     'CERRAR SESIÓN',
@@ -86,7 +109,8 @@ class PrincipalUsuario extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => InicioSesion()),
+                        MaterialPageRoute(
+                            builder: (context) => const InicioSesion()),
                       );
                     },
                   ),
@@ -115,7 +139,7 @@ class PrincipalUsuario extends StatelessWidget {
                       },
                       icon: const Icon(Icons.home, size: 32),
                     ),
-                    CircleAvatar(
+                    const CircleAvatar(
                       radius: 22,
                       backgroundImage: AssetImage('assets/user.jpg'),
                     ),
@@ -134,8 +158,7 @@ class PrincipalUsuario extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed:
-            onPressed ?? () {}, // Usa el callback proporcionado o uno vacío
+        onPressed: onPressed ?? () {},
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           padding: const EdgeInsets.symmetric(vertical: 16),

@@ -5,8 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegistrarVehiculo extends StatefulWidget {
-  final String numControl; // Número de control del conductor
-
+  final String numControl;
   const RegistrarVehiculo({super.key, required this.numControl});
 
   @override
@@ -26,9 +25,12 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
 
   String? fotoUrl;
 
-  Future<void> seleccionarFoto() async {
+  Future<void> seleccionarFoto(bool desdeCamara) async {
     final picker = ImagePicker();
-    final XFile? imagen = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? imagen = await picker.pickImage(
+      source: desdeCamara ? ImageSource.camera : ImageSource.gallery,
+      imageQuality: 75,
+    );
 
     if (imagen == null) return;
 
@@ -36,7 +38,7 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
         'vehiculo-${DateTime.now().millisecondsSinceEpoch}.jpg';
     final ref = FirebaseStorage.instance
         .ref()
-        .child('vehiculos/${widget.numControl}/$nombreArchivo');
+        .child('usuarios/${widget.numControl}/vehiculo/$nombreArchivo');
 
     await ref.putFile(File(imagen.path));
     final url = await ref.getDownloadURL();
@@ -44,6 +46,37 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
     setState(() {
       fotoUrl = url;
     });
+  }
+
+  void _mostrarOpcionesImagen() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.photo_camera),
+                title: const Text('Tomar foto'),
+                onTap: () {
+                  Navigator.pop(context);
+                  seleccionarFoto(true);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Elegir de galería'),
+                onTap: () {
+                  Navigator.pop(context);
+                  seleccionarFoto(false);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<void> guardarVehiculo() async {
@@ -71,7 +104,7 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al guardar: \$e')),
+        SnackBar(content: Text('Error al guardar: $e')),
       );
     }
   }
@@ -116,7 +149,11 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
                 ElevatedButton.icon(
                   icon: const Icon(Icons.photo_camera),
                   label: const Text('Subir Foto del Vehículo'),
-                  onPressed: seleccionarFoto,
+                  onPressed: _mostrarOpcionesImagen,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[300],
+                    foregroundColor: Colors.black,
+                  ),
                 ),
                 if (fotoUrl != null)
                   Padding(

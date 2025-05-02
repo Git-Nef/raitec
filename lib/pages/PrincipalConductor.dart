@@ -101,7 +101,10 @@ class PrincipalConductor extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => PrincipalUsuario()),
+                  MaterialPageRoute(
+                      builder: (context) => PrincipalUsuario(
+                            numControl: '',
+                          )),
                 );
               },
             ),
