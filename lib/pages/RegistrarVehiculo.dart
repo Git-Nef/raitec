@@ -25,11 +25,40 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
 
   String? fotoUrl;
 
-  Future<void> seleccionarFoto(bool desdeCamara) async {
+  @override
+  void initState() {
+    super.initState();
+    _cargarDatosVehiculo();
+  }
+
+  Future<void> _cargarDatosVehiculo() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(widget.numControl)
+        .collection('vehiculo')
+        .doc('info')
+        .get();
+
+    if (doc.exists) {
+      final data = doc.data()!;
+      _marca.text = data['marca'] ?? '';
+      _modelo.text = data['modelo'] ?? '';
+      _anio.text = data['anio'] ?? '';
+      _matricula.text = data['matricula'] ?? '';
+      _color.text = data['color'] ?? '';
+      _seguro.text = data['seguro'] ?? '';
+      _asientos.text = data['asientos'] ?? '';
+      _caracteristicas.text = data['caracteristicas'] ?? '';
+      setState(() {
+        fotoUrl = data['fotoUrl'];
+      });
+    }
+  }
+
+  Future<void> _seleccionarFoto(bool desdeCamara) async {
     final picker = ImagePicker();
     final XFile? imagen = await picker.pickImage(
       source: desdeCamara ? ImageSource.camera : ImageSource.gallery,
-      imageQuality: 75,
     );
 
     if (imagen == null) return;
@@ -38,7 +67,7 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
         'vehiculo-${DateTime.now().millisecondsSinceEpoch}.jpg';
     final ref = FirebaseStorage.instance
         .ref()
-        .child('usuarios/${widget.numControl}/vehiculo/$nombreArchivo');
+        .child('vehiculos/${widget.numControl}/$nombreArchivo');
 
     await ref.putFile(File(imagen.path));
     final url = await ref.getDownloadURL();
@@ -46,37 +75,6 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
     setState(() {
       fotoUrl = url;
     });
-  }
-
-  void _mostrarOpcionesImagen() {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              ListTile(
-                leading: const Icon(Icons.photo_camera),
-                title: const Text('Tomar foto'),
-                onTap: () {
-                  Navigator.pop(context);
-                  seleccionarFoto(true);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Elegir de galería'),
-                onTap: () {
-                  Navigator.pop(context);
-                  seleccionarFoto(false);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
   }
 
   Future<void> guardarVehiculo() async {
@@ -98,8 +96,14 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
         'fotoUrl': fotoUrl ?? '',
       });
 
+      // Cambiar el campo esConductor a true
+      await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(widget.numControl)
+          .update({'esConductor': true});
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vehículo registrado exitosamente')),
+        const SnackBar(content: Text('Vehículo guardado correctamente')),
       );
       Navigator.pop(context);
     } catch (e) {
@@ -109,16 +113,31 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
     }
   }
 
+  bool get camposCompletos {
+    return _marca.text.trim().isNotEmpty &&
+        _modelo.text.trim().isNotEmpty &&
+        _anio.text.trim().isNotEmpty &&
+        _matricula.text.trim().isNotEmpty &&
+        _color.text.trim().isNotEmpty &&
+        _seguro.text.trim().isNotEmpty &&
+        _asientos.text.trim().isNotEmpty &&
+        _caracteristicas.text.trim().isNotEmpty &&
+        fotoUrl != null;
+  }
+
+  void actualizarEstado() => setState(() {});
+
   Widget _input(String label, TextEditingController controller) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: TextField(
         controller: controller,
+        onChanged: (_) => actualizarEstado(),
         decoration: InputDecoration(
           labelText: label,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           filled: true,
           fillColor: Colors.grey[200],
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         ),
       ),
     );
@@ -143,17 +162,26 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
                 _input('Color', _color),
                 _input('Seguro', _seguro),
                 _input('Número de Asientos', _asientos),
-                _input('Características (ej. Bluetooth, aire acondicionado)',
-                    _caracteristicas),
+                _input('Características', _caracteristicas),
                 const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.photo_camera),
-                  label: const Text('Subir Foto del Vehículo'),
-                  onPressed: _mostrarOpcionesImagen,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[300],
-                    foregroundColor: Colors.black,
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.camera_alt),
+                        label: const Text('Tomar Foto'),
+                        onPressed: () => _seleccionarFoto(true),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.photo_library),
+                        label: const Text('Galería'),
+                        onPressed: () => _seleccionarFoto(false),
+                      ),
+                    ),
+                  ],
                 ),
                 if (fotoUrl != null)
                   Padding(
@@ -162,10 +190,11 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
                   ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: guardarVehiculo,
+                  onPressed: camposCompletos ? guardarVehiculo : null,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: Colors.blue,
+                    backgroundColor:
+                        camposCompletos ? Colors.blue : Colors.grey,
                   ),
                   child: const Text('GUARDAR VEHÍCULO',
                       style: TextStyle(color: Colors.white)),
