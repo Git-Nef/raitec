@@ -89,7 +89,7 @@ class ISConductores extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => PrincipalConductor()),
+                          builder: (context) => PrincipalConductor(numControl:nip)),
                     );
                   },
                   child: const Text(

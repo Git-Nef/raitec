@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:raitec/pages/PrincipalConductor.dart';
 import 'package:raitec/pages/PrincipalUsuario.dart';
 import 'package:raitec/pages/Registro.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -104,13 +105,22 @@ class InicioSesion extends StatelessWidget {
 
                       final data = doc.data();
                       if (data?['nip'] == nip) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                PrincipalUsuario(numControl: clave),
-                          ),
-                        );
+                        if(data?['esConductor']==false){
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  PrincipalUsuario(numControl: clave),
+                            ),
+                          );
+                        }else{
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PrincipalConductor(numControl: clave),
+                            ),
+                          );
+                        }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('NIP incorrecto')),
