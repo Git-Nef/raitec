@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:raitec/pages/RegistrarVehiculo.dart';
 import 'package:raitec/pages/sesion.dart';
 
 class InfoVehiculo extends StatelessWidget {
@@ -91,6 +92,13 @@ class InfoVehiculo extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       // Acción para registrar vehículo
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RegistrarVehiculo(
+                              numControl: numControl!), // Pasando numControl
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
