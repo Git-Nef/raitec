@@ -3,6 +3,7 @@ import 'package:raitec/pages/PrincipalConductor.dart';
 import 'package:raitec/pages/PrincipalUsuario.dart';
 import 'package:raitec/pages/Registro.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:raitec/pages/sesion.dart';
 
 class InicioSesion extends StatelessWidget {
   const InicioSesion({super.key});
@@ -105,14 +106,17 @@ class InicioSesion extends StatelessWidget {
 
                       final data = doc.data();
                       if (data?['nip'] == nip) {
+                        SessionManager().setNumControl(clave);
                         if(data?['esConductor']==false){
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
                                   PrincipalUsuario(numControl: clave),
+
                             ),
                           );
+
                         }else{
                           Navigator.push(
                             context,
