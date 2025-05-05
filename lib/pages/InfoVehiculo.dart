@@ -7,7 +7,8 @@ class InfoVehiculo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String? numControl = SessionManager().numControl; // Obtenemos la clave del usuario
+    final String? numControl =
+        SessionManager().numControl; // Obtenemos la clave del usuario
     final docRef = FirebaseFirestore.instance
         .collection('usuarios')
         .doc(numControl)
@@ -44,7 +45,10 @@ class InfoVehiculo extends StatelessWidget {
                 children: [
                   const Text(
                     'Menú',
-                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Image.asset('assets/LogoPantallas.png', height: 60),
@@ -98,29 +102,43 @@ class InfoVehiculo extends StatelessWidget {
                     ),
                     child: const Text(
                       'Registrar Vehículo',
-                      style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
-                _infoFila(context, ['Marca del Coche', 'Modelo', 'Año'], [
+                _infoFila(context, [
+                  'Marca del Coche',
+                  'Modelo',
+                  'Año'
+                ], [
                   data['marca'] ?? 'N/A',
                   data['modelo'] ?? 'N/A',
                   data['anio'] ?? 'N/A',
                 ]),
                 const SizedBox(height: 8),
-                _infoFila(context, ['Matrícula', 'Color del Coche'], [
+                _infoFila(context, [
+                  'Matrícula',
+                  'Color del Coche'
+                ], [
                   data['matricula'] ?? 'N/A',
                   data['color'] ?? 'N/A',
                 ]),
                 const SizedBox(height: 8),
-                _infoFila(context, ['Seguro del Vehículo', 'Número de Asientos'], [
+                _infoFila(context, [
+                  'Seguro del Vehículo',
+                  'Número de Asientos'
+                ], [
                   data['seguro'] ?? 'N/A',
                   data['asientos'] ?? 'N/A',
                 ]),
                 const SizedBox(height: 8),
-                _infoFila(context, ['Nacionalidad', 'Características'], [
-                  data['nacionalidad'] ?? 'N/A',
+                _infoFila(context, [
+                  'Características'
+                ], [
                   data['caracteristicas'] ?? 'N/A',
                 ]),
                 const SizedBox(height: 24),
@@ -135,13 +153,14 @@ class InfoVehiculo extends StatelessWidget {
                     children: [
                       const Text(
                         'FOTOGRAFÍA DEL VEHÍCULO',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       const SizedBox(height: 12),
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.network(
-                          data['foto'] ??
+                          data['fotoUrl'] ??
                               'https://via.placeholder.com/300x180.png?text=Sin+Foto',
                           height: 180,
                           fit: BoxFit.cover,
@@ -168,7 +187,8 @@ class InfoVehiculo extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(right: 16.0),
                   child: IconButton(
-                    icon: const Icon(Icons.arrow_back, size: 42, color: Colors.white),
+                    icon: const Icon(Icons.arrow_back,
+                        size: 42, color: Colors.white),
                     onPressed: () {
                       Navigator.pop(context);
                     },
@@ -189,7 +209,8 @@ class InfoVehiculo extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(right: 16.0),
                   child: IconButton(
-                    icon: const Icon(Icons.account_circle, size: 42, color: Colors.white),
+                    icon: const Icon(Icons.account_circle,
+                        size: 42, color: Colors.white),
                     onPressed: () {
                       // Acción perfil
                     },
@@ -204,49 +225,46 @@ class InfoVehiculo extends StatelessWidget {
   }
 
   Widget _infoFila(
-      BuildContext context,
-      List<String> labels,
-      List<String> values,
-      ) {
+      BuildContext context, List<String> labels, List<String> values) {
     return Column(
       children: [
         Row(
           children: labels
               .map((text) => Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.blueGrey[50],
-                border: Border.all(color: Colors.grey.shade300),
-              ),
-              child: Text(
-                text,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ))
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.blueGrey[50],
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: Text(
+                        text,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ))
               .toList(),
         ),
         Row(
           children: values
               .map((text) => Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                border: Border(
-                  left: BorderSide(color: Colors.grey.shade300),
-                  right: BorderSide(color: Colors.grey.shade300),
-                  bottom: BorderSide(color: Colors.grey.shade300),
-                ),
-              ),
-              child: Text(
-                text,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14),
-              ),
-            ),
-          ))
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          left: BorderSide(color: Colors.grey.shade300),
+                          right: BorderSide(color: Colors.grey.shade300),
+                          bottom: BorderSide(color: Colors.grey.shade300),
+                        ),
+                      ),
+                      child: Text(
+                        text,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ))
               .toList(),
         ),
       ],
