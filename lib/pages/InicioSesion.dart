@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:raitec/pages/PrincipalConductor.dart';
 import 'package:raitec/pages/PrincipalUsuario.dart';
 import 'package:raitec/pages/Registro.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:raitec/pages/sesion.dart';
 import 'package:raitec/pages/ISConductores.dart';
 
 class InicioSesion extends StatelessWidget {
@@ -84,15 +87,61 @@ class InicioSesion extends StatelessWidget {
                     ),
                     elevation: 4,
                   ),
-                  onPressed: () {
-                    final clave = claveController.text;
-                    final nip = nipController.text;
-                    print('Clave: $clave, NIP: $nip');
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => PrincipalUsuario()),
-                    );
+                  onPressed: () async {
+                    final clave = claveController.text.trim();
+                    final nip = nipController.text.trim();
+
+                    if (clave.isEmpty || nip.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Completa ambos campos')),
+                      );
+                      return;
+                    }
+
+                    try {
+                      final doc = await FirebaseFirestore.instance
+                          .collection('usuarios')
+                          .doc(clave)
+                          .get();
+
+                      if (!doc.exists) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Usuario no encontrado')),
+                        );
+                        return;
+                      }
+
+                      final data = doc.data();
+                      if (data?['nip'] == nip) {
+                        SessionManager().setNumControl(clave);
+                        if (data?['esConductor'] == false) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  PrincipalUsuario(numControl: clave),
+                            ),
+                          );
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  PrincipalConductor(numControl: clave),
+                            ),
+                          );
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('NIP incorrecto')),
+                        );
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: $e')),
+                      );
+                    }
                   },
                   child: const Text(
                     'Iniciar Sesión',

@@ -7,7 +7,9 @@ import 'package:raitec/pages/Registro.dart';
 import 'package:raitec/pages/ISConductores.dart';
 
 class PrincipalConductor extends StatelessWidget {
-  const PrincipalConductor({super.key});
+  final String numControl;
+
+  const PrincipalConductor({super.key, required this.numControl});
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +103,11 @@ class PrincipalConductor extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => PrincipalUsuario()),
+                  MaterialPageRoute(
+                    builder: (context) => PrincipalUsuario(
+                      numControl: numControl,
+                    ),
+                  ),
                 );
               },
             ),
@@ -143,28 +149,20 @@ class PrincipalConductor extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 40),
-
-            // Botón 1
             buildButton('Mi información', () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => InfoUsuario()),
               );
             }),
-
             const SizedBox(height: 24),
-
-            // Botón 2
             buildButton('Mi vehículo', () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => InfoVehiculo()),
               );
             }),
-
             const SizedBox(height: 24),
-
-            // Botón 3
             buildButton('Mis rutas', () {
               Navigator.push(
                 context,
@@ -181,7 +179,6 @@ class PrincipalConductor extends StatelessWidget {
           height: 70,
           child: Stack(
             children: [
-              // Ícono de Home centrado
               Align(
                 alignment: Alignment.center,
                 child: IconButton(
@@ -191,8 +188,6 @@ class PrincipalConductor extends StatelessWidget {
                   },
                 ),
               ),
-
-              // Ícono de Perfil a la derecha
               Align(
                 alignment: Alignment.centerRight,
                 child: Padding(
@@ -213,7 +208,6 @@ class PrincipalConductor extends StatelessWidget {
     );
   }
 
-  // Botón reutilizable
   Widget buildButton(String text, VoidCallback onPressed) {
     return SizedBox(
       width: double.infinity,

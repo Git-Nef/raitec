@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:raitec/DataType/data.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:raitec/pages/sesion.dart';// Asegúrate de que SessionManager esté aquí
 
 class InfoUsuario extends StatelessWidget {
   const InfoUsuario({super.key});
 
+  Future<Map<String, dynamic>?> obtenerDatosUsuario() async {
+    String? clave = SessionManager().numControl;
+    if (clave == null) return null;
+
+    final doc = await FirebaseFirestore.instance.collection('usuarios').doc(clave).get();
+    return doc.data();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final estudiante = estudianteEjemplo;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       bottomNavigationBar: BottomAppBar(
@@ -18,86 +25,89 @@ class InfoUsuario extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+            children: const [
               Icon(Icons.arrow_back_ios_new, size: 28, color: Colors.blueGrey),
               Icon(Icons.home_filled, size: 30, color: Colors.blueAccent),
               CircleAvatar(
-                backgroundImage: NetworkImage(estudiante.fotografiaUrl),
+                backgroundColor: Colors.grey,
+                child: Icon(Icons.person, color: Colors.white),
               ),
             ],
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            // Logo
-            Center(
-              child: Image.asset(
-                'assets/logoAppbar.png',
-                height: 120,
-              ),
-            ),
-            const SizedBox(height: 20),
+      body: FutureBuilder<Map<String, dynamic>?>(
+        future: obtenerDatosUsuario(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            // Título
-            const Text(
-              'INFORMACIÓN DE USUARIO',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-                color: Colors.blueGrey,
-              ),
-            ),
-            const SizedBox(height: 20),
+          if (!snapshot.hasData || snapshot.data == null) {
+            return const Center(child: Text('No se encontraron datos del usuario.'));
+          }
 
-            // Tarjeta con info
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    filaInfo('Nombre Alumno', estudiante.nombre),
-                    filaInfo('Edad', '${estudiante.edad}'),
-                    filaInfo('Número de Control', estudiante.numControl),
-                    filaInfo('Carrera', estudiante.carrera),
-                    filaInfo('Dirección', estudiante.direccion),
-                    filaInfo('Teléfono', estudiante.telefono),
-                    filaInfo('Nacionalidad', estudiante.nacionalidad),
-                    filaInfo('Fecha de Nacimiento', estudiante.fechaNacimiento),
-                    filaInfo(
-                        'Teléfono Emergencia', estudiante.telefonoEmergencia),
-
-                    const SizedBox(height: 16),
-
-                    // Foto y firma
-                    Row(
+          final data = snapshot.data!;
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Center(
+                  child: Image.asset('assets/logoAppbar.png', height: 120),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'INFORMACIÓN DE USUARIO',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                    color: Colors.blueGrey,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
                       children: [
-                        Expanded(
-                          child: columnaImagen(
-                            label: 'Fotografía',
-                            imageUrl: estudiante.fotografiaUrl,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: columnaImagen(
-                            label: 'Firma Estudiante',
-                            imageUrl: estudiante.firmaUrl,
-                          ),
+                        filaInfo('Nombre Alumno', data['nombre']),
+                        filaInfo('Edad', '${data['edad']}'),
+                        filaInfo('Número de Control', data['numControl']),
+                        filaInfo('Carrera', data['carrera']),
+                        filaInfo('Dirección', data['direccion']),
+                        filaInfo('Teléfono', data['telefono']),
+                        filaInfo('Nacionalidad', data['nacionalidad']),
+                        filaInfo('Fecha de Nacimiento', data['fechaNacimiento']),
+                        filaInfo('Tel. Emergencia', data['telefonoEmergencia']),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: columnaImagen(
+                                label: 'Fotografía',
+                                imageUrl: data['fotografiaUrl'],
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: columnaImagen(
+                                label: 'Firma Estudiante',
+                                imageUrl: data['firmaUrl'],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
