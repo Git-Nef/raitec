@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'RaiTec',
       debugShowCheckedModeBanner: false,
-      home: RutasOfrecidas(), // Tu pantalla inicial
+      home: SplashScreen(), // Tu pantalla inicial
     );
   }
 }
