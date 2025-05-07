@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Aspirar extends StatelessWidget {
-  const Aspirar({super.key});
+  const Aspirar({super.key, required String numControl});
 
   @override
   Widget build(BuildContext context) {

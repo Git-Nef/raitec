@@ -1,12 +1,11 @@
 import 'dart:io';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:raitec/pages/FirestoreService.dart';
 import 'package:raitec/pages/InicioSesion.dart';
 import 'package:raitec/pages/aspirar.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Registro extends StatefulWidget {
   const Registro({super.key});
@@ -34,19 +33,47 @@ class _RegistroState extends State<Registro> {
   String? fotografiaUrl;
   String? firmaUrl;
 
-  Future<void> seleccionarImagen(bool desdeCamara, String tipo) async {
+  Future<void> seleccionarImagen(String tipo) async {
     final picker = ImagePicker();
-    final XFile? imagen = await picker.pickImage(
-      source: desdeCamara ? ImageSource.camera : ImageSource.gallery,
-      imageQuality: 75,
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.photo_camera),
+                title: const Text('Tomar foto'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final XFile? imagen =
+                      await picker.pickImage(source: ImageSource.camera);
+                  if (imagen != null) await _subirImagen(imagen, tipo);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Elegir de galería'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final XFile? imagen =
+                      await picker.pickImage(source: ImageSource.gallery);
+                  if (imagen != null) await _subirImagen(imagen, tipo);
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
+  }
 
-    if (imagen == null) return;
-
+  Future<void> _subirImagen(XFile imagen, String tipo) async {
     final nombreArchivo = '$tipo-${DateTime.now().millisecondsSinceEpoch}.jpg';
     final ref =
         FirebaseStorage.instance.ref().child('usuarios/$tipo/$nombreArchivo');
-
     await ref.putFile(File(imagen.path));
     final url = await ref.getDownloadURL();
 
@@ -63,6 +90,24 @@ class _RegistroState extends State<Registro> {
     );
   }
 
+  bool get camposCompletos {
+    return _numControl.text.trim().isNotEmpty &&
+        _nip.text.trim().isNotEmpty &&
+        _confirmNip.text.trim().isNotEmpty &&
+        _nombre.text.trim().isNotEmpty &&
+        _edad.text.trim().isNotEmpty &&
+        _carrera.text.trim().isNotEmpty &&
+        _direccion.text.trim().isNotEmpty &&
+        _telefono.text.trim().isNotEmpty &&
+        _nacionalidad.text.trim().isNotEmpty &&
+        _fechaNacimiento.text.trim().isNotEmpty &&
+        _telefonoEmergencia.text.trim().isNotEmpty &&
+        fotografiaUrl != null &&
+        firmaUrl != null;
+  }
+
+  void actualizarEstado() => setState(() {});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,8 +120,8 @@ class _RegistroState extends State<Registro> {
             key: _formKey,
             child: Column(
               children: [
-                Image.asset('assets/logoRaitec.png', height: 100),
-                const SizedBox(height: 24),
+                Image.asset('assets/logoAppbar.png', height: 165),
+                const SizedBox(height: 10),
                 const Text('Registro de Usuario',
                     style:
                         TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
@@ -90,81 +135,117 @@ class _RegistroState extends State<Registro> {
                 _input('Dirección', _direccion),
                 _input('Teléfono', _telefono, keyboard: TextInputType.phone),
                 _input('Nacionalidad', _nacionalidad),
-                _input('Fecha de Nacimiento (YYYY-MM-DD)', _fechaNacimiento),
+                GestureDetector(
+                  onTap: _seleccionarFechaNacimiento,
+                  child: AbsorbPointer(
+                    child: _input(
+                        'Fecha de Nacimiento (YYYY-MM-DD)', _fechaNacimiento),
+                  ),
+                ),
                 _input('Tel. Emergencia', _telefonoEmergencia,
                     keyboard: TextInputType.phone),
                 const SizedBox(height: 16),
-                _botonesImagen('Subir Foto de Perfil o INE', 'foto'),
+                _uploadButton('SUBIR FOTO DE PERFIL O INE', 'foto'),
                 if (fotografiaUrl != null)
                   Image.network(fotografiaUrl!, height: 120),
                 const SizedBox(height: 24),
-                _botonesImagen('Subir Firma Digital o Escaneada', 'firma'),
+                _uploadButton('SUBIR FIRMA DIGITAL O ESCANEADA', 'firma'),
                 if (firmaUrl != null) Image.network(firmaUrl!, height: 80),
                 const SizedBox(height: 24),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          camposCompletos ? Colors.blue : Colors.grey,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 6,
+                    ),
+                    onPressed: camposCompletos
+                        ? () async {
+                            final nip = _nip.text.trim();
+                            final confirm = _confirmNip.text.trim();
+                            if (nip != confirm) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Los NIP no coinciden')),
+                              );
+                              return;
+                            }
+                            try {
+                              await firestore.crearUsuario(
+                                _numControl.text.trim(),
+                                {
+                                  'numControl': _numControl.text.trim(),
+                                  'nip': nip,
+                                  'nombre': _nombre.text.trim(),
+                                  'edad': int.tryParse(_edad.text.trim()) ?? 0,
+                                  'carrera': _carrera.text.trim(),
+                                  'direccion': _direccion.text.trim(),
+                                  'telefono': _telefono.text.trim(),
+                                  'nacionalidad': _nacionalidad.text.trim(),
+                                  'fechaNacimiento':
+                                      _fechaNacimiento.text.trim(),
+                                  'telefonoEmergencia':
+                                      _telefonoEmergencia.text.trim(),
+                                  'fotografiaUrl': fotografiaUrl ?? '',
+                                  'firmaUrl': firmaUrl ?? '',
+                                  'esConductor': false,
+                                },
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('Usuario registrado')),
+                              );
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const InicioSesion()),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Error: $e')),
+                              );
+                            }
+                          }
+                        : null,
+                    child: const Text(
+                      'REGISTRARME',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                     ),
                   ),
-                  onPressed: () async {
-                    try {
-                      await firestore.crearUsuario(
-                        _numControl.text.trim(),
-                        {
-                          'numControl': _numControl.text.trim(),
-                          'nip': _nip.text.trim(),
-                          'nombre': _nombre.text.trim(),
-                          'edad': int.tryParse(_edad.text.trim()) ?? 0,
-                          'carrera': _carrera.text.trim(),
-                          'direccion': _direccion.text.trim(),
-                          'telefono': _telefono.text.trim(),
-                          'nacionalidad': _nacionalidad.text.trim(),
-                          'fechaNacimiento': _fechaNacimiento.text.trim(),
-                          'telefonoEmergencia': _telefonoEmergencia.text.trim(),
-                          'fotografiaUrl': fotografiaUrl ?? '',
-                          'firmaUrl': firmaUrl ?? '',
-                          'esConductor': false,
-                        },
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Usuario registrado')),
-                      );
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const InicioSesion()),
-                      );
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: \$e')),
-                      );
-                    }
-                  },
-                  child: const Text('REGISTRARME',
-                      style: TextStyle(fontSize: 18, color: Colors.white)),
                 ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const InicioSesion()));
-                  },
-                  child: const Text('¿Ya tienes cuenta? Inicia sesión'),
-                ),
-                const SizedBox(height: 24),
-                const Text('¿Quieres ser conductor?',
-                    style: TextStyle(fontSize: 16)),
-                OutlinedButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const Aspirar()));
-                  },
-                  child: const Text('Elaborar Petición'),
+                const SizedBox(height: 20),
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    text: '¿Ya tienes cuenta? ',
+                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+                    children: [
+                      TextSpan(
+                        text: 'Inicia sesión',
+                        style: const TextStyle(
+                          decoration: TextDecoration.underline,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const InicioSesion()),
+                            );
+                          },
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 30),
               ],
@@ -179,8 +260,9 @@ class _RegistroState extends State<Registro> {
       {bool obscure = false, TextInputType keyboard = TextInputType.text}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: TextFormField(
+      child: TextField(
         controller: controller,
+        onChanged: (_) => actualizarEstado(),
         obscureText: obscure,
         keyboardType: keyboard,
         decoration: InputDecoration(
@@ -193,27 +275,44 @@ class _RegistroState extends State<Registro> {
     );
   }
 
-  Widget _botonesImagen(String titulo, String tipo) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(titulo, style: const TextStyle(fontWeight: FontWeight.bold)),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            OutlinedButton.icon(
-              onPressed: () => seleccionarImagen(true, tipo),
-              icon: const Icon(Icons.camera_alt),
-              label: const Text('Cámara'),
+  Widget _uploadButton(String texto, String tipo) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: () => seleccionarImagen(tipo),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.grey[300],
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6),
             ),
-            OutlinedButton.icon(
-              onPressed: () => seleccionarImagen(false, tipo),
-              icon: const Icon(Icons.image),
-              label: const Text('Galería'),
+          ),
+          child: Text(
+            texto,
+            style: const TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.w500,
             ),
-          ],
+          ),
         ),
-      ],
+      ),
     );
+  }
+
+  Future<void> _seleccionarFechaNacimiento() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().subtract(const Duration(days: 365 * 18)),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _fechaNacimiento.text =
+            '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+      });
+    }
   }
 }
