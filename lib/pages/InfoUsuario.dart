@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:raitec/pages/sesion.dart';// Asegúrate de que SessionManager esté aquí
+import 'package:raitec/pages/sesion.dart'; // Asegúrate de que SessionManager esté aquí
 
 class InfoUsuario extends StatelessWidget {
   const InfoUsuario({super.key});
@@ -25,13 +25,20 @@ class InfoUsuario extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Icon(Icons.arrow_back_ios_new, size: 28, color: Colors.blueGrey),
-              Icon(Icons.home_filled, size: 30, color: Colors.blueAccent),
-              CircleAvatar(
-                backgroundColor: Colors.grey,
-                child: Icon(Icons.person, color: Colors.white),
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new, size: 28, color: Colors.blueGrey),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
+              IconButton(
+                icon: const Icon(Icons.home_filled, size: 30, color: Colors.blueAccent),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(width: 28), // Relleno donde estaba el icono de usuario
             ],
           ),
         ),
@@ -68,7 +75,8 @@ class InfoUsuario extends StatelessWidget {
                 Card(
                   elevation: 4,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
