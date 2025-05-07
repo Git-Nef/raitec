@@ -172,27 +172,33 @@ class RutasOfrecidas extends StatelessWidget {
         },
       ),
       bottomNavigationBar: BottomAppBar(
+        color: Colors.white,
+        elevation: 10,
         shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        color: raitecBlue,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Icon(Icons.arrow_back, color: Colors.white),
-              Icon(Icons.home, color: Colors.white),
-              Icon(Icons.search, color: Colors.white),
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new,
+                    size: 28, color: Colors.blueGrey),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.home_filled,
+                    size: 30, color: Colors.blueAccent),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(width: 28), // Espacio para simetría
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: raitecBlue,
-        onPressed: () {},
-        child: const Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
