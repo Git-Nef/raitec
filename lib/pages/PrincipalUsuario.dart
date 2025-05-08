@@ -3,6 +3,7 @@ import 'package:raitec/pages/InfoCostos.dart';
 import 'package:raitec/pages/InfoUsuario.dart';
 import 'package:raitec/pages/InicioSesion.dart';
 import 'package:raitec/pages/MisRutas.dart';
+import 'package:raitec/pages/RutasOfrecidas.dart';
 import 'package:raitec/pages/aspirar.dart';
 import 'package:raitec/pages/InfoVehiculo.dart'; // Agregado para navegación
 import 'package:raitec/pages/RegistrarVehiculo.dart'; // Agregado para navegación
@@ -147,7 +148,7 @@ class PrincipalUsuario extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => MisRutas()),
+                    MaterialPageRoute(builder: (context) => RutasOfrecidas()),
                   );
                 },
               ),
