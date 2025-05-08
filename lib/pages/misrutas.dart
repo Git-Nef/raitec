@@ -5,6 +5,8 @@ import 'package:raitec/pages/PrincipalUsuario.dart';
 import 'package:raitec/pages/Registro.dart';
 import 'package:raitec/pages/ISConductores.dart';
 
+import 'capturaHr.dart';
+
 class MisRutas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -131,7 +133,13 @@ class MisRutas extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Acción para registrar ruta
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                    CapturarHorarioRuta()
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0D66D0),
