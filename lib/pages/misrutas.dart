@@ -1,13 +1,122 @@
 import 'package:flutter/material.dart';
-import 'package:raitec/pages/InfoUsuario.dart';
-import 'package:raitec/pages/InfoVehiculo.dart';
-import 'package:raitec/pages/PrincipalUsuario.dart';
-import 'package:raitec/pages/Registro.dart';
-import 'package:raitec/pages/ISConductores.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:raitec/pages/sesion.dart';
 import 'capturaHr.dart';
 
-class MisRutas extends StatelessWidget {
+class MisRutas extends StatefulWidget {
+  const MisRutas({super.key});
+
+  @override
+  State<MisRutas> createState() => _MisRutasState();
+}
+
+class _MisRutasState extends State<MisRutas> {
+  String? direccionOrigen;
+  String? direccionDestino;
+  Map<String, dynamic>? rutaData;
+
+  @override
+  void initState() {
+    super.initState();
+    _obtenerRuta();
+  }
+
+  Future<void> _obtenerRuta() async {
+    final clave = SessionManager().numControl;
+    if (clave == null) return;
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(clave)
+        .collection('rutas')
+        .doc('info')
+        .get();
+
+    if (snapshot.exists) {
+      final data = snapshot.data()!;
+      final origen = data['origen'];
+      final destino = data['destino'];
+
+      final origenPlacemark = await placemarkFromCoordinates(origen['lat'], origen['lng']);
+      final destinoPlacemark = await placemarkFromCoordinates(destino['lat'], destino['lng']);
+
+      setState(() {
+        rutaData = data;
+        direccionOrigen = '${origenPlacemark.first.street}, ${origenPlacemark.first.locality}';
+        direccionDestino = '${destinoPlacemark.first.street}, ${destinoPlacemark.first.locality}';
+      });
+    }
+  }
+
+  Widget _rutaCard(Map<String, dynamic> data, String origenTxt, String destinoTxt) {
+    final dias = data['dias'] ?? 'Sin días';
+    final hora = data['horaSalida'] ?? 'Sin hora';
+    final lugares = data['lugaresDisponibles'] ?? 0;
+
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      elevation: 6,
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Ruta Programada',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF0D66D0),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Icon(Icons.location_on, color: Colors.red),
+                const SizedBox(width: 8),
+                Expanded(child: Text(origenTxt, style: const TextStyle(fontSize: 14))),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Row(
+              children: [
+                const Icon(Icons.flag, color: Colors.green),
+                const SizedBox(width: 8),
+                Expanded(child: Text(destinoTxt, style: const TextStyle(fontSize: 14))),
+              ],
+            ),
+            const Divider(height: 25),
+            Row(
+              children: [
+                const Icon(Icons.calendar_today),
+                const SizedBox(width: 8),
+                Text('Días: $dias'),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Row(
+              children: [
+                const Icon(Icons.access_time),
+                const SizedBox(width: 8),
+                Text('Hora: $hora'),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Row(
+              children: [
+                const Icon(Icons.event_seat),
+                const SizedBox(width: 8),
+                Text('Asientos disponibles: $lugares'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,104 +125,8 @@ class MisRutas extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 1,
         centerTitle: true,
-        title: Image.asset(
-          'assets/logoAppbar.png',
-          height: 140,
-        ),
+        title: Image.asset('assets/logoAppbar.png', height: 140),
         iconTheme: const IconThemeData(color: Colors.black87),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Menú',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Image.asset(
-                    'assets/LogoPantallas.png',
-                    height: 60,
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Mi información'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => InfoUsuario()),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.directions_car),
-              title: const Text('Mi vehículo'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => InfoVehiculo()),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.map),
-              title: const Text('Mis rutas'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MisRutas()),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Principal Usuario'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => PrincipalUsuario(
-                            numControl: '',
-                          )),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.app_registration),
-              title: const Text('Registro'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Registro()),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.drive_eta),
-              title: const Text('Identifícate'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ISConductores()),
-                );
-              },
-            ),
-          ],
-        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
@@ -135,19 +148,13 @@ class MisRutas extends StatelessWidget {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                    CapturarHorarioRuta()
-                  ),
+                  MaterialPageRoute(builder: (context) => const CapturarHorarioRuta()),
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0D66D0),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 elevation: 6,
               ),
               child: const Text(
@@ -173,72 +180,10 @@ class MisRutas extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 15),
-            _rutaCard(),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        elevation: 8,
-        color: Colors.white,
-        notchMargin: 8,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Icon(Icons.arrow_back_ios_new, size: 24, color: Colors.black54),
-              Icon(Icons.home_filled, size: 28, color: Color(0xFF0D66D0)),
-              CircleAvatar(
-                backgroundImage: AssetImage('assets/foto_usuario.png'),
-                radius: 18,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _rutaCard() {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      elevation: 4,
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            const CircleAvatar(
-              radius: 30,
-              backgroundImage: AssetImage('assets/foto_usuario.png'),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    'RUTA: GUSTAVO DÍAZ ORDAZ',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: Color(0xFF0D66D0),
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  Text('Luis Angel Maldonado Reyes',
-                      style: TextStyle(fontSize: 14)),
-                  Text('21041298@utdurango.edu.mx',
-                      style: TextStyle(fontSize: 13)),
-                  Text('(+52) 618-322-5070', style: TextStyle(fontSize: 13)),
-                  Text('Lunes a Jueves de 13:00 P.M a 14:00 P.M',
-                      style: TextStyle(fontSize: 13)),
-                ],
-              ),
-            ),
+            if (rutaData != null && direccionOrigen != null && direccionDestino != null)
+              _rutaCard(rutaData!, direccionOrigen!, direccionDestino!)
+            else
+              const Text("No tienes rutas registradas."),
           ],
         ),
       ),
