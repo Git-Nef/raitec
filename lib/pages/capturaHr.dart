@@ -83,15 +83,8 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         .collection('rutas')
         .doc('info');
 
-    final diasSeleccionados = dias
-        .where((d) => diasActivos[d]!)
-        .map((d) => {
-              'dia': d,
-              'horaInicio': horaInicio[d]!.format(context),
-            })
-        .toList();
-
     try {
+      var diasSeleccionados;
       await docRef.set({
         'lugaresDisponibles': int.parse(_asientosController.text),
         'origen': {
@@ -111,6 +104,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
       _asientosController.clear();
       setState(() {
         origenSeleccionado = null;
+        for (var d in dias) diasActivos[d] = false;
         for (var d in dias) diasActivos[d] = false;
       });
     } catch (e) {
@@ -137,6 +131,42 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                 keyboardType: TextInputType.number,
                 validator: (value) =>
                     value!.isEmpty ? 'Escribe los asientos' : null,
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView(
+                  children: dias.map((dia) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SwitchListTile(
+                          title: Text(dia),
+                          value: diasActivos[dia]!,
+                          onChanged: (bool value) {
+                            setState(() {
+                              diasActivos[dia] = value;
+                            });
+                          },
+                        ),
+                        if (diasActivos[dia]!)
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Row(
+                              children: [
+                                Text('Inicio:'),
+                                TextButton(
+                                  onPressed: () => _seleccionarHora(dia),
+                                  child: Text(horaInicio[dia]!.format(context)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        const Divider(),
+                      ],
+                    );
+                  }).toList(),
+                ),
               ),
               const SizedBox(height: 16),
               Expanded(

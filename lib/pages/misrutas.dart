@@ -15,6 +15,8 @@ class _MisRutasState extends State<MisRutas> {
   String? direccionOrigen;
   String? direccionDestino;
   Map<String, dynamic>? rutaData;
+  String horarioTexto = '';
+  int lugaresDisponibles = 0;
 
   @override
   void initState() {
@@ -37,6 +39,17 @@ class _MisRutasState extends State<MisRutas> {
       final data = snapshot.data()!;
       final origen = data['origen'];
       final destino = data['destino'];
+      final horarios = data['horarios'] as List<dynamic>?;
+      lugaresDisponibles = data['lugaresDisponibles'] ?? 0;
+
+      // Construir string de horarios
+      if (horarios != null) {
+        horarioTexto = horarios.map((h) {
+          return '${h['dia']} (${h['horaInicio']})';
+        }).join(', ');
+      } else {
+        horarioTexto = 'Sin horarios registrados';
+      }
 
       final origenPlacemark = await placemarkFromCoordinates(origen['lat'], origen['lng']);
       final destinoPlacemark = await placemarkFromCoordinates(destino['lat'], destino['lng']);
@@ -49,11 +62,7 @@ class _MisRutasState extends State<MisRutas> {
     }
   }
 
-  Widget _rutaCard(Map<String, dynamic> data, String origenTxt, String destinoTxt) {
-    final dias = data['dias'] ?? 'Sin días';
-    final hora = data['horaSalida'] ?? 'Sin hora';
-    final lugares = data['lugaresDisponibles'] ?? 0;
-
+  Widget _rutaCard(String origenTxt, String destinoTxt, String horariosTxt, int lugares) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 6,
@@ -92,15 +101,7 @@ class _MisRutasState extends State<MisRutas> {
               children: [
                 const Icon(Icons.calendar_today),
                 const SizedBox(width: 8),
-                Text('Días: $dias'),
-              ],
-            ),
-            const SizedBox(height: 5),
-            Row(
-              children: [
-                const Icon(Icons.access_time),
-                const SizedBox(width: 8),
-                Text('Hora: $hora'),
+                Expanded(child: Text('Horarios: $horariosTxt')),
               ],
             ),
             const SizedBox(height: 5),
@@ -181,7 +182,7 @@ class _MisRutasState extends State<MisRutas> {
             ),
             const SizedBox(height: 15),
             if (rutaData != null && direccionOrigen != null && direccionDestino != null)
-              _rutaCard(rutaData!, direccionOrigen!, direccionDestino!)
+              _rutaCard(direccionOrigen!, direccionDestino!, horarioTexto, lugaresDisponibles)
             else
               const Text("No tienes rutas registradas."),
           ],
