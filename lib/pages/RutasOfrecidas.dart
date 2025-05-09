@@ -38,12 +38,12 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
         rutasTemp.add({
           'ruta': 'RUTA DE ${doc.id}',
           'conductor': doc.data()['nombre'] ?? 'Sin nombre',
-          'email': doc.data()['email'] ?? 'Sin correo',
+          'email': doc.data().containsKey('email') ? doc.data()['email'] : null,
           'telefono': doc.data()['telefono'] ?? 'Sin número',
           'horario': data['dias'] != null && data['horaEntrada'] != null
               ? '${data['dias']} - ${data['horaEntrada']}'
               : 'Horario no disponible',
-          'precio': 25, // Puedes cambiarlo si tienes este campo en Firestore
+          'precio': 25,
           'origen': LatLng(origen['lat'], origen['lng']),
           'destino': LatLng(destino['lat'], destino['lng']),
         });
@@ -116,7 +116,9 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                         const SizedBox(height: 8),
                         _infoRow(
                             Icons.person, ruta['conductor'], Colors.blueGrey),
-                        _infoRow(Icons.email, ruta['email'], Colors.redAccent),
+                        if (ruta['email'] != null)
+                          _infoRow(
+                              Icons.email, ruta['email'], Colors.redAccent),
                         _infoRow(Icons.phone, ruta['telefono'], Colors.green),
                         _infoRow(
                             Icons.schedule, ruta['horario'], Colors.orange),
