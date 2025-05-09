@@ -3,6 +3,11 @@ import 'package:raitec/pages/InfoCostos.dart';
 import 'package:raitec/pages/InfoUsuario.dart';
 import 'package:raitec/pages/InicioSesion.dart';
 import 'package:raitec/pages/MisRutas.dart';
+import 'package:raitec/pages/RutasOfrecidas.dart';
+import 'package:raitec/pages/aspirar.dart';
+import 'package:raitec/pages/InfoVehiculo.dart'; // Agregado para navegación
+import 'package:raitec/pages/RegistrarVehiculo.dart'; // Agregado para navegación
+import 'package:raitec/pages/sesion.dart';
 
 class PrincipalUsuario extends StatelessWidget {
   const PrincipalUsuario({super.key});
@@ -94,6 +99,152 @@ class PrincipalUsuario extends StatelessWidget {
                 ],
               ),
             ),
+            // Aquí agregamos los items para redirigir a las diferentes pantallas
+            ListTile(
+              leading: const Icon(Icons.directions_car),
+              title: const Text('Registrar Vehículo'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        RegistrarVehiculo(numControl: numControl),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('Info Vehículo'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => InfoVehiculo(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.account_circle),
+              title: const Text('Mi Información'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => InfoUsuario(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.map),
+              title: const Text('Mis Rutas'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MisRutas(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.exit_to_app),
+              title: const Text('Cerrar sesión'),
+              onTap: () {
+                _confirmarCerrarSesion(context);
+              },
+            ),
+          ],
+        ),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 10),
+              Center(
+                child: Image.asset(
+                  'assets/SplashScreen.png',
+                  height: 180,
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'BIENVENIDO A RaiTec',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 24),
+              // Botones principales con eventos
+              buildBoton(
+                'BUSCAR UNA RUTA',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RutasOfrecidas()),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              buildBoton(
+                'COSTOS',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InfoCostos()),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              buildBoton(
+                'MI INFORMACIÓN',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InfoUsuario()),
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '¿Quieres ser conductor?',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              ),
+              const SizedBox(height: 10),
+              buildBoton(
+                'Elaborar Petición',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Aspirar(numControl: numControl),
+                    ),
+                  );
+                },
+              ),
+              const Spacer(),
+              buildBoton(
+                'CERRAR SESIÓN',
+                color: Colors.red, // Botón rojo
+                onPressed: () {
+                  _confirmarCerrarSesion(context);
+                },
+              ),
+              const SizedBox(height: 80),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
             // Barra inferior
             Positioned(
