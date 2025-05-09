@@ -1,62 +1,58 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'ubicacion.dart'; // Asegúrate de importar tu clase Ubicacion
+import 'ubicacion.dart';
 
-class RutasOfrecidas extends StatelessWidget {
-  final List<Map<String, dynamic>> rutas = [
-    {
-      'ruta': 'RUTA: GUSTAVO DÍAZ ORDAZ',
-      'conductor': 'Luis Ángel Maldonado Reyes',
-      'email': 'luisangel@rutas.edu.mx',
-      'telefono': '618-222-5009',
-      'horario': 'Lunes a Jueves de 13:00 PM a 14:00 PM',
-      'precio': 30,
-      'lat': 24.0409364620994,
-      'lng': -104.69581942452406,
-    },
-    {
-      'ruta': 'RUTA: COLINAS DEL SALITITO',
-      'conductor': 'Luis Enrique García Madrigal',
-      'email': 'luisegm@rutas.edu.mx',
-      'telefono': '618-323-5009',
-      'horario': '7:00 AM - 10:00 AM',
-      'precio': 15,
-      'lat': 24.040085364260186,
-      'lng': -104.69360344795389,
-    },
-    {
-      'ruta': 'RUTA: BOSQUES DEL VALLE',
-      'conductor': 'José Manuel Ibarra Sánchez',
-      'email': 'joseibarra@rutas.edu.mx',
-      'telefono': '618-113-5090',
-      'horario': '7:00 AM - 10:00 AM',
-      'precio': 27,
-      'lat': 24.045638670770572,
-      'lng': -104.69519865601404,
-    },
-    {
-      'ruta': 'RUTA: JARDINES',
-      'conductor': 'Martín Dorian Arroyo',
-      'email': 'martinarroyo@rutas.edu.mx',
-      'telefono': '618-999-1212',
-      'horario': '7:00 AM - 10:00 AM',
-      'precio': 100,
-      'lat': 24.051578966219676,
-      'lng': -104.6935010460035,
-    },
-    {
-      'ruta': 'RUTA: JOYAS DEL VALLE',
-      'conductor': 'Jorge Ramírez Duarte',
-      'email': 'jorgeramirez@rutas.edu.mx',
-      'telefono': '618-103-9090',
-      'horario': '7:00 AM - 10:00 AM',
-      'precio': 53,
-      'lat': 24.04303129543229,
-      'lng': -104.69710006029678,
-    },
-  ];
+class RutasOfrecidas extends StatefulWidget {
+  const RutasOfrecidas({super.key});
 
+  @override
+  State<RutasOfrecidas> createState() => _RutasOfrecidasState();
+}
+
+class _RutasOfrecidasState extends State<RutasOfrecidas> {
   final Color raitecBlue = const Color(0xFF0D66D0);
+  List<Map<String, dynamic>> rutas = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarRutasDesdeFirestore();
+  }
+
+  Future<void> _cargarRutasDesdeFirestore() async {
+    final snapshot = await FirebaseFirestore.instance.collection('usuarios').get();
+
+    List<Map<String, dynamic>> rutasTemp = [];
+
+    for (var doc in snapshot.docs) {
+      final rutasRef = doc.reference.collection('rutas').doc('info');
+      final rutaDoc = await rutasRef.get();
+
+      if (rutaDoc.exists) {
+        final data = rutaDoc.data()!;
+        final destino = data['destino'];
+        final origen = data['origen'];
+
+        rutasTemp.add({
+          'ruta': 'RUTA DE ${doc.id}',
+          'conductor': doc.data()['nombre'] ?? 'Sin nombre',
+          'email': doc.data()['email'] ?? 'Sin correo',
+          'telefono': doc.data()['telefono'] ?? 'Sin número',
+          'horario': destino['dias'] != null && destino['horaSalida'] != null
+              ? '${destino['dias']} - ${destino['horaSalida']}'
+              : 'Horario no disponible',
+          'precio': 25, // Puedes personalizar este valor si lo agregas en Firestore
+          'lat': destino['lat'],
+          'lng': destino['lng'],
+        });
+      }
+    }
+
+    setState(() {
+      rutas = rutasTemp;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,10 +65,7 @@ class RutasOfrecidas extends StatelessWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(
-              'assets/logoAppbar.png',
-              height: 30,
-            ),
+            Image.asset('assets/logoAppbar.png', height: 30),
             const SizedBox(width: 10),
             ShaderMask(
               shaderCallback: (bounds) => LinearGradient(
@@ -93,7 +86,9 @@ class RutasOfrecidas extends StatelessWidget {
           ],
         ),
       ),
-      body: ListView.builder(
+      body: rutas.isEmpty
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
         itemCount: rutas.length,
         itemBuilder: (context, index) {
           final ruta = rutas[index];
@@ -129,6 +124,7 @@ class RutasOfrecidas extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (context) => Ubicacion(
                             destino: LatLng(ruta['lat'], ruta['lng']),
+                            nombreRuta: ruta['ruta'],
                           ),
                         ),
                       );
@@ -172,27 +168,33 @@ class RutasOfrecidas extends StatelessWidget {
         },
       ),
       bottomNavigationBar: BottomAppBar(
+        color: Colors.white,
+        elevation: 10,
         shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        color: raitecBlue,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Icon(Icons.arrow_back, color: Colors.white),
-              Icon(Icons.home, color: Colors.white),
-              Icon(Icons.search, color: Colors.white),
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new,
+                    size: 28, color: Colors.blueGrey),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.home_filled,
+                    size: 30, color: Colors.blueAccent),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(width: 28),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: raitecBlue,
-        onPressed: () {},
-        child: const Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
