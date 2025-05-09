@@ -9,7 +9,10 @@ class InfoUsuario extends StatelessWidget {
     String? clave = SessionManager().numControl;
     if (clave == null) return null;
 
-    final doc = await FirebaseFirestore.instance.collection('usuarios').doc(clave).get();
+    final doc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(clave)
+        .get();
     return doc.data();
   }
 
@@ -27,18 +30,21 @@ class InfoUsuario extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new, size: 28, color: Colors.blueGrey),
+                icon: const Icon(Icons.arrow_back_ios_new,
+                    size: 28, color: Colors.blueGrey),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.home_filled, size: 30, color: Colors.blueAccent),
+                icon: const Icon(Icons.home_filled,
+                    size: 30, color: Colors.blueAccent),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
-              const SizedBox(width: 28), // Relleno donde estaba el icono de usuario
+              const SizedBox(
+                  width: 28), // Relleno donde estaba el icono de usuario
             ],
           ),
         ),
@@ -51,7 +57,8 @@ class InfoUsuario extends StatelessWidget {
           }
 
           if (!snapshot.hasData || snapshot.data == null) {
-            return const Center(child: Text('No se encontraron datos del usuario.'));
+            return const Center(
+                child: Text('No se encontraron datos del usuario.'));
           }
 
           final data = snapshot.data!;
@@ -88,7 +95,8 @@ class InfoUsuario extends StatelessWidget {
                         filaInfo('Dirección', data['direccion']),
                         filaInfo('Teléfono', data['telefono']),
                         filaInfo('Nacionalidad', data['nacionalidad']),
-                        filaInfo('Fecha de Nacimiento', data['fechaNacimiento']),
+                        filaInfo(
+                            'Fecha de Nacimiento', data['fechaNacimiento']),
                         filaInfo('Tel. Emergencia', data['telefonoEmergencia']),
                         filaInfo('Email', data['email']),
                         const SizedBox(height: 16),

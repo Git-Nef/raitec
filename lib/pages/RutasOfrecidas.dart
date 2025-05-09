@@ -20,47 +20,47 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
     _cargarRutasDesdeFirestore();
   }
 
- Future<void> _cargarRutasDesdeFirestore() async {
-  final snapshot = await FirebaseFirestore.instance.collection('usuarios').get();
-  List<Map<String, dynamic>> rutasTemp = [];
+  Future<void> _cargarRutasDesdeFirestore() async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection('usuarios').get();
+    List<Map<String, dynamic>> rutasTemp = [];
 
-  for (var doc in snapshot.docs) {
-    final usuarioData = doc.data();
-    final rutasRef = doc.reference.collection('rutas').doc('info');
-    final rutaDoc = await rutasRef.get();
+    for (var doc in snapshot.docs) {
+      final usuarioData = doc.data();
+      final rutasRef = doc.reference.collection('rutas').doc('info');
+      final rutaDoc = await rutasRef.get();
 
-    if (rutaDoc.exists) {
-      final data = rutaDoc.data()!;
-      final destino = data['destino'];
-      final horarios = data['horarios'];
+      if (rutaDoc.exists) {
+        final data = rutaDoc.data()!;
+        final destino = data['destino'];
+        final horarios = data['horarios'];
 
-      String horarioTexto = 'Horario no disponible';
-      if (horarios != null && horarios is List && horarios.isNotEmpty) {
-        final primerHorario = horarios[0];
-        final dia = primerHorario['dia'];
-        final horaInicio = primerHorario['horaInicio'];
-        final horaFin = primerHorario['horaFin'];
-        horarioTexto = '$dia: $horaInicio - $horaFin';
+        String horarioTexto = 'Horario no disponible';
+        if (horarios != null && horarios is List && horarios.isNotEmpty) {
+          final primerHorario = horarios[0];
+          final dia = primerHorario['dia'];
+          final horaInicio = primerHorario['horaInicio'];
+          final horaFin = primerHorario['horaFin'];
+          horarioTexto = '$dia: $horaInicio - $horaFin';
+        }
+
+        rutasTemp.add({
+          'ruta': 'RUTA DE ${doc.id}',
+          'conductor': usuarioData['nombre'] ?? 'Sin nombre',
+          'email': usuarioData['email'] ?? 'Sin correo',
+          'telefono': usuarioData['telefono'] ?? 'Sin número',
+          'horario': horarioTexto,
+          'precio': 25,
+          'lat': destino['lat'],
+          'lng': destino['lng'],
+        });
       }
-
-      rutasTemp.add({
-        'ruta': 'RUTA DE ${doc.id}',
-        'conductor': usuarioData['nombre'] ?? 'Sin nombre',
-        'email': usuarioData['email'] ?? 'Sin correo',
-        'telefono': usuarioData['telefono'] ?? 'Sin número',
-        'horario': horarioTexto,
-        'precio': 25,
-        'lat': destino['lat'],
-        'lng': destino['lng'],
-      });
     }
+
+    setState(() {
+      rutas = rutasTemp;
+    });
   }
-
-  setState(() {
-    rutas = rutasTemp;
-  });
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +101,8 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
               itemBuilder: (context, index) {
                 final ruta = rutas[index];
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   elevation: 6,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
@@ -120,10 +121,12 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        _infoRow(Icons.person, ruta['conductor'], Colors.blueGrey),
+                        _infoRow(
+                            Icons.person, ruta['conductor'], Colors.blueGrey),
                         _infoRow(Icons.email, ruta['email'], Colors.redAccent),
                         _infoRow(Icons.phone, ruta['telefono'], Colors.green),
-                        _infoRow(Icons.schedule, ruta['horario'], Colors.orange),
+                        _infoRow(
+                            Icons.schedule, ruta['horario'], Colors.orange),
                         const SizedBox(height: 10),
                         ElevatedButton.icon(
                           onPressed: () {
@@ -164,7 +167,8 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                               children: [
                                 Icon(Icons.map, color: raitecBlue),
                                 const SizedBox(width: 6),
-                                const Icon(Icons.location_on, color: Colors.redAccent),
+                                const Icon(Icons.location_on,
+                                    color: Colors.redAccent),
                               ],
                             ),
                           ],

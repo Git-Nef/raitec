@@ -142,8 +142,8 @@ class _RegistroState extends State<Registro> {
                 GestureDetector(
                   onTap: _seleccionarFechaNacimiento,
                   child: AbsorbPointer(
-                    child: _input('Fecha de Nacimiento (YYYY-MM-DD)',
-                        _fechaNacimiento),
+                    child: _input(
+                        'Fecha de Nacimiento (YYYY-MM-DD)', _fechaNacimiento),
                   ),
                 ),
                 _input('Tel. Emergencia', _telefonoEmergencia,
@@ -182,8 +182,9 @@ class _RegistroState extends State<Registro> {
                               return;
                             }
 
-                            final emailValido = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
-                                .hasMatch(email);
+                            final emailValido =
+                                RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
+                                    .hasMatch(email);
                             if (!emailValido) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
