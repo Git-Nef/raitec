@@ -1,73 +1,7 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:raitec/pages/RegistrarVehiculo.dart';
-import 'package:raitec/pages/FirestoreService.dart';
 
-class Aspirar extends StatefulWidget {
-  final String numControl;
-  const Aspirar({super.key, required this.numControl});
-
-  @override
-  State<Aspirar> createState() => _AspirarState();
-}
-
-class _AspirarState extends State<Aspirar> {
-  final firestore = FirestoreService();
-
-  Future<void> _subirArchivo(String tipo, bool desdeCamara) async {
-    final picker = ImagePicker();
-    final XFile? archivo = await picker.pickImage(
-      source: desdeCamara ? ImageSource.camera : ImageSource.gallery,
-    );
-
-    if (archivo == null) return;
-
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('usuarios/${widget.numControl}/documentos/$tipo.jpg');
-
-    await ref.putFile(File(archivo.path));
-    final url = await ref.getDownloadURL();
-
-    await firestore.subirDocumento(widget.numControl, tipo, url);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Documento "$tipo" subido correctamente')),
-    );
-  }
-
-  void _mostrarOpcionesImagen(String tipo) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              ListTile(
-                leading: const Icon(Icons.photo_camera),
-                title: const Text('Tomar foto'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _subirArchivo(tipo, true);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Elegir de galería'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _subirArchivo(tipo, false);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+class Aspirar extends StatelessWidget {
+  const Aspirar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -87,23 +21,31 @@ class _AspirarState extends State<Aspirar> {
                 const SizedBox(height: 40),
                 const Icon(Icons.download, size: 60, color: Colors.grey),
                 const SizedBox(height: 20),
-                _uploadButton('SUBIR HORARIO', 'horario'),
-                _uploadButton('SUBIR KARDEX', 'kardex'),
-                _uploadButton('SUBIR LICENCIA DE CONDUCIR', 'licencia'),
-                _uploadButton(
-                    'SUBIR COMPROBANTE DE DOMICILIO', 'comprobante_domicilio'),
+
+                // Caja de texto para ingresar matrícula
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Ingresar Matrícula',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+                _uploadButton('SUBIR HORARIO'),
+                _uploadButton('SUBIR KARDEX'),
+                _uploadButton('SUBIR LICENCIA DE CONDUCIR'),
+                _uploadButton('SUBIR COMPROBANTE DE DOMICILIO'),
+
                 const SizedBox(height: 30),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              RegistrarVehiculo(numControl: widget.numControl),
-                        ),
-                      );
+                      // Acción para enviar papelería
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue[700],
@@ -113,7 +55,7 @@ class _AspirarState extends State<Aspirar> {
                       ),
                     ),
                     child: const Text(
-                      'CONTINUAR A INFORMACIÓN DEL VEHÍCULO',
+                      'ENVIAR PAPELERÍA',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -159,13 +101,15 @@ class _AspirarState extends State<Aspirar> {
     );
   }
 
-  Widget _uploadButton(String texto, String tipo) {
+  Widget _uploadButton(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: () => _mostrarOpcionesImagen(tipo),
+          onPressed: () {
+            // Acción para cargar archivo
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.grey[300],
             padding: const EdgeInsets.symmetric(vertical: 16),
@@ -174,7 +118,7 @@ class _AspirarState extends State<Aspirar> {
             ),
           ),
           child: Text(
-            texto,
+            text,
             style: const TextStyle(
               color: Colors.black87,
               fontWeight: FontWeight.w500,
