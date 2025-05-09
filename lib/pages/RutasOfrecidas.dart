@@ -39,12 +39,12 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
           'conductor': doc.data()['nombre'] ?? 'Sin nombre',
           'email': doc.data()['email'] ?? 'Sin correo',
           'telefono': doc.data()['telefono'] ?? 'Sin número',
-          'horario': data['dias'] != null && data['horaEntrada'] != null
-              ? '${data['dias']} - ${data['horaEntrada']}'
+          'horario': destino['dias'] != null && destino['horaSalida'] != null
+              ? '${destino['dias']} - ${destino['horaSalida']}'
               : 'Horario no disponible',
-          'precio': 25, // Puedes cambiarlo si tienes este campo en Firestore
-          'origen': LatLng(origen['lat'], origen['lng']),
-          'destino': LatLng(destino['lat'], destino['lng']),
+          'precio': 25, // Puedes personalizar este valor si lo agregas en Firestore
+          'lat': destino['lat'],
+          'lng': destino['lng'],
         });
       }
     }
@@ -123,8 +123,7 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => Ubicacion(
-                            origen: ruta['origen'],
-                            destino: ruta['destino'],
+                            destino: LatLng(ruta['lat'], ruta['lng']),
                             nombreRuta: ruta['ruta'],
                           ),
                         ),

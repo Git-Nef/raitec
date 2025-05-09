@@ -10,11 +10,9 @@ class Estudiante {
   final String telefonoEmergencia;
   final String fotografiaUrl;
   final String firmaUrl;
-  final String email;
 
   Estudiante({
     required this.nombre,
-    required this.email,
     required this.edad,
     required this.numControl,
     required this.carrera,
@@ -30,7 +28,6 @@ class Estudiante {
 
 final estudianteEjemplo = Estudiante(
   nombre: 'Ana López',
-  email: 'ejemplo@gmail.com',
   edad: 21,
   numControl: '20201234',
   carrera: 'Ingeniería en Sistemas',
