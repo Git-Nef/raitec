@@ -8,22 +8,28 @@ class FirestoreService {
     await _db.collection('usuarios').doc(uid).set(data);
   }
 
-  /// Registrar vehículo
-  Future<void> registrarVehiculo(Map<String, dynamic> data) async {
-    await _db.collection('vehiculos').add(data);
-  }
-
-  /// Subir documentos del conductor
-  Future<void> subirDocumentosConductor(
-      String uid, Map<String, dynamic> data) async {
+  /// Subir documento individual del conductor (horario, kardex, licencia, etc.)
+  Future<void> subirDocumento(
+      String uid, String tipo, String urlArchivo) async {
     await _db
         .collection('usuarios')
         .doc(uid)
         .collection('documentos')
-        .add(data);
+        .doc(tipo)
+        .set({'url': urlArchivo});
   }
 
-  /// Crear ruta
+  /// Guardar información del vehículo como subcolección de usuario
+  Future<void> guardarVehiculo(String uid, Map<String, dynamic> data) async {
+    await _db
+        .collection('usuarios')
+        .doc(uid)
+        .collection('vehiculo')
+        .doc('info')
+        .set(data);
+  }
+
+  /// Crear ruta (nivel global)
   Future<void> crearRuta(Map<String, dynamic> data) async {
     await _db.collection('rutas').add(data);
   }
@@ -41,22 +47,28 @@ class FirestoreService {
     return await _db.collection('usuarios').doc(uid).get();
   }
 
-  /// Obtener vehículos por usuario
-  Stream<QuerySnapshot> obtenerVehiculosUsuario(String uid) {
-    return _db
-        .collection('vehiculos')
-        .where('idUsuario', isEqualTo: uid)
-        .snapshots();
-  }
-
-  /// Actualizar datos de un usuario
+  /// Actualizar datos del usuario
   Future<void> actualizarUsuario(String uid, Map<String, dynamic> data) async {
     await _db.collection('usuarios').doc(uid).update(data);
   }
 
-  /// Eliminar un vehículo
-  Future<void> eliminarVehiculo(String vehiculoId) async {
-    await _db.collection('vehiculos').doc(vehiculoId).delete();
+  /// Obtener documentos del conductor
+  Stream<QuerySnapshot> obtenerDocumentos(String uid) {
+    return _db
+        .collection('usuarios')
+        .doc(uid)
+        .collection('documentos')
+        .snapshots();
+  }
+
+  /// Obtener información del vehículo del usuario
+  Future<DocumentSnapshot> obtenerVehiculo(String uid) async {
+    return await _db
+        .collection('usuarios')
+        .doc(uid)
+        .collection('vehiculo')
+        .doc('info')
+        .get();
   }
 
   /// Eliminar ruta

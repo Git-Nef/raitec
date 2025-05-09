@@ -21,7 +21,8 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
   }
 
   Future<void> _cargarRutasDesdeFirestore() async {
-    final snapshot = await FirebaseFirestore.instance.collection('usuarios').get();
+    final snapshot =
+        await FirebaseFirestore.instance.collection('usuarios').get();
 
     List<Map<String, dynamic>> rutasTemp = [];
 
@@ -37,7 +38,7 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
         rutasTemp.add({
           'ruta': 'RUTA DE ${doc.id}',
           'conductor': doc.data()['nombre'] ?? 'Sin nombre',
-          'email': doc.data()['email'] ?? 'Sin correo',
+          'email': doc.data().containsKey('email') ? doc.data()['email'] : null,
           'telefono': doc.data()['telefono'] ?? 'Sin número',
           'horario': data['dias'] != null && data['horaEntrada'] != null
               ? '${data['dias']} - ${data['horaEntrada']}'
@@ -89,85 +90,90 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
       body: rutas.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
-        itemCount: rutas.length,
-        itemBuilder: (context, index) {
-          final ruta = rutas[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            elevation: 6,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    ruta['ruta'],
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: raitecBlue,
-                    ),
+              itemCount: rutas.length,
+              itemBuilder: (context, index) {
+                final ruta = rutas[index];
+                return Card(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  const SizedBox(height: 8),
-                  _infoRow(Icons.person, ruta['conductor'], Colors.blueGrey),
-                  _infoRow(Icons.email, ruta['email'], Colors.redAccent),
-                  _infoRow(Icons.phone, ruta['telefono'], Colors.green),
-                  _infoRow(Icons.schedule, ruta['horario'], Colors.orange),
-                  const SizedBox(height: 10),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Ubicacion(
-                            origen: ruta['origen'],
-                            destino: ruta['destino'],
-                            nombreRuta: ruta['ruta'],
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ruta['ruta'],
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: raitecBlue,
                           ),
                         ),
-                      );
-                    },
-                    icon: Icon(Icons.map, color: raitecBlue),
-                    label: const Text("Ver ruta en mapa"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: raitecBlue,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      elevation: 3,
+                        const SizedBox(height: 8),
+                        _infoRow(
+                            Icons.person, ruta['conductor'], Colors.blueGrey),
+                        if (ruta['email'] != null)
+                          _infoRow(
+                              Icons.email, ruta['email'], Colors.redAccent),
+                        _infoRow(Icons.phone, ruta['telefono'], Colors.green),
+                        _infoRow(
+                            Icons.schedule, ruta['horario'], Colors.orange),
+                        const SizedBox(height: 10),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Ubicacion(
+                                  origen: ruta['origen'],
+                                  destino: ruta['destino'],
+                                  nombreRuta: ruta['ruta'],
+                                ),
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.map, color: raitecBlue),
+                          label: const Text("Ver ruta en mapa"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: raitecBlue,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            elevation: 3,
+                          ),
+                        ),
+                        const Divider(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '\$${ruta['precio']} MXN',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Icon(Icons.map, color: raitecBlue),
+                                const SizedBox(width: 6),
+                                const Icon(Icons.location_on,
+                                    color: Colors.redAccent),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  const Divider(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '\$${ruta['precio']} MXN',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.map, color: raitecBlue),
-                          const SizedBox(width: 6),
-                          const Icon(Icons.location_on,
-                              color: Colors.redAccent),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
-      ),
       bottomNavigationBar: BottomAppBar(
         color: Colors.white,
         elevation: 10,

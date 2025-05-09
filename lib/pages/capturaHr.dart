@@ -16,7 +16,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
   final TextEditingController _asientosController = TextEditingController();
   LatLng? origenSeleccionado;
   final LatLng destinoFijo =
-  const LatLng(24.03265897848829, -104.64678790491564);
+      const LatLng(24.03265897848829, -104.64678790491564);
 
   final List<String> dias = [
     'Lunes',
@@ -83,15 +83,8 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         .collection('rutas')
         .doc('info');
 
-    final diasSeleccionados = dias
-        .where((d) => diasActivos[d]!)
-        .map((d) => {
-      'dia': d,
-      'horaInicio': horaInicio[d]!.format(context),
-    })
-        .toList();
-
     try {
+      var diasSeleccionados;
       await docRef.set({
         'lugaresDisponibles': int.parse(_asientosController.text),
         'origen': {
@@ -111,6 +104,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
       _asientosController.clear();
       setState(() {
         origenSeleccionado = null;
+        for (var d in dias) diasActivos[d] = false;
         for (var d in dias) diasActivos[d] = false;
       });
     } catch (e) {
@@ -136,7 +130,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                     labelText: 'Asientos traseros disponibles'),
                 keyboardType: TextInputType.number,
                 validator: (value) =>
-                value!.isEmpty ? 'Escribe los asientos' : null,
+                    value!.isEmpty ? 'Escribe los asientos' : null,
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -157,7 +151,43 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                         if (diasActivos[dia]!)
                           Padding(
                             padding:
-                            const EdgeInsets.symmetric(horizontal: 16.0),
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Row(
+                              children: [
+                                Text('Inicio:'),
+                                TextButton(
+                                  onPressed: () => _seleccionarHora(dia),
+                                  child: Text(horaInicio[dia]!.format(context)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        const Divider(),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView(
+                  children: dias.map((dia) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SwitchListTile(
+                          title: Text(dia),
+                          value: diasActivos[dia]!,
+                          onChanged: (bool value) {
+                            setState(() {
+                              diasActivos[dia] = value;
+                            });
+                          },
+                        ),
+                        if (diasActivos[dia]!)
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
                             child: Row(
                               children: [
                                 Text('Inicio:'),

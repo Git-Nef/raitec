@@ -23,7 +23,7 @@ class Ubicacion extends StatefulWidget {
 class _UbicacionState extends State<Ubicacion> {
   GoogleMapController? _mapController;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   Set<Marker> _marcadores = {};
   Set<Polyline> _polilineas = {};
@@ -39,15 +39,15 @@ class _UbicacionState extends State<Ubicacion> {
 
   void _inicializarNotificaciones() async {
     const AndroidInitializationSettings androidInit =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const InitializationSettings initSettings =
-    InitializationSettings(android: androidInit);
+        InitializationSettings(android: androidInit);
     await flutterLocalNotificationsPlugin.initialize(initSettings);
   }
 
   void _mostrarNotificacionLlegada() async {
     const AndroidNotificationDetails androidDetails =
-    AndroidNotificationDetails(
+        AndroidNotificationDetails(
       'canal_ruta',
       'Llegada a destino',
       importance: Importance.max,
@@ -55,7 +55,7 @@ class _UbicacionState extends State<Ubicacion> {
     );
 
     const NotificationDetails generalNotificationDetails =
-    NotificationDetails(android: androidDetails);
+        NotificationDetails(android: androidDetails);
 
     await flutterLocalNotificationsPlugin.show(
       0,
@@ -94,13 +94,15 @@ class _UbicacionState extends State<Ubicacion> {
             markerId: const MarkerId("origen"),
             position: widget.origen,
             infoWindow: const InfoWindow(title: "Origen"),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            icon:
+                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           ),
           Marker(
             markerId: const MarkerId("destino"),
             position: widget.destino,
             infoWindow: const InfoWindow(title: "Destino"),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+            icon:
+                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
           ),
         };
       });
