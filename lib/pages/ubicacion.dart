@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:location/location.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 
 class Ubicacion extends StatefulWidget {
+  final LatLng origen;
   final LatLng destino;
   final String? nombreRuta;
 
-  const Ubicacion({super.key, required this.destino, this.nombreRuta});
+  const Ubicacion({
+    super.key,
+    required this.origen,
+    required this.destino,
+    this.nombreRuta,
+  });
 
   @override
   State<Ubicacion> createState() => _UbicacionState();
@@ -17,21 +22,19 @@ class Ubicacion extends StatefulWidget {
 
 class _UbicacionState extends State<Ubicacion> {
   GoogleMapController? _mapController;
-  final Location _location = Location();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
 
   Set<Marker> _marcadores = {};
   Set<Polyline> _polilineas = {};
   List<LatLng> _puntosRuta = [];
-  LatLng? _ubicacionActual;
   bool _notificado = false;
 
   @override
   void initState() {
     super.initState();
     _inicializarNotificaciones();
-    _iniciarUbicacion();
+    _cargarRutaDesde(widget.origen);
   }
 
   void _inicializarNotificaciones() async {
@@ -49,7 +52,6 @@ class _UbicacionState extends State<Ubicacion> {
       'Llegada a destino',
       importance: Importance.max,
       priority: Priority.high,
-      ticker: 'Llegaste al destino',
     );
 
     const NotificationDetails generalNotificationDetails =
@@ -63,52 +65,11 @@ class _UbicacionState extends State<Ubicacion> {
     );
   }
 
-  void _iniciarUbicacion() async {
-    bool servicioHabilitado = await _location.serviceEnabled();
-    if (!servicioHabilitado) {
-      servicioHabilitado = await _location.requestService();
-      if (!servicioHabilitado) return;
-    }
-
-    PermissionStatus permiso = await _location.hasPermission();
-    if (permiso == PermissionStatus.denied) {
-      permiso = await _location.requestPermission();
-      if (permiso != PermissionStatus.granted) return;
-    }
-
-    final ubicacionInicial = await _location.getLocation();
-    _actualizarUbicacion(ubicacionInicial);
-
-    _location.onLocationChanged.listen((ubicacionNueva) {
-      _actualizarUbicacion(ubicacionNueva);
-    });
-  }
-
-  void _actualizarUbicacion(LocationData data) async {
-    final nuevaUbicacion = LatLng(data.latitude!, data.longitude!);
-    _ubicacionActual = nuevaUbicacion;
-
-    _marcadores.removeWhere((m) => m.markerId == const MarkerId("actual"));
-    _marcadores.add(
-      Marker(
-        markerId: const MarkerId("actual"),
-        position: nuevaUbicacion,
-        infoWindow: const InfoWindow(title: "Tú estás aquí"),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-      ),
-    );
-
-    _mapController?.animateCamera(CameraUpdate.newLatLng(nuevaUbicacion));
-
-    await _cargarRutaDesde(nuevaUbicacion);
-    _verificarLlegada(nuevaUbicacion);
-  }
-
-  Future<void> _cargarRutaDesde(LatLng origenActual) async {
+  Future<void> _cargarRutaDesde(LatLng origen) async {
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI", // Reemplaza con tu API key
-      PointLatLng(origenActual.latitude, origenActual.longitude),
+      "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI", // reemplaza con tu propia API key
+      PointLatLng(origen.latitude, origen.longitude),
       PointLatLng(widget.destino.latitude, widget.destino.longitude),
     );
 
@@ -128,15 +89,23 @@ class _UbicacionState extends State<Ubicacion> {
           ),
         );
 
-        _marcadores.removeWhere((m) => m.markerId == const MarkerId("destino"));
-        _marcadores.add(
+        _marcadores = {
+          Marker(
+            markerId: const MarkerId("origen"),
+            position: widget.origen,
+            infoWindow: const InfoWindow(title: "Origen"),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+          ),
           Marker(
             markerId: const MarkerId("destino"),
             position: widget.destino,
             infoWindow: const InfoWindow(title: "Destino"),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
           ),
-        );
+        };
       });
+
+      _verificarLlegada(origen);
     }
   }
 
@@ -158,18 +127,17 @@ class _UbicacionState extends State<Ubicacion> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.nombreRuta ?? 'Ruta en tiempo real'),
+        title: Text(widget.nombreRuta ?? 'Ruta en mapa'),
       ),
       body: GoogleMap(
         initialCameraPosition: CameraPosition(
-          target: _ubicacionActual ?? widget.destino,
+          target: widget.origen,
           zoom: 14,
         ),
         onMapCreated: (controller) => _mapController = controller,
         markers: _marcadores,
         polylines: _polilineas,
         myLocationEnabled: false,
-        myLocationButtonEnabled: true,
         zoomControlsEnabled: false,
       ),
     );
