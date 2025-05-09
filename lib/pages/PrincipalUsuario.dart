@@ -10,7 +10,8 @@ import 'package:raitec/pages/RegistrarVehiculo.dart'; // Agregado para navegaci�
 import 'package:raitec/pages/sesion.dart';
 
 class PrincipalUsuario extends StatelessWidget {
-  const PrincipalUsuario({super.key});
+  final String numControl;
+  const PrincipalUsuario({super.key, required this.numControl});
 
   @override
   Widget build(BuildContext context) {
@@ -52,50 +53,8 @@ class PrincipalUsuario extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
-                  const SizedBox(height: 24),
-
-                  // Botones principales con eventos
-                  buildBoton(
-                    'BUSCAR UNA RUTA',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => MisRutas()),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  buildBoton(
-                    'COSTOS',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => InfoCostos()),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  buildBoton(
-                    'MI INFORMACIÓN',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => InfoUsuario()),
-                      );
-                    },
-                  ),
-                  const Spacer(),
-                  buildBoton(
-                    'CERRAR SESIÓN',
-                    color: Colors.lightBlueAccent,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => InicioSesion()),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 80),
+                  const SizedBox(height: 8),
+                  Image.asset('assets/LogoPantallas.png', height: 60),
                 ],
               ),
             ),
@@ -285,8 +244,7 @@ class PrincipalUsuario extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed:
-            onPressed ?? () {}, // Usa el callback proporcionado o uno vacío
+        onPressed: onPressed ?? () {},
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           padding: const EdgeInsets.symmetric(vertical: 16),
