@@ -20,39 +20,47 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
     _cargarRutasDesdeFirestore();
   }
 
-  Future<void> _cargarRutasDesdeFirestore() async {
-    final snapshot = await FirebaseFirestore.instance.collection('usuarios').get();
+ Future<void> _cargarRutasDesdeFirestore() async {
+  final snapshot = await FirebaseFirestore.instance.collection('usuarios').get();
+  List<Map<String, dynamic>> rutasTemp = [];
 
-    List<Map<String, dynamic>> rutasTemp = [];
+  for (var doc in snapshot.docs) {
+    final usuarioData = doc.data();
+    final rutasRef = doc.reference.collection('rutas').doc('info');
+    final rutaDoc = await rutasRef.get();
 
-    for (var doc in snapshot.docs) {
-      final rutasRef = doc.reference.collection('rutas').doc('info');
-      final rutaDoc = await rutasRef.get();
+    if (rutaDoc.exists) {
+      final data = rutaDoc.data()!;
+      final destino = data['destino'];
+      final horarios = data['horarios'];
 
-      if (rutaDoc.exists) {
-        final data = rutaDoc.data()!;
-        final destino = data['destino'];
-        final origen = data['origen'];
-
-        rutasTemp.add({
-          'ruta': 'RUTA DE ${doc.id}',
-          'conductor': doc.data()['nombre'] ?? 'Sin nombre',
-          'email': doc.data()['email'] ?? 'Sin correo',
-          'telefono': doc.data()['telefono'] ?? 'Sin número',
-          'horario': destino['dias'] != null && destino['horaSalida'] != null
-              ? '${destino['dias']} - ${destino['horaSalida']}'
-              : 'Horario no disponible',
-          'precio': 25, // Puedes personalizar este valor si lo agregas en Firestore
-          'lat': destino['lat'],
-          'lng': destino['lng'],
-        });
+      String horarioTexto = 'Horario no disponible';
+      if (horarios != null && horarios is List && horarios.isNotEmpty) {
+        final primerHorario = horarios[0];
+        final dia = primerHorario['dia'];
+        final horaInicio = primerHorario['horaInicio'];
+        final horaFin = primerHorario['horaFin'];
+        horarioTexto = '$dia: $horaInicio - $horaFin';
       }
-    }
 
-    setState(() {
-      rutas = rutasTemp;
-    });
+      rutasTemp.add({
+        'ruta': 'RUTA DE ${doc.id}',
+        'conductor': usuarioData['nombre'] ?? 'Sin nombre',
+        'email': usuarioData['email'] ?? 'Sin correo',
+        'telefono': usuarioData['telefono'] ?? 'Sin número',
+        'horario': horarioTexto,
+        'precio': 25,
+        'lat': destino['lat'],
+        'lng': destino['lng'],
+      });
+    }
   }
+
+  setState(() {
+    rutas = rutasTemp;
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -89,118 +97,84 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
       body: rutas.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
-        itemCount: rutas.length,
-        itemBuilder: (context, index) {
-          final ruta = rutas[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            elevation: 6,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    ruta['ruta'],
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: raitecBlue,
-                    ),
+              itemCount: rutas.length,
+              itemBuilder: (context, index) {
+                final ruta = rutas[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  const SizedBox(height: 8),
-                  _infoRow(Icons.person, ruta['conductor'], Colors.blueGrey),
-                  _infoRow(Icons.email, ruta['email'], Colors.redAccent),
-                  _infoRow(Icons.phone, ruta['telefono'], Colors.green),
-                  _infoRow(Icons.schedule, ruta['horario'], Colors.orange),
-                  const SizedBox(height: 10),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Ubicacion(
-                            destino: LatLng(ruta['lat'], ruta['lng']),
-                            nombreRuta: ruta['ruta'],
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ruta['ruta'],
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: raitecBlue,
                           ),
                         ),
-                      );
-                    },
-                    icon: Icon(Icons.map, color: raitecBlue),
-                    label: const Text("Ver ruta en mapa"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: raitecBlue,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      elevation: 3,
+                        const SizedBox(height: 8),
+                        _infoRow(Icons.person, ruta['conductor'], Colors.blueGrey),
+                        _infoRow(Icons.email, ruta['email'], Colors.redAccent),
+                        _infoRow(Icons.phone, ruta['telefono'], Colors.green),
+                        _infoRow(Icons.schedule, ruta['horario'], Colors.orange),
+                        const SizedBox(height: 10),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Ubicacion(
+                                  destino: LatLng(ruta['lat'], ruta['lng']),
+                                  nombreRuta: ruta['ruta'],
+                                ),
+                              ),
+                            );
+                          },
+                          icon: Icon(Icons.map, color: raitecBlue),
+                          label: const Text("Ver ruta en mapa"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: raitecBlue,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 3,
+                          ),
+                        ),
+                        const Divider(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '\$${ruta['precio']} MXN',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Icon(Icons.map, color: raitecBlue),
+                                const SizedBox(width: 6),
+                                const Icon(Icons.location_on, color: Colors.redAccent),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  const Divider(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '\$${ruta['precio']} MXN',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Icon(Icons.map, color: raitecBlue),
-                          const SizedBox(width: 6),
-                          const Icon(Icons.location_on,
-                              color: Colors.redAccent),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
-      ),
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        color: raitecBlue,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new,
-                    size: 28, color: Colors.blueGrey),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.home_filled,
-                    size: 30, color: Colors.blueAccent),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              const SizedBox(width: 28),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: raitecBlue,
-        onPressed: () {},
-        child: const Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
