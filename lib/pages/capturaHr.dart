@@ -13,19 +13,37 @@ class CapturarHorarioRuta extends StatefulWidget {
 
 class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _horaController = TextEditingController();
-  final TextEditingController _diasController = TextEditingController();
   final TextEditingController _asientosController = TextEditingController();
-
   LatLng? origenSeleccionado;
-  final LatLng destinoFijo = const LatLng(24.03265897848829, -104.64678790491564);
+  final LatLng destinoFijo =
+      const LatLng(24.03265897848829, -104.64678790491564);
 
-  void _seleccionarUbicacion() async {
+  final List<String> dias = [
+    'Lunes',
+    'Martes',
+    'Miércoles',
+    'Jueves',
+    'Viernes',
+    'Sábado',
+    'Domingo'
+  ];
+  Map<String, bool> diasActivos = {};
+  Map<String, TimeOfDay> horaInicio = {};
+
+  @override
+  void initState() {
+    super.initState();
+    for (var dia in dias) {
+      diasActivos[dia] = false;
+      horaInicio[dia] = const TimeOfDay(hour: 9, minute: 0);
+    }
+  }
+
+  Future<void> _seleccionarUbicacion() async {
     final resultado = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const SeleccionarUbicacion()),
     );
-
     if (resultado != null && resultado is LatLng) {
       setState(() {
         origenSeleccionado = resultado;
@@ -33,12 +51,28 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
     }
   }
 
+  Future<void> _seleccionarHora(String dia) async {
+    final TimeOfDay? seleccionada = await showTimePicker(
+      context: context,
+      initialTime: horaInicio[dia]!,
+    );
+    if (seleccionada != null) {
+      setState(() {
+        horaInicio[dia] = seleccionada;
+      });
+    }
+  }
+
   Future<void> _guardarRuta() async {
     final clave = SessionManager().numControl;
-
-    if (!_formKey.currentState!.validate() || origenSeleccionado == null || clave == null || clave.isEmpty) {
+    if (!_formKey.currentState!.validate() ||
+        origenSeleccionado == null ||
+        clave == null ||
+        clave.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor completa todos los campos y selecciona una ubicación')),
+        const SnackBar(
+            content: Text(
+                'Por favor completa todos los campos y selecciona una ubicación')),
       );
       return;
     }
@@ -49,10 +83,16 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         .collection('rutas')
         .doc('info');
 
+    final diasSeleccionados = dias
+        .where((d) => diasActivos[d]!)
+        .map((d) => {
+              'dia': d,
+              'horaInicio': horaInicio[d]!.format(context),
+            })
+        .toList();
+
     try {
       await docRef.set({
-        'horaSalida': _horaController.text,
-        'dias': _diasController.text,
         'lugaresDisponibles': int.parse(_asientosController.text),
         'origen': {
           'lat': origenSeleccionado!.latitude,
@@ -62,20 +102,17 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
           'lat': destinoFijo.latitude,
           'lng': destinoFijo.longitude,
         },
+        'horarios': diasSeleccionados,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ruta guardada exitosamente')),
       );
-
-      // Limpiar campos
-      _horaController.clear();
-      _diasController.clear();
       _asientosController.clear();
       setState(() {
         origenSeleccionado = null;
+        for (var d in dias) diasActivos[d] = false;
       });
-
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al guardar: $e')),
@@ -94,22 +131,49 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
           child: Column(
             children: [
               TextFormField(
-                controller: _diasController,
-                decoration: const InputDecoration(labelText: 'Días del viaje (ej. Lunes-Viernes)'),
-                validator: (value) => value!.isEmpty ? 'Escribe los días' : null,
-              ),
-              TextFormField(
-                controller: _horaController,
-                decoration: const InputDecoration(labelText: 'Hora de salida (ej. 3:00pm)'),
-                validator: (value) => value!.isEmpty ? 'Escribe la hora' : null,
-              ),
-              TextFormField(
                 controller: _asientosController,
-                decoration: const InputDecoration(labelText: 'Asientos traseros disponibles'),
+                decoration: const InputDecoration(
+                    labelText: 'Asientos traseros disponibles'),
                 keyboardType: TextInputType.number,
-                validator: (value) => value!.isEmpty ? 'Escribe los asientos' : null,
+                validator: (value) =>
+                    value!.isEmpty ? 'Escribe los asientos' : null,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView(
+                  children: dias.map((dia) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SwitchListTile(
+                          title: Text(dia),
+                          value: diasActivos[dia]!,
+                          onChanged: (bool value) {
+                            setState(() {
+                              diasActivos[dia] = value;
+                            });
+                          },
+                        ),
+                        if (diasActivos[dia]!)
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Row(
+                              children: [
+                                Text('Inicio:'),
+                                TextButton(
+                                  onPressed: () => _seleccionarHora(dia),
+                                  child: Text(horaInicio[dia]!.format(context)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        const Divider(),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
               ElevatedButton.icon(
                 onPressed: _seleccionarUbicacion,
                 icon: const Icon(Icons.location_pin),
@@ -117,7 +181,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                     ? 'Seleccionar punto de partida'
                     : 'Ubicación seleccionada'),
               ),
-              const Spacer(),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _guardarRuta,
                 child: const Text('Guardar ruta'),
