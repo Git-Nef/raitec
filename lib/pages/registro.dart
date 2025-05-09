@@ -22,7 +22,6 @@ class _RegistroState extends State<Registro> {
   final _nip = TextEditingController();
   final _confirmNip = TextEditingController();
   final _nombre = TextEditingController();
-  final _email = TextEditingController();
   final _edad = TextEditingController();
   final _carrera = TextEditingController();
   final _direccion = TextEditingController();
@@ -96,7 +95,6 @@ class _RegistroState extends State<Registro> {
         _nip.text.trim().isNotEmpty &&
         _confirmNip.text.trim().isNotEmpty &&
         _nombre.text.trim().isNotEmpty &&
-        _email.text.trim().isNotEmpty &&
         _edad.text.trim().isNotEmpty &&
         _carrera.text.trim().isNotEmpty &&
         _direccion.text.trim().isNotEmpty &&
@@ -132,8 +130,6 @@ class _RegistroState extends State<Registro> {
                 _input('NIP', _nip, obscure: true),
                 _input('Confirmar NIP', _confirmNip, obscure: true),
                 _input('Nombre Completo', _nombre),
-                _input('Correo Electrónico', _email,
-                    keyboard: TextInputType.emailAddress),
                 _input('Edad', _edad, keyboard: TextInputType.number),
                 _input('Carrera', _carrera),
                 _input('Dirección', _direccion),
@@ -172,8 +168,6 @@ class _RegistroState extends State<Registro> {
                         ? () async {
                             final nip = _nip.text.trim();
                             final confirm = _confirmNip.text.trim();
-                            final email = _email.text.trim();
-
                             if (nip != confirm) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -181,18 +175,6 @@ class _RegistroState extends State<Registro> {
                               );
                               return;
                             }
-
-                            final emailValido =
-                                RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
-                                    .hasMatch(email);
-                            if (!emailValido) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Correo inválido')),
-                              );
-                              return;
-                            }
-
                             try {
                               await firestore.crearUsuario(
                                 _numControl.text.trim(),
@@ -200,7 +182,6 @@ class _RegistroState extends State<Registro> {
                                   'numControl': _numControl.text.trim(),
                                   'nip': nip,
                                   'nombre': _nombre.text.trim(),
-                                  'email': email,
                                   'edad': int.tryParse(_edad.text.trim()) ?? 0,
                                   'carrera': _carrera.text.trim(),
                                   'direccion': _direccion.text.trim(),

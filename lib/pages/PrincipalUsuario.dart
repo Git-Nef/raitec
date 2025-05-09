@@ -187,7 +187,7 @@ class PrincipalUsuario extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Aspirar(),
+                      builder: (context) => Aspirar(numControl: numControl),
                     ),
                   );
                 },

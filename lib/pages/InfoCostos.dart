@@ -16,13 +16,21 @@ class InfoCostos extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Icon(Icons.arrow_back_ios_new,
-                  size: 28, color: Colors.blueGrey),
-              const Icon(Icons.home_filled, size: 30, color: Colors.blueAccent),
-              CircleAvatar(
-                backgroundImage: NetworkImage(
-                    'https://example.com/user-photo.jpg'), // URL de ejemplo para la foto del usuario
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new,
+                    size: 28, color: Colors.blueGrey),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
+              IconButton(
+                icon: const Icon(Icons.home_filled,
+                    size: 30, color: Colors.blueAccent),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(width: 28), // Reemplazo del avatar eliminado
             ],
           ),
         ),
