@@ -21,9 +21,7 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
   }
 
   Future<void> _cargarRutasDesdeFirestore() async {
-    final snapshot =
-        await FirebaseFirestore.instance.collection('usuarios').get();
-
+    final snapshot = await FirebaseFirestore.instance.collection('usuarios').get();
     List<Map<String, dynamic>> rutasTemp = [];
 
     for (var doc in snapshot.docs) {
@@ -32,21 +30,28 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
 
       if (rutaDoc.exists) {
         final data = rutaDoc.data()!;
-        final destino = data['destino'];
         final origen = data['origen'];
+        final destino = data['destino'];
+        final horarios = data['horarios'] as List<dynamic>?;
+        final lugares = data['lugaresDisponibles'];
 
-        rutasTemp.add({
-          'ruta': 'RUTA DE ${doc.id}',
-          'conductor': doc.data()['nombre'] ?? 'Sin nombre',
-          'email': doc.data().containsKey('email') ? doc.data()['email'] : null,
-          'telefono': doc.data()['telefono'] ?? 'Sin número',
-          'horario': data['dias'] != null && data['horaEntrada'] != null
-              ? '${data['dias']} - ${data['horaEntrada']}'
-              : 'Horario no disponible',
-          'precio': 25, // Puedes cambiarlo si tienes este campo en Firestore
-          'origen': LatLng(origen['lat'], origen['lng']),
-          'destino': LatLng(destino['lat'], destino['lng']),
-        });
+        if (origen != null && destino != null && horarios != null) {
+          final horarioTexto = horarios.map((h) {
+            return '${h['dia']} (${h['horaInicio']})';
+          }).join(', ');
+
+          rutasTemp.add({
+            'ruta': 'RUTA DE ${doc.id}',
+            'conductor': doc.data()['nombre'] ?? 'Sin nombre',
+            'email': doc.data().containsKey('email') ? doc.data()['email'] : 'Sin correo',
+            'telefono': doc.data()['telefono'] ?? 'Sin número',
+            'horario': horarioTexto,
+            'precio': 25,
+            'origen': LatLng(origen['lat'], origen['lng']),
+            'destino': LatLng(destino['lat'], destino['lng']),
+            'lugaresDisponibles': lugares ?? 0,
+          });
+        }
       }
     }
 
@@ -90,90 +95,86 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
       body: rutas.isEmpty
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
-              itemCount: rutas.length,
-              itemBuilder: (context, index) {
-                final ruta = rutas[index];
-                return Card(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  elevation: 6,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          ruta['ruta'],
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: raitecBlue,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        _infoRow(
-                            Icons.person, ruta['conductor'], Colors.blueGrey),
-                        if (ruta['email'] != null)
-                          _infoRow(
-                              Icons.email, ruta['email'], Colors.redAccent),
-                        _infoRow(Icons.phone, ruta['telefono'], Colors.green),
-                        _infoRow(
-                            Icons.schedule, ruta['horario'], Colors.orange),
-                        const SizedBox(height: 10),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Ubicacion(
-                                  origen: ruta['origen'],
-                                  destino: ruta['destino'],
-                                  nombreRuta: ruta['ruta'],
-                                ),
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.map, color: raitecBlue),
-                          label: const Text("Ver ruta en mapa"),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: raitecBlue,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                            elevation: 3,
-                          ),
-                        ),
-                        const Divider(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '\$${ruta['precio']} MXN',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                Icon(Icons.map, color: raitecBlue),
-                                const SizedBox(width: 6),
-                                const Icon(Icons.location_on,
-                                    color: Colors.redAccent),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
+        itemCount: rutas.length,
+        itemBuilder: (context, index) {
+          final ruta = rutas[index];
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            elevation: 6,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    ruta['ruta'],
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: raitecBlue,
                     ),
                   ),
-                );
-              },
+                  const SizedBox(height: 8),
+                  _infoRow(Icons.person, ruta['conductor'], Colors.blueGrey),
+                  _infoRow(Icons.email, ruta['email'], Colors.redAccent),
+                  _infoRow(Icons.phone, ruta['telefono'], Colors.green),
+                  _infoRow(Icons.schedule, ruta['horario'], Colors.orange),
+                  _infoRow(Icons.event_seat, 'Asientos disponibles: ${ruta['lugaresDisponibles']}', Colors.purple),
+                  const SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Ubicacion(
+                            origen: ruta['origen'],
+                            destino: ruta['destino'],
+                            nombreRuta: ruta['ruta'],
+                          ),
+                        ),
+                      );
+                    },
+                    icon: Icon(Icons.map, color: raitecBlue),
+                    label: const Text("Ver ruta en mapa"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: raitecBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 3,
+                    ),
+                  ),
+                  const Divider(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '\$${ruta['precio']} MXN',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Icon(Icons.map, color: raitecBlue),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.location_on, color: Colors.redAccent),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
+          );
+        },
+      ),
       bottomNavigationBar: BottomAppBar(
         color: Colors.white,
         elevation: 10,
@@ -184,17 +185,15 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new,
-                    size: 28, color: Colors.blueGrey),
+                icon: const Icon(Icons.arrow_back_ios_new, size: 28, color: Colors.blueGrey),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.home_filled,
-                    size: 30, color: Colors.blueAccent),
+                icon: const Icon(Icons.home_filled, size: 30, color: Colors.blueAccent),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.popUntil(context, (route) => route.isFirst);
                 },
               ),
               const SizedBox(width: 28),
