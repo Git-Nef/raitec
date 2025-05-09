@@ -46,13 +46,15 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
 
         rutasTemp.add({
           'ruta': 'RUTA DE ${doc.id}',
-          'conductor': usuarioData['nombre'] ?? 'Sin nombre',
-          'email': usuarioData['email'] ?? 'Sin correo',
-          'telefono': usuarioData['telefono'] ?? 'Sin número',
-          'horario': horarioTexto,
-          'precio': 25,
-          'lat': destino['lat'],
-          'lng': destino['lng'],
+          'conductor': doc.data()['nombre'] ?? 'Sin nombre',
+          'email': doc.data()['email'] ?? 'Sin correo',
+          'telefono': doc.data()['telefono'] ?? 'Sin número',
+          'horario': data['dias'] != null && data['horaEntrada'] != null
+              ? '${data['dias']} - ${data['horaEntrada']}'
+              : 'Horario no disponible',
+          'precio': 25, // Puedes cambiarlo si tienes este campo en Firestore
+          'origen': LatLng(origen['lat'], origen['lng']),
+          'destino': LatLng(destino['lat'], destino['lng']),
         });
       }
     }
@@ -107,17 +109,21 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          ruta['ruta'],
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: raitecBlue,
+                  const SizedBox(height: 8),
+                  _infoRow(Icons.person, ruta['conductor'], Colors.blueGrey),
+                  _infoRow(Icons.email, ruta['email'], Colors.redAccent),
+                  _infoRow(Icons.phone, ruta['telefono'], Colors.green),
+                  _infoRow(Icons.schedule, ruta['horario'], Colors.orange),
+                  const SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Ubicacion(
+                            origen: ruta['origen'],
+                            destino: ruta['destino'],
+                            nombreRuta: ruta['ruta'],
                           ),
                         ),
                         const SizedBox(height: 8),
