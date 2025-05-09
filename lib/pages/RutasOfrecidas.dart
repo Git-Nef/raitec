@@ -23,26 +23,17 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
   Future<void> _cargarRutasDesdeFirestore() async {
     final snapshot =
         await FirebaseFirestore.instance.collection('usuarios').get();
+
     List<Map<String, dynamic>> rutasTemp = [];
 
     for (var doc in snapshot.docs) {
-      final usuarioData = doc.data();
       final rutasRef = doc.reference.collection('rutas').doc('info');
       final rutaDoc = await rutasRef.get();
 
       if (rutaDoc.exists) {
         final data = rutaDoc.data()!;
         final destino = data['destino'];
-        final horarios = data['horarios'];
-
-        String horarioTexto = 'Horario no disponible';
-        if (horarios != null && horarios is List && horarios.isNotEmpty) {
-          final primerHorario = horarios[0];
-          final dia = primerHorario['dia'];
-          final horaInicio = primerHorario['horaInicio'];
-          final horaFin = primerHorario['horaFin'];
-          horarioTexto = '$dia: $horaInicio - $horaFin';
-        }
+        final origen = data['origen'];
 
         rutasTemp.add({
           'ruta': 'RUTA DE ${doc.id}',
@@ -109,21 +100,17 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  const SizedBox(height: 8),
-                  _infoRow(Icons.person, ruta['conductor'], Colors.blueGrey),
-                  _infoRow(Icons.email, ruta['email'], Colors.redAccent),
-                  _infoRow(Icons.phone, ruta['telefono'], Colors.green),
-                  _infoRow(Icons.schedule, ruta['horario'], Colors.orange),
-                  const SizedBox(height: 10),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Ubicacion(
-                            origen: ruta['origen'],
-                            destino: ruta['destino'],
-                            nombreRuta: ruta['ruta'],
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ruta['ruta'],
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: raitecBlue,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -140,7 +127,8 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => Ubicacion(
-                                  destino: LatLng(ruta['lat'], ruta['lng']),
+                                  origen: ruta['origen'],
+                                  destino: ruta['destino'],
                                   nombreRuta: ruta['ruta'],
                                 ),
                               ),
@@ -152,8 +140,7 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                             backgroundColor: Colors.white,
                             foregroundColor: raitecBlue,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                                borderRadius: BorderRadius.circular(12)),
                             elevation: 3,
                           ),
                         ),
@@ -185,6 +172,34 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                 );
               },
             ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.white,
+        elevation: 10,
+        shape: const CircularNotchedRectangle(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new,
+                    size: 28, color: Colors.blueGrey),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.home_filled,
+                    size: 30, color: Colors.blueAccent),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(width: 28),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
