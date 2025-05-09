@@ -5,9 +5,13 @@ import 'package:raitec/pages/InfoVehiculo.dart';
 import 'package:raitec/pages/PrincipalUsuario.dart';
 import 'package:raitec/pages/Registro.dart';
 import 'package:raitec/pages/ISConductores.dart';
+import 'package:raitec/pages/InicioSesion.dart';
+import 'package:raitec/pages/sesion.dart';
 
 class PrincipalConductor extends StatelessWidget {
-  const PrincipalConductor({super.key});
+  final String numControl;
+
+  const PrincipalConductor({super.key, required this.numControl});
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +29,6 @@ class PrincipalConductor extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        title: Image.asset(
-          'assets/LogoPantallas.png',
-          height: 90,
-        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_none, color: Colors.black),
@@ -135,9 +135,15 @@ class PrincipalConductor extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 32),
+            Center(
+              child: Image.asset(
+                'assets/SplashScreen.png',
+                height: 180,
+              ),
+            ),
+            const SizedBox(height: 24),
             const Text(
               'Bienvenido al servicio de conductor de RaiTec',
               textAlign: TextAlign.center,
@@ -147,84 +153,45 @@ class PrincipalConductor extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 40),
-
-            // Botón 1
             buildButton('Mi información', () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => InfoUsuario()),
               );
             }),
-
             const SizedBox(height: 24),
-
-            // Botón 2
             buildButton('Mi vehículo', () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => InfoVehiculo()),
               );
             }),
-
             const SizedBox(height: 24),
-
-            // Botón 3
             buildButton('Mis rutas', () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => MisRutas()),
               );
             }),
+            const Spacer(),
+            buildButton('CERRAR SESIÓN', () {
+              _confirmarCerrarSesion(context);
+            }, color: Colors.red),
+            const SizedBox(height: 80),
           ],
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.lightBlue,
-        elevation: 8,
-        child: SizedBox(
-          height: 70,
-          child: Stack(
-            children: [
-              // Ícono de Home centrado
-              Align(
-                alignment: Alignment.center,
-                child: IconButton(
-                  icon: const Icon(Icons.home, size: 42, color: Colors.white),
-                  onPressed: () {
-                    // Acción de Home
-                  },
-                ),
-              ),
-
-              // Ícono de Perfil a la derecha
-              Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: IconButton(
-                    icon: const Icon(Icons.account_circle,
-                        size: 42, color: Colors.white),
-                    onPressed: () {
-                      // Acción de perfil
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
   }
 
-  // Botón reutilizable
-  Widget buildButton(String text, VoidCallback onPressed) {
+  Widget buildButton(String text, VoidCallback onPressed,
+      {Color color = Colors.blue}) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
+          backgroundColor: color,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -240,6 +207,36 @@ class PrincipalConductor extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _confirmarCerrarSesion(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirmación"),
+          content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Cancelar"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text("Aceptar"),
+              onPressed: () {
+                SessionManager().setNumControl('');
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const InicioSesion()),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

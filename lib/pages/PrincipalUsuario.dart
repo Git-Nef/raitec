@@ -17,41 +17,44 @@ class PrincipalUsuario extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Stack(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 2,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu, color: Colors.black),
+            onPressed: () {
+              Scaffold.of(context).openDrawer(); // Menú de hamburguesa
+            },
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications, size: 30),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text(
+                      'Notificaciones abiertas'))); // Icono de notificación
+            },
+          ),
+        ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Colors.blue),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      const Spacer(),
-                      IconButton(
-                        icon: const Icon(Icons.notifications, size: 30),
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Notificaciones abiertas')),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Center(
-                    child: Image.asset(
-                      'assets/SplashScreen.png',
-                      height: 180,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
                   const Text(
-                    'BIENVENIDO A RaiTec',
+                    'Menú',
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Image.asset('assets/LogoPantallas.png', height: 60),
@@ -184,7 +187,7 @@ class PrincipalUsuario extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Aspirar(numControl: numControl),
+                      builder: (context) => Aspirar(),
                     ),
                   );
                 },
@@ -205,37 +208,34 @@ class PrincipalUsuario extends StatelessWidget {
     );
   }
 
-            // Barra inferior
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                color: Colors.grey[400],
-                height: 70,
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Inicio seleccionado')),
-                        );
-                      },
-                      icon: const Icon(Icons.home, size: 32),
-                    ),
-                    CircleAvatar(
-                      radius: 22,
-                      backgroundImage: AssetImage('assets/user.jpg'),
-                    ),
-                  ],
-                ),
-              ),
+  // Función para mostrar confirmación al cerrar sesión
+  void _confirmarCerrarSesion(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirmación"),
+          content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Cancelar"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Cierra el diálogo
+              },
+            ),
+            TextButton(
+              child: const Text("Aceptar"),
+              onPressed: () {
+                SessionManager().setNumControl(''); // Limpiar sesión
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const InicioSesion()),
+                );
+              },
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 
