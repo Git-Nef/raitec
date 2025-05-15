@@ -122,9 +122,10 @@ class PrincipalUsuario extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 10),
               Center(
@@ -136,13 +137,13 @@ class PrincipalUsuario extends StatelessWidget {
               const SizedBox(height: 12),
               const Text(
                 'BIENVENIDO A RaiTec',
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
               ),
               const SizedBox(height: 24),
-              // Botones principales con eventos
               buildBoton(
                 'BUSCAR UNA RUTA',
                 onPressed: () {
@@ -192,15 +193,15 @@ class PrincipalUsuario extends StatelessWidget {
                   );
                 },
               ),
-              const Spacer(),
+              const SizedBox(height: 30),
               buildBoton(
                 'CERRAR SESIÓN',
-                color: Colors.red, // Botón rojo
+                color: Colors.red,
                 onPressed: () {
                   _confirmarCerrarSesion(context);
                 },
               ),
-              const SizedBox(height: 80),
+              const SizedBox(height: 40),
             ],
           ),
         ),

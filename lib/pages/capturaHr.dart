@@ -13,10 +13,12 @@ class CapturarHorarioRuta extends StatefulWidget {
 
 class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nombreRutaController = TextEditingController();
   final TextEditingController _asientosController = TextEditingController();
   LatLng? origenSeleccionado;
+
   final LatLng destinoFijo =
-      const LatLng(24.03265897848829, -104.64678790491564);
+  const LatLng(24.03265897848829, -104.64678790491564);
 
   final List<String> dias = [
     'Lunes',
@@ -27,6 +29,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
     'Sábado',
     'Domingo'
   ];
+
   Map<String, bool> diasActivos = {};
   Map<String, TimeOfDay> horaInicio = {};
 
@@ -71,8 +74,26 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         clave.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text(
-                'Por favor completa todos los campos y selecciona una ubicación')),
+          content: Text(
+              'Por favor completa todos los campos y selecciona una ubicación'),
+        ),
+      );
+      return;
+    }
+
+    final List<Map<String, String>> diasSeleccionados = [];
+    for (var dia in dias) {
+      if (diasActivos[dia] == true) {
+        diasSeleccionados.add({
+          'dia': dia,
+          'horaInicio': horaInicio[dia]!.format(context),
+        });
+      }
+    }
+
+    if (diasSeleccionados.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecciona al menos un día y hora')),
       );
       return;
     }
@@ -84,8 +105,8 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         .doc('info');
 
     try {
-      var diasSeleccionados;
       await docRef.set({
+        'nombreRuta': _nombreRutaController.text.trim(),
         'lugaresDisponibles': int.parse(_asientosController.text),
         'origen': {
           'lat': origenSeleccionado!.latitude,
@@ -101,11 +122,16 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ruta guardada exitosamente')),
       );
+
+      // Limpiar todo
+      _nombreRutaController.clear();
       _asientosController.clear();
       setState(() {
         origenSeleccionado = null;
-        for (var d in dias) diasActivos[d] = false;
-        for (var d in dias) diasActivos[d] = false;
+        for (var d in dias) {
+          diasActivos[d] = false;
+          horaInicio[d] = const TimeOfDay(hour: 9, minute: 0);
+        }
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -125,12 +151,21 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
           child: Column(
             children: [
               TextFormField(
+                controller: _nombreRutaController,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre de la ruta ejemplo: (Jardines)',
+                ),
+                validator: (value) =>
+                value!.isEmpty ? 'Escribe un nombre para la ruta' : null,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
                 controller: _asientosController,
                 decoration: const InputDecoration(
                     labelText: 'Asientos traseros disponibles'),
                 keyboardType: TextInputType.number,
                 validator: (value) =>
-                    value!.isEmpty ? 'Escribe los asientos' : null,
+                value!.isEmpty ? 'Escribe los asientos' : null,
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -151,46 +186,11 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                         if (diasActivos[dia]!)
                           Padding(
                             padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            const EdgeInsets.symmetric(horizontal: 16.0),
                             child: Row(
                               children: [
-                                Text('Inicio:'),
-                                TextButton(
-                                  onPressed: () => _seleccionarHora(dia),
-                                  child: Text(horaInicio[dia]!.format(context)),
-                                ),
-                              ],
-                            ),
-                          ),
-                        const Divider(),
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: ListView(
-                  children: dias.map((dia) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SwitchListTile(
-                          title: Text(dia),
-                          value: diasActivos[dia]!,
-                          onChanged: (bool value) {
-                            setState(() {
-                              diasActivos[dia] = value;
-                            });
-                          },
-                        ),
-                        if (diasActivos[dia]!)
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Row(
-                              children: [
-                                Text('Inicio:'),
+                                const Text('Inicio:'),
+                                const SizedBox(width: 10),
                                 TextButton(
                                   onPressed: () => _seleccionarHora(dia),
                                   child: Text(horaInicio[dia]!.format(context)),

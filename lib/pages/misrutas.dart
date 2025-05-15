@@ -17,6 +17,7 @@ class _MisRutasState extends State<MisRutas> {
   Map<String, dynamic>? rutaData;
   String horarioTexto = '';
   int lugaresDisponibles = 0;
+  String nombreRuta = 'Sin nombre';
 
   @override
   void initState() {
@@ -41,8 +42,8 @@ class _MisRutasState extends State<MisRutas> {
       final destino = data['destino'];
       final horarios = data['horarios'] as List<dynamic>?;
       lugaresDisponibles = data['lugaresDisponibles'] ?? 0;
+      nombreRuta = data['nombreRuta'] ?? 'Sin nombre';
 
-      // Construir string de horarios
       if (horarios != null) {
         horarioTexto = horarios.map((h) {
           return '${h['dia']} (${h['horaInicio']})';
@@ -51,18 +52,23 @@ class _MisRutasState extends State<MisRutas> {
         horarioTexto = 'Sin horarios registrados';
       }
 
-      final origenPlacemark = await placemarkFromCoordinates(origen['lat'], origen['lng']);
-      final destinoPlacemark = await placemarkFromCoordinates(destino['lat'], destino['lng']);
+      final origenPlacemark =
+      await placemarkFromCoordinates(origen['lat'], origen['lng']);
+      final destinoPlacemark =
+      await placemarkFromCoordinates(destino['lat'], destino['lng']);
 
       setState(() {
         rutaData = data;
-        direccionOrigen = '${origenPlacemark.first.street}, ${origenPlacemark.first.locality}';
-        direccionDestino = '${destinoPlacemark.first.street}, ${destinoPlacemark.first.locality}';
+        direccionOrigen =
+        '${origenPlacemark.first.street}, ${origenPlacemark.first.locality}';
+        direccionDestino =
+        '${destinoPlacemark.first.street}, ${destinoPlacemark.first.locality}';
       });
     }
   }
 
-  Widget _rutaCard(String origenTxt, String destinoTxt, String horariosTxt, int lugares) {
+  Widget _rutaCard(String nombre, String origenTxt, String destinoTxt,
+      String horariosTxt, int lugares) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 6,
@@ -72,9 +78,9 @@ class _MisRutasState extends State<MisRutas> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Ruta Programada',
-              style: TextStyle(
+            Text(
+              nombre,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF0D66D0),
@@ -85,7 +91,9 @@ class _MisRutasState extends State<MisRutas> {
               children: [
                 const Icon(Icons.location_on, color: Colors.red),
                 const SizedBox(width: 8),
-                Expanded(child: Text(origenTxt, style: const TextStyle(fontSize: 14))),
+                Expanded(
+                    child:
+                    Text(origenTxt, style: const TextStyle(fontSize: 14))),
               ],
             ),
             const SizedBox(height: 5),
@@ -93,7 +101,9 @@ class _MisRutasState extends State<MisRutas> {
               children: [
                 const Icon(Icons.flag, color: Colors.green),
                 const SizedBox(width: 8),
-                Expanded(child: Text(destinoTxt, style: const TextStyle(fontSize: 14))),
+                Expanded(
+                    child:
+                    Text(destinoTxt, style: const TextStyle(fontSize: 14))),
               ],
             ),
             const Divider(height: 25),
@@ -149,13 +159,16 @@ class _MisRutasState extends State<MisRutas> {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const CapturarHorarioRuta()),
+                  MaterialPageRoute(
+                      builder: (context) => const CapturarHorarioRuta()),
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0D66D0),
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding:
+                const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
                 elevation: 6,
               ),
               child: const Text(
@@ -181,8 +194,16 @@ class _MisRutasState extends State<MisRutas> {
               ),
             ),
             const SizedBox(height: 15),
-            if (rutaData != null && direccionOrigen != null && direccionDestino != null)
-              _rutaCard(direccionOrigen!, direccionDestino!, horarioTexto, lugaresDisponibles)
+            if (rutaData != null &&
+                direccionOrigen != null &&
+                direccionDestino != null)
+              _rutaCard(
+                nombreRuta,
+                direccionOrigen!,
+                direccionDestino!,
+                horarioTexto,
+                lugaresDisponibles,
+              )
             else
               const Text("No tienes rutas registradas."),
           ],
