@@ -54,20 +54,12 @@ class _MisRutasState extends State<MisRutas> {
       }
 
       final origenPlacemark =
-      await placemarkFromCoordinates(origen['lat'], origen['lng']);
-      final destinoPlacemark =
-      await placemarkFromCoordinates(destino['lat'], destino['lng']);
-      final origenPlacemark =
           await placemarkFromCoordinates(origen['lat'], origen['lng']);
       final destinoPlacemark =
           await placemarkFromCoordinates(destino['lat'], destino['lng']);
 
       setState(() {
         rutaData = data;
-        direccionOrigen =
-        '${origenPlacemark.first.street}, ${origenPlacemark.first.locality}';
-        direccionDestino =
-        '${destinoPlacemark.first.street}, ${destinoPlacemark.first.locality}';
         direccionOrigen =
             '${origenPlacemark.first.street}, ${origenPlacemark.first.locality}';
         direccionDestino =
@@ -78,8 +70,6 @@ class _MisRutasState extends State<MisRutas> {
 
   Widget _rutaCard(String nombre, String origenTxt, String destinoTxt,
       String horariosTxt, int lugares) {
-  Widget _rutaCard(
-      String origenTxt, String destinoTxt, String horariosTxt, int lugares) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 6,
@@ -104,9 +94,6 @@ class _MisRutasState extends State<MisRutas> {
                 const SizedBox(width: 8),
                 Expanded(
                     child:
-                    Text(origenTxt, style: const TextStyle(fontSize: 14))),
-                Expanded(
-                    child:
                         Text(origenTxt, style: const TextStyle(fontSize: 14))),
               ],
             ),
@@ -115,9 +102,6 @@ class _MisRutasState extends State<MisRutas> {
               children: [
                 const Icon(Icons.flag, color: Colors.green),
                 const SizedBox(width: 8),
-                Expanded(
-                    child:
-                    Text(destinoTxt, style: const TextStyle(fontSize: 14))),
                 Expanded(
                     child:
                         Text(destinoTxt, style: const TextStyle(fontSize: 14))),
@@ -178,16 +162,10 @@ class _MisRutasState extends State<MisRutas> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => const CapturarHorarioRuta()),
-                  MaterialPageRoute(
-                      builder: (context) => const CapturarHorarioRuta()),
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0D66D0),
-                padding:
-                const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 shape: RoundedRectangleBorder(
@@ -222,8 +200,8 @@ class _MisRutasState extends State<MisRutas> {
                 direccionDestino != null)
               Column(
                 children: [
-                  _rutaCard(direccionOrigen!, direccionDestino!, horarioTexto,
-                      lugaresDisponibles),
+                  _rutaCard(nombreRuta, direccionOrigen!, direccionDestino!,
+                      horarioTexto, lugaresDisponibles),
                   const SizedBox(height: 12),
                   ElevatedButton.icon(
                     onPressed: () {
@@ -247,16 +225,6 @@ class _MisRutasState extends State<MisRutas> {
                     ),
                   ),
                 ],
-              )
-            if (rutaData != null &&
-                direccionOrigen != null &&
-                direccionDestino != null)
-              _rutaCard(
-                nombreRuta,
-                direccionOrigen!,
-                direccionDestino!,
-                horarioTexto,
-                lugaresDisponibles,
               )
             else
               const Text("No tienes rutas registradas."),
