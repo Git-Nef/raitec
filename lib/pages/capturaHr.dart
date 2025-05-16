@@ -13,6 +13,7 @@ class CapturarHorarioRuta extends StatefulWidget {
 
 class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nombreRutaController = TextEditingController();
   final TextEditingController _asientosController = TextEditingController();
   LatLng? origenSeleccionado;
   final LatLng destinoFijo =
@@ -27,6 +28,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
     'Sábado',
     'Domingo'
   ];
+
   Map<String, bool> diasActivos = {};
   Map<String, TimeOfDay> horaInicio = {};
 
@@ -77,7 +79,6 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
       return;
     }
 
-    // Construir lista de días seleccionados con hora
     final diasSeleccionados = dias.where((dia) => diasActivos[dia]!).map((dia) {
       return {
         'dia': dia,
@@ -87,7 +88,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
 
     if (diasSeleccionados.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debes seleccionar al menos un día')),
+        const SnackBar(content: Text('Selecciona al menos un día y hora')),
       );
       return;
     }
@@ -100,6 +101,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
 
     try {
       await docRef.set({
+        'nombreRuta': _nombreRutaController.text.trim(),
         'lugaresDisponibles': int.parse(_asientosController.text),
         'origen': {
           'lat': origenSeleccionado!.latitude,
@@ -110,13 +112,13 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
           'lng': destinoFijo.longitude,
         },
         'horarios': diasSeleccionados,
-        'nombreRuta': 'Ruta de $clave'
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ruta guardada exitosamente')),
       );
 
+      _nombreRutaController.clear();
       _asientosController.clear();
       setState(() {
         origenSeleccionado = null;
@@ -142,6 +144,14 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
           key: _formKey,
           child: Column(
             children: [
+              TextFormField(
+                controller: _nombreRutaController,
+                decoration: const InputDecoration(
+                    labelText: 'Nombre de la ruta (Ejemplo: Jardines)'),
+                validator: (value) =>
+                    value!.isEmpty ? 'Escribe un nombre para la ruta' : null,
+              ),
+              const SizedBox(height: 12),
               TextFormField(
                 controller: _asientosController,
                 decoration: const InputDecoration(
@@ -173,6 +183,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                             child: Row(
                               children: [
                                 const Text('Hora de entrada:'),
+                                const SizedBox(width: 10),
                                 TextButton(
                                   onPressed: () => _seleccionarHora(dia),
                                   child: Text(horaInicio[dia]!.format(context)),

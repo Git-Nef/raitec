@@ -5,8 +5,8 @@ import 'package:raitec/pages/InicioSesion.dart';
 import 'package:raitec/pages/MisRutas.dart';
 import 'package:raitec/pages/RutasOfrecidas.dart';
 import 'package:raitec/pages/aspirar.dart';
-import 'package:raitec/pages/InfoVehiculo.dart'; // Agregado para navegación
-import 'package:raitec/pages/RegistrarVehiculo.dart'; // Agregado para navegación
+import 'package:raitec/pages/InfoVehiculo.dart';
+import 'package:raitec/pages/RegistrarVehiculo.dart';
 import 'package:raitec/pages/sesion.dart';
 
 class PrincipalUsuario extends StatelessWidget {
@@ -23,19 +23,18 @@ class PrincipalUsuario extends StatelessWidget {
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu, color: Colors.black),
-            onPressed: () {
-              Scaffold.of(context).openDrawer(); // Menú de hamburguesa
-            },
+            onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications, size: 30),
+            icon:
+                const Icon(Icons.notifications, size: 30, color: Colors.black),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text(
-                      'Notificaciones abiertas'))); // Icono de notificación
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Notificaciones abiertas')),
+              );
             },
           ),
         ],
@@ -52,16 +51,16 @@ class PrincipalUsuario extends StatelessWidget {
                   const Text(
                     'Menú',
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Image.asset('assets/LogoPantallas.png', height: 60),
                 ],
               ),
             ),
-            // Aquí agregamos los items para redirigir a las diferentes pantallas
             ListTile(
               leading: const Icon(Icons.directions_car),
               title: const Text('Registrar Vehículo'),
@@ -81,9 +80,7 @@ class PrincipalUsuario extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => InfoVehiculo(),
-                  ),
+                  MaterialPageRoute(builder: (context) => InfoVehiculo()),
                 );
               },
             ),
@@ -93,9 +90,7 @@ class PrincipalUsuario extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => InfoUsuario(),
-                  ),
+                  MaterialPageRoute(builder: (context) => InfoUsuario()),
                 );
               },
             ),
@@ -105,9 +100,7 @@ class PrincipalUsuario extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => MisRutas(),
-                  ),
+                  MaterialPageRoute(builder: (context) => MisRutas()),
                 );
               },
             ),
@@ -122,9 +115,10 @@ class PrincipalUsuario extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 10),
               Center(
@@ -136,42 +130,33 @@ class PrincipalUsuario extends StatelessWidget {
               const SizedBox(height: 12),
               const Text(
                 'BIENVENIDO A RaiTec',
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
               ),
               const SizedBox(height: 24),
-              // Botones principales con eventos
-              buildBoton(
-                'BUSCAR UNA RUTA',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RutasOfrecidas()),
-                  );
-                },
-              ),
+              buildBoton('BUSCAR UNA RUTA', onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => RutasOfrecidas()),
+                );
+              }),
               const SizedBox(height: 16),
-              buildBoton(
-                'COSTOS',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => InfoCostos()),
-                  );
-                },
-              ),
+              buildBoton('COSTOS', onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoCostos()),
+                );
+              }),
               const SizedBox(height: 16),
-              buildBoton(
-                'MI INFORMACIÓN',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => InfoUsuario()),
-                  );
-                },
-              ),
+              buildBoton('MI INFORMACIÓN', onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoUsuario()),
+                );
+              }),
               const SizedBox(height: 24),
               const Align(
                 alignment: Alignment.centerLeft,
@@ -181,26 +166,19 @@ class PrincipalUsuario extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              buildBoton(
-                'Elaborar Petición',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Aspirar(numControl: numControl),
-                    ),
-                  );
-                },
-              ),
-              const Spacer(),
-              buildBoton(
-                'CERRAR SESIÓN',
-                color: Colors.red, // Botón rojo
-                onPressed: () {
-                  _confirmarCerrarSesion(context);
-                },
-              ),
-              const SizedBox(height: 80),
+              buildBoton('Elaborar Petición', onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Aspirar(numControl: numControl),
+                  ),
+                );
+              }),
+              const SizedBox(height: 30),
+              buildBoton('CERRAR SESIÓN', color: Colors.red, onPressed: () {
+                _confirmarCerrarSesion(context);
+              }),
+              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -208,7 +186,6 @@ class PrincipalUsuario extends StatelessWidget {
     );
   }
 
-  // Función para mostrar confirmación al cerrar sesión
   void _confirmarCerrarSesion(BuildContext context) {
     showDialog(
       context: context,
@@ -219,14 +196,12 @@ class PrincipalUsuario extends StatelessWidget {
           actions: <Widget>[
             TextButton(
               child: const Text("Cancelar"),
-              onPressed: () {
-                Navigator.of(context).pop(); // Cierra el diálogo
-              },
+              onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
               child: const Text("Aceptar"),
               onPressed: () {
-                SessionManager().setNumControl(''); // Limpiar sesión
+                SessionManager().setNumControl('');
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => const InicioSesion()),

@@ -18,6 +18,7 @@ class _MisRutasState extends State<MisRutas> {
   Map<String, dynamic>? rutaData;
   String horarioTexto = '';
   int lugaresDisponibles = 0;
+  String nombreRuta = 'Sin nombre';
 
   @override
   void initState() {
@@ -42,8 +43,9 @@ class _MisRutasState extends State<MisRutas> {
       final destino = data['destino'];
       final horarios = data['horarios'] as List<dynamic>?;
       lugaresDisponibles = data['lugaresDisponibles'] ?? 0;
+      nombreRuta = data['nombreRuta'] ?? 'Ruta Programada';
 
-      if (horarios != null) {
+      if (horarios != null && horarios.isNotEmpty) {
         horarioTexto = horarios.map((h) {
           return '${h['dia']} (${h['horaInicio']})';
         }).join(', ');
@@ -66,8 +68,8 @@ class _MisRutasState extends State<MisRutas> {
     }
   }
 
-  Widget _rutaCard(
-      String origenTxt, String destinoTxt, String horariosTxt, int lugares) {
+  Widget _rutaCard(String nombre, String origenTxt, String destinoTxt,
+      String horariosTxt, int lugares) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 6,
@@ -77,9 +79,9 @@ class _MisRutasState extends State<MisRutas> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Ruta Programada',
-              style: TextStyle(
+            Text(
+              nombre,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF0D66D0),
@@ -91,8 +93,8 @@ class _MisRutasState extends State<MisRutas> {
                 const Icon(Icons.location_on, color: Colors.red),
                 const SizedBox(width: 8),
                 Expanded(
-                    child:
-                        Text(origenTxt, style: const TextStyle(fontSize: 14))),
+                  child: Text(origenTxt, style: const TextStyle(fontSize: 14)),
+                ),
               ],
             ),
             const SizedBox(height: 5),
@@ -101,8 +103,8 @@ class _MisRutasState extends State<MisRutas> {
                 const Icon(Icons.flag, color: Colors.green),
                 const SizedBox(width: 8),
                 Expanded(
-                    child:
-                        Text(destinoTxt, style: const TextStyle(fontSize: 14))),
+                  child: Text(destinoTxt, style: const TextStyle(fontSize: 14)),
+                ),
               ],
             ),
             const Divider(height: 25),
@@ -198,15 +200,16 @@ class _MisRutasState extends State<MisRutas> {
                 direccionDestino != null)
               Column(
                 children: [
-                  _rutaCard(direccionOrigen!, direccionDestino!, horarioTexto,
-                      lugaresDisponibles),
+                  _rutaCard(nombreRuta, direccionOrigen!, direccionDestino!,
+                      horarioTexto, lugaresDisponibles),
                   const SizedBox(height: 12),
                   ElevatedButton.icon(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const PasajerosPendientes()),
+                          builder: (context) => const PasajerosPendientes(),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.group),
