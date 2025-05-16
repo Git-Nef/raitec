@@ -5,8 +5,8 @@ import 'package:raitec/pages/InicioSesion.dart';
 import 'package:raitec/pages/MisRutas.dart';
 import 'package:raitec/pages/RutasOfrecidas.dart';
 import 'package:raitec/pages/aspirar.dart';
-import 'package:raitec/pages/InfoVehiculo.dart'; // Agregado para navegación
-import 'package:raitec/pages/RegistrarVehiculo.dart'; // Agregado para navegación
+import 'package:raitec/pages/InfoVehiculo.dart';
+import 'package:raitec/pages/RegistrarVehiculo.dart';
 import 'package:raitec/pages/sesion.dart';
 
 class PrincipalUsuario extends StatelessWidget {
@@ -16,31 +16,34 @@ class PrincipalUsuario extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 2,
+        backgroundColor: Colors.black,
+        elevation: 1,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.black),
-            onPressed: () {
-              Scaffold.of(context).openDrawer(); // Menú de hamburguesa
-            },
+            icon: const Icon(Icons.menu, color: Colors.white),
+            onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
         centerTitle: true,
+        title: const Text(
+          'RaiTec',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications, size: 30),
+            icon: const Icon(Icons.notifications_none, color: Colors.white),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text(
-                      'Notificaciones abiertas'))); // Icono de notificación
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Notificaciones abiertas')),
+              );
             },
           ),
         ],
       ),
       drawer: Drawer(
+        backgroundColor: Colors.grey[900],
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -49,138 +52,123 @@ class PrincipalUsuario extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Menú',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Image.asset('assets/LogoPantallas.png', height: 60),
+                  const Text('Menú',
+                      style: TextStyle(color: Colors.white, fontSize: 24)),
+                  const SizedBox(height: 10),
+                  Image.asset('assets/LogoPantallas.png', height: 50),
                 ],
               ),
             ),
-            // Aquí agregamos los items para redirigir a las diferentes pantallas
-            ListTile(
-              leading: const Icon(Icons.directions_car),
-              title: const Text('Registrar Vehículo'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        RegistrarVehiculo(numControl: numControl),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('Info Vehículo'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => InfoVehiculo(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.account_circle),
-              title: const Text('Mi Información'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => InfoUsuario(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.map),
-              title: const Text('Mis Rutas'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MisRutas(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.exit_to_app),
-              title: const Text('Cerrar sesión'),
-              onTap: () {
-                _confirmarCerrarSesion(context);
-              },
-            ),
+            _drawerItem(Icons.directions_car, 'Registrar Vehículo', () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RegistrarVehiculo(numControl: numControl),
+                ),
+              );
+            }),
+            _drawerItem(Icons.info, 'Info Vehículo', () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => InfoVehiculo()),
+              );
+            }),
+            _drawerItem(Icons.account_circle, 'Mi Información', () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => InfoUsuario()),
+              );
+            }),
+            _drawerItem(Icons.map, 'Mis Rutas', () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MisRutas()),
+              );
+            }),
+            _drawerItem(Icons.logout, 'Cerrar sesión', () {
+              _confirmarCerrarSesion(context);
+            }, color: Colors.redAccent),
           ],
         ),
       ),
       body: SafeArea(
+<<<<<<< HEAD
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
+=======
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+>>>>>>> neftali
             children: [
               const SizedBox(height: 10),
               Center(
-                child: Image.asset(
-                  'assets/SplashScreen.png',
-                  height: 180,
-                ),
+                child: Image.asset('assets/SplashScreen.png', height: 140),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
               const Text(
+<<<<<<< HEAD
                 'BIENVENIDO A RaiTec',
                 textAlign: TextAlign.center,
+=======
+                'Bienvenido a RaiTec',
+>>>>>>> neftali
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
               ),
               const SizedBox(height: 24),
+<<<<<<< HEAD
               buildBoton(
                 'BUSCAR UNA RUTA',
                 onPressed: () {
                   Navigator.push(
+=======
+              _actionCard(
+                context,
+                icon: Icons.search,
+                text: 'Buscar una ruta',
+                onTap: () => Navigator.push(
+>>>>>>> neftali
                     context,
-                    MaterialPageRoute(builder: (context) => RutasOfrecidas()),
-                  );
-                },
+                    MaterialPageRoute(builder: (context) => RutasOfrecidas())),
               ),
-              const SizedBox(height: 16),
-              buildBoton(
-                'COSTOS',
-                onPressed: () {
-                  Navigator.push(
+              _actionCard(
+                context,
+                icon: Icons.attach_money,
+                text: 'Costos',
+                onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => InfoCostos()),
-                  );
-                },
+                    MaterialPageRoute(builder: (context) => InfoCostos())),
               ),
-              const SizedBox(height: 16),
-              buildBoton(
-                'MI INFORMACIÓN',
-                onPressed: () {
-                  Navigator.push(
+              _actionCard(
+                context,
+                icon: Icons.person,
+                text: 'Mi información',
+                onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => InfoUsuario()),
-                  );
-                },
+                    MaterialPageRoute(builder: (context) => InfoUsuario())),
               ),
-              const SizedBox(height: 24),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '¿Quieres ser conductor?',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              const SizedBox(height: 30),
+              const Text(
+                '¿Quieres ser conductor?',
+                style: TextStyle(color: Colors.white70, fontSize: 16),
+              ),
+              _actionCard(
+                context,
+                icon: Icons.drive_eta,
+                text: 'Elaborar petición',
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Aspirar(numControl: numControl)),
                 ),
               ),
+<<<<<<< HEAD
               const SizedBox(height: 10),
               buildBoton(
                 'Elaborar Petición',
@@ -202,6 +190,17 @@ class PrincipalUsuario extends StatelessWidget {
                 },
               ),
               const SizedBox(height: 40),
+=======
+              const Spacer(),
+              _actionCard(
+                context,
+                icon: Icons.logout,
+                text: 'Cerrar sesión',
+                color: Colors.red,
+                onTap: () => _confirmarCerrarSesion(context),
+              ),
+              const SizedBox(height: 20),
+>>>>>>> neftali
             ],
           ),
         ),
@@ -209,60 +208,71 @@ class PrincipalUsuario extends StatelessWidget {
     );
   }
 
-  // Función para mostrar confirmación al cerrar sesión
-  void _confirmarCerrarSesion(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Confirmación"),
-          content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("Cancelar"),
-              onPressed: () {
-                Navigator.of(context).pop(); // Cierra el diálogo
-              },
-            ),
-            TextButton(
-              child: const Text("Aceptar"),
-              onPressed: () {
-                SessionManager().setNumControl(''); // Limpiar sesión
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const InicioSesion()),
-                );
-              },
-            ),
-          ],
-        );
-      },
+  Widget _actionCard(BuildContext context,
+      {required IconData icon,
+        required String text,
+        required VoidCallback onTap,
+        Color color = Colors.blueAccent}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.grey[850],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+          child: Row(
+            children: [
+              Icon(icon, color: color, size: 28),
+              const SizedBox(width: 16),
+              Text(
+                text,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500),
+              ),
+              const Spacer(),
+              const Icon(Icons.arrow_forward_ios, color: Colors.white38, size: 16),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  Widget buildBoton(String texto,
-      {Color color = Colors.blue, VoidCallback? onPressed}) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onPressed ?? () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+  Widget _drawerItem(IconData icon, String title, VoidCallback onTap,
+      {Color color = Colors.white}) {
+    return ListTile(
+      leading: Icon(icon, color: color),
+      title: Text(title, style: TextStyle(color: color)),
+      onTap: onTap,
+    );
+  }
+
+  void _confirmarCerrarSesion(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Confirmación"),
+        content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
+        actions: [
+          TextButton(
+            child: const Text("Cancelar"),
+            onPressed: () => Navigator.pop(context),
           ),
-          elevation: 3,
-        ),
-        child: Text(
-          texto,
-          style: const TextStyle(
-            fontSize: 16,
-            letterSpacing: 1.5,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+          TextButton(
+            child: const Text("Aceptar"),
+            onPressed: () {
+              SessionManager().setNumControl('');
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (_) => const InicioSesion()));
+            },
           ),
-        ),
+        ],
       ),
     );
   }

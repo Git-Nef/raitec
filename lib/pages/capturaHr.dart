@@ -74,6 +74,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         clave.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
+<<<<<<< HEAD
           content: Text(
               'Por favor completa todos los campos y selecciona una ubicación'),
         ),
@@ -94,9 +95,21 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
     if (diasSeleccionados.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Selecciona al menos un día y hora')),
+=======
+          content: Text('Completa todos los campos y selecciona una ubicación'),
+        ),
+>>>>>>> neftali
       );
       return;
     }
+
+    final horariosSeleccionados = {
+      for (var dia in dias)
+        if (diasActivos[dia] == true)
+          dia: {
+            'horaInicio': horaInicio[dia]!.format(context),
+          }
+    };
 
     final docRef = FirebaseFirestore.instance
         .collection('usuarios')
@@ -116,13 +129,14 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
           'lat': destinoFijo.latitude,
           'lng': destinoFijo.longitude,
         },
-        'horarios': diasSeleccionados,
+        'horarios': horariosSeleccionados,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ruta guardada exitosamente')),
       );
 
+<<<<<<< HEAD
       // Limpiar todo
       _nombreRutaController.clear();
       _asientosController.clear();
@@ -132,6 +146,12 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
           diasActivos[d] = false;
           horaInicio[d] = const TimeOfDay(hour: 9, minute: 0);
         }
+=======
+      _asientosController.clear();
+      setState(() {
+        origenSeleccionado = null;
+        for (var d in dias) diasActivos[d] = false;
+>>>>>>> neftali
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -143,9 +163,15 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Capturar horario de ruta')),
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: const Text('Capturar Horario de Ruta'),
+        foregroundColor: Colors.white,
+        centerTitle: true,
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: Column(
@@ -161,30 +187,41 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _asientosController,
+                style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
-                    labelText: 'Asientos traseros disponibles'),
+                  labelText: 'Asientos traseros disponibles',
+                  labelStyle: TextStyle(color: Colors.grey),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey),
+                  ),
+                ),
                 keyboardType: TextInputType.number,
                 validator: (value) =>
                 value!.isEmpty ? 'Escribe los asientos' : null,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               Expanded(
-                child: ListView(
-                  children: dias.map((dia) {
+                child: ListView.separated(
+                  itemCount: dias.length,
+                  separatorBuilder: (_, __) => const Divider(color: Colors.grey),
+                  itemBuilder: (context, index) {
+                    final dia = dias[index];
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SwitchListTile(
-                          title: Text(dia),
+                          title: Text(dia, style: const TextStyle(color: Colors.white)),
                           value: diasActivos[dia]!,
                           onChanged: (bool value) {
                             setState(() {
                               diasActivos[dia] = value;
                             });
                           },
+                          activeColor: Colors.white,
                         ),
                         if (diasActivos[dia]!)
                           Padding(
+<<<<<<< HEAD
                             padding:
                             const EdgeInsets.symmetric(horizontal: 16.0),
                             child: Row(
@@ -194,27 +231,83 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                                 TextButton(
                                   onPressed: () => _seleccionarHora(dia),
                                   child: Text(horaInicio[dia]!.format(context)),
+=======
+                            padding: const EdgeInsets.only(left: 16),
+                            child: Row(
+                              children: [
+                                const Text('Inicio:',
+                                    style: TextStyle(color: Colors.white70)),
+                                const SizedBox(width: 10),
+                                TextButton.icon(
+                                  onPressed: () => _seleccionarHora(dia),
+                                  icon: const Icon(Icons.access_time, size: 20, color: Colors.white),
+                                  label: Text(
+                                    horaInicio[dia]!.format(context),
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+>>>>>>> neftali
                                 ),
                               ],
                             ),
                           ),
+<<<<<<< HEAD
                         const Divider(),
                       ],
                     );
                   }).toList(),
                 ),
               ),
-              ElevatedButton.icon(
-                onPressed: _seleccionarUbicacion,
-                icon: const Icon(Icons.location_pin),
-                label: Text(origenSeleccionado == null
-                    ? 'Seleccionar punto de partida'
-                    : 'Ubicación seleccionada'),
+=======
+                      ],
+                    );
+                  },
+                ),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
+>>>>>>> neftali
+              ElevatedButton.icon(
+                onPressed: _seleccionarUbicacion,
+                icon: const Icon(Icons.place_outlined, size: 20, color: Colors.white),
+                label: Text(
+                  origenSeleccionado == null
+                      ? 'Seleccionar punto de partida'
+                      : 'Ubicación seleccionada',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[850],
+                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
                 onPressed: _guardarRuta,
-                child: const Text('Guardar ruta'),
+                icon: const Icon(Icons.check_circle_outline, size: 20, color: Colors.white),
+                label: const Text(
+                  'Guardar ruta',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
               ),
             ],
           ),

@@ -34,12 +34,19 @@ class _AspirarState extends State<Aspirar> {
     await firestore.subirDocumento(widget.numControl, tipo, url);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Documento "$tipo" subido correctamente')),
+      SnackBar(
+        content: Text('Documento "$tipo" subido correctamente'),
+        backgroundColor: Colors.green,
+      ),
     );
   }
 
   void _mostrarOpcionesImagen(String tipo) {
     showModalBottomSheet(
+      backgroundColor: Colors.grey[900],
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       context: context,
       builder: (BuildContext context) {
         return SafeArea(
@@ -47,16 +54,16 @@ class _AspirarState extends State<Aspirar> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               ListTile(
-                leading: const Icon(Icons.photo_camera),
-                title: const Text('Tomar foto'),
+                leading: const Icon(Icons.photo_camera, color: Colors.white),
+                title: const Text('Tomar foto', style: TextStyle(color: Colors.white)),
                 onTap: () {
                   Navigator.pop(context);
                   _subirArchivo(tipo, true);
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Elegir de galería'),
+                leading: const Icon(Icons.photo_library, color: Colors.white),
+                title: const Text('Elegir de galería', style: TextStyle(color: Colors.white)),
                 onTap: () {
                   Navigator.pop(context);
                   _subirArchivo(tipo, false);
@@ -69,57 +76,70 @@ class _AspirarState extends State<Aspirar> {
     );
   }
 
+  Widget _uploadButton(String texto, String tipo) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: ElevatedButton.icon(
+        onPressed: () => _mostrarOpcionesImagen(tipo),
+        icon: const Icon(Icons.upload_file, color: Colors.white),
+        label: Text(
+          texto,
+          style: const TextStyle(fontSize: 16, color: Colors.white),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.grey[850],
+          foregroundColor: Colors.white,
+          minimumSize: const Size.fromHeight(50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.black,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
                   'assets/SplashScreen.png',
-                  height: 260,
+                  height: 200,
                 ),
-                const SizedBox(height: 40),
-                const Icon(Icons.download, size: 60, color: Colors.grey),
-                const SizedBox(height: 20),
-                _uploadButton('SUBIR HORARIO', 'horario'),
-                _uploadButton('SUBIR KARDEX', 'kardex'),
-                _uploadButton('SUBIR LICENCIA DE CONDUCIR', 'licencia'),
-                _uploadButton(
-                    'SUBIR COMPROBANTE DE DOMICILIO', 'comprobante_domicilio'),
                 const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              RegistrarVehiculo(numControl: widget.numControl),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[700],
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                const Icon(Icons.cloud_upload_rounded, size: 60, color: Colors.white),
+                const SizedBox(height: 20),
+                _uploadButton('Subir Horario', 'horario'),
+                _uploadButton('Subir Kardex', 'kardex'),
+                _uploadButton('Subir Licencia de Conducir', 'licencia'),
+                _uploadButton('Subir Comprobante de Domicilio', 'comprobante_domicilio'),
+                const SizedBox(height: 30),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.arrow_forward_ios),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            RegistrarVehiculo(numControl: widget.numControl),
                       ),
-                    ),
-                    child: const Text(
-                      'CONTINUAR A INFORMACIÓN DEL VEHÍCULO',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 1.2,
-                      ),
+                    );
+                  },
+                  label: const Text(
+                    'Continuar a Vehículo',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    minimumSize: const Size.fromHeight(50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                 ),
@@ -130,56 +150,26 @@ class _AspirarState extends State<Aspirar> {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              icon: const Icon(Icons.arrow_back, size: 32),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
             ),
             ElevatedButton(
               onPressed: () {
                 // Acción de ayuda
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue[400],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.all(12),
+                backgroundColor: Colors.grey[800],
+                padding: const EdgeInsets.all(14),
+                shape: const CircleBorder(),
               ),
               child: const Icon(Icons.help_outline, color: Colors.white),
             )
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _uploadButton(String texto, String tipo) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton(
-          onPressed: () => _mostrarOpcionesImagen(tipo),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey[300],
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
-            ),
-          ),
-          child: Text(
-            texto,
-            style: const TextStyle(
-              color: Colors.black87,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
         ),
       ),
     );

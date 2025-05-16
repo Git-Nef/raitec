@@ -22,7 +22,6 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
   final _seguro = TextEditingController();
   final _asientos = TextEditingController();
   final _caracteristicas = TextEditingController();
-
   String? fotoUrl;
 
   @override
@@ -96,7 +95,6 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
         'fotoUrl': fotoUrl ?? '',
       });
 
-      // Cambiar el campo esConductor a true
       await FirebaseFirestore.instance
           .collection('usuarios')
           .doc(widget.numControl)
@@ -129,15 +127,20 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
 
   Widget _input(String label, TextEditingController controller) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 14),
       child: TextField(
         controller: controller,
         onChanged: (_) => actualizarEstado(),
+        style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: const TextStyle(color: Colors.white70),
           filled: true,
-          fillColor: Colors.grey[200],
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          fillColor: Colors.grey[850],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
         ),
       ),
     );
@@ -146,7 +149,21 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Registrar Vehículo')),
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 1,
+        centerTitle: true,
+        title: const Text(
+          'Registrar Vehículo',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Form(
@@ -155,6 +172,7 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                const SizedBox(height: 16), // Espacio para evitar empalme
                 _input('Marca', _marca),
                 _input('Modelo', _modelo),
                 _input('Año', _anio),
@@ -163,21 +181,44 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
                 _input('Seguro', _seguro),
                 _input('Número de Asientos', _asientos),
                 _input('Características', _caracteristicas),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
+                const Text(
+                  'Fotografía del auto',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton.icon(
-                        icon: const Icon(Icons.camera_alt),
-                        label: const Text('Tomar Foto'),
+                        icon: const Icon(Icons.camera_alt_outlined, size: 20),
+                        label: const Text('Cámara'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[850],
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                         onPressed: () => _seleccionarFoto(true),
                       ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: ElevatedButton.icon(
-                        icon: const Icon(Icons.photo_library),
+                        icon: const Icon(Icons.image_outlined, size: 20),
                         label: const Text('Galería'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[850],
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                         onPressed: () => _seleccionarFoto(false),
                       ),
                     ),
@@ -186,19 +227,40 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
                 if (fotoUrl != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
-                    child: Image.network(fotoUrl!, height: 160),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(fotoUrl!, height: 160),
+                    ),
                   ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: camposCompletos ? guardarVehiculo : null,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor:
-                        camposCompletos ? Colors.blue : Colors.grey,
+                const SizedBox(height: 30),
+                Center(
+                  child: SizedBox(
+                    width: 220,
+                    height: 44,
+                    child: ElevatedButton(
+                      onPressed: camposCompletos ? guardarVehiculo : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: camposCompletos
+                            ? Colors.blueAccent
+                            : Colors.grey[700],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: camposCompletos ? 3 : 0,
+                      ),
+                      child: const Text(
+                        'Guardar vehículo',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ),
                   ),
-                  child: const Text('GUARDAR VEHÍCULO',
-                      style: TextStyle(color: Colors.white)),
                 ),
+                const SizedBox(height: 80), // Espacio final para evitar empalme inferior
               ],
             ),
           ),

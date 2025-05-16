@@ -6,84 +6,74 @@ class InfoCostos extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        elevation: 10,
-        shape: const CircularNotchedRectangle(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new,
-                    size: 28, color: Colors.blueGrey),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.home_filled,
-                    size: 30, color: Colors.blueAccent),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              const SizedBox(width: 28), // Reemplazo del avatar eliminado
-            ],
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0.5,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        centerTitle: true,
+        title: const Text(
+          'Costos de Viaje',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
           ),
         ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Logo
-            Center(
-              child: Image.asset(
-                'assets/SplashScreen.png',
-                height: 160,
-              ),
+            const SizedBox(height: 10),
+            Image.asset(
+              'assets/SplashScreen.png',
+              height: 120,
             ),
-            const SizedBox(height: 20),
-
-            // Título
-            const Text(
-              'INFORMACIÓN DE COSTOS',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-                color: Colors.blueGrey,
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Tarjeta con info de costos
+            const SizedBox(height: 30),
             Card(
-              elevation: 4,
+              color: Colors.grey[900],
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 3,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(
+                    vertical: 24.0, horizontal: 18.0),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    filaInfo('Tarifa base:', '\$5.00'),
-                    filaInfo('Costo por kilómetro:', '\$2.00'),
-                    filaInfo('Costo por minuto:', '\$0.30'),
-                    const SizedBox(height: 20),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text(
-                        'El costo por kilómetros, minutos y tarifa base está sujeto a cambios sin previo aviso.\n\nTe recomendamos estar atento a nuestras actualizaciones y comunicados para conocer cualquier modificación en nuestras tarifas.',
-                        style: TextStyle(fontSize: 14, color: Colors.black87),
-                        textAlign: TextAlign.justify,
+                    filaInfo('Tarifa base', '\$5.00'),
+                    filaInfo('Por kilómetro', '\$2.00'),
+                    filaInfo('Por minuto', '\$0.30'),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Nota importante',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
                       ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Las tarifas están sujetas a cambios sin previo aviso. Consulta frecuentemente nuestras actualizaciones para mantenerte informado.',
+                      style: TextStyle(
+                        color: Colors.white60,
+                        fontSize: 13.5,
+                        height: 1.5,
+                      ),
+                      textAlign: TextAlign.justify,
                     ),
                   ],
                 ),
               ),
             ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
@@ -92,21 +82,28 @@ class InfoCostos extends StatelessWidget {
 
   Widget filaInfo(String label, String valor) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
         children: [
           Expanded(
             flex: 2,
             child: Text(
               label,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15.5,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
           Expanded(
             flex: 1,
             child: Text(
               valor,
-              style: const TextStyle(fontSize: 16),
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 15.5,
+              ),
               textAlign: TextAlign.right,
             ),
           ),

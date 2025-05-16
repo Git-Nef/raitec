@@ -23,7 +23,12 @@ class Ubicacion extends StatefulWidget {
 
 class _UbicacionState extends State<Ubicacion> {
   GoogleMapController? _mapController;
+<<<<<<< HEAD
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+=======
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+>>>>>>> neftali
 
   Set<Marker> _marcadores = {};
   Set<Polyline> _polilineas = {};
@@ -43,20 +48,38 @@ class _UbicacionState extends State<Ubicacion> {
   }
 
   void _inicializarNotificaciones() async {
+<<<<<<< HEAD
     const AndroidInitializationSettings androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
     const InitializationSettings initSettings = InitializationSettings(android: androidInit);
+=======
+    const AndroidInitializationSettings androidInit =
+    AndroidInitializationSettings('@mipmap/ic_launcher');
+    const InitializationSettings initSettings =
+    InitializationSettings(android: androidInit);
+>>>>>>> neftali
     await flutterLocalNotificationsPlugin.initialize(initSettings);
   }
 
   void _mostrarNotificacionLlegada() async {
+<<<<<<< HEAD
     const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+=======
+    const AndroidNotificationDetails androidDetails =
+    AndroidNotificationDetails(
+>>>>>>> neftali
       'canal_ruta',
       'Llegada a destino',
       importance: Importance.max,
       priority: Priority.high,
+      color: Colors.blue,
     );
 
+<<<<<<< HEAD
     const NotificationDetails generalNotificationDetails = NotificationDetails(android: androidDetails);
+=======
+    const NotificationDetails generalNotificationDetails =
+    NotificationDetails(android: androidDetails);
+>>>>>>> neftali
 
     await flutterLocalNotificationsPlugin.show(
       0,
@@ -69,7 +92,11 @@ class _UbicacionState extends State<Ubicacion> {
   Future<void> _cargarRutaDesde(LatLng origen) async {
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+<<<<<<< HEAD
       "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI",
+=======
+      "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI", // Reemplaza con tu API Key
+>>>>>>> neftali
       PointLatLng(origen.latitude, origen.longitude),
       PointLatLng(widget.destino.latitude, widget.destino.longitude),
     );
@@ -97,7 +124,7 @@ class _UbicacionState extends State<Ubicacion> {
         _polilineas.add(
           Polyline(
             polylineId: const PolylineId("ruta"),
-            color: Colors.blue,
+            color: Colors.blueAccent,
             width: 5,
             points: _puntosRuta,
           ),
@@ -213,8 +240,20 @@ class _UbicacionState extends State<Ubicacion> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text(widget.nombreRuta ?? 'Ruta en mapa'),
+        backgroundColor: Colors.black,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: Text(
+          widget.nombreRuta ?? 'Ruta en mapa',
+          style: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 18,
+            color: Colors.white,
+          ),
+        ),
       ),
       body: GoogleMap(
         initialCameraPosition: CameraPosition(
@@ -224,7 +263,8 @@ class _UbicacionState extends State<Ubicacion> {
         onMapCreated: (controller) => _mapController = controller,
         markers: _marcadores,
         polylines: _polilineas,
-        myLocationEnabled: false,
+        myLocationEnabled: true,
+        myLocationButtonEnabled: false,
         zoomControlsEnabled: false,
       ),
       bottomSheet: Container(
