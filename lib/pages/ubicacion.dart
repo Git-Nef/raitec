@@ -32,7 +32,7 @@ class Ubicacion extends StatefulWidget {
 class _UbicacionState extends State<Ubicacion> {
   GoogleMapController? _mapController;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   Set<Marker> _marcadores = {};
   Set<Polyline> _polilineas = {};
@@ -71,7 +71,7 @@ class _UbicacionState extends State<Ubicacion> {
       priority: Priority.high,
     );
     const generalNotificationDetails =
-    NotificationDetails(android: androidDetails);
+        NotificationDetails(android: androidDetails);
 
     await flutterLocalNotificationsPlugin.show(
       0,
@@ -86,7 +86,8 @@ class _UbicacionState extends State<Ubicacion> {
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       request: PolylineRequest(
         origin: PointLatLng(origen.latitude, origen.longitude),
-        destination: PointLatLng(widget.destino.latitude, widget.destino.longitude),
+        destination:
+            PointLatLng(widget.destino.latitude, widget.destino.longitude),
         mode: TravelMode.driving,
       ),
       googleApiKey: "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI",
@@ -121,14 +122,14 @@ class _UbicacionState extends State<Ubicacion> {
             position: widget.origen,
             infoWindow: const InfoWindow(title: "Origen"),
             icon:
-            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           ),
           Marker(
             markerId: const MarkerId("destino"),
             position: widget.destino,
             infoWindow: const InfoWindow(title: "Destino"),
             icon:
-            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
           ),
         };
       });
@@ -173,8 +174,8 @@ class _UbicacionState extends State<Ubicacion> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (conductorDoc.data()?['fotoUrl'] != null)
-              Image.network(conductorDoc['fotoUrl'], height: 80),
+            if (conductorDoc.data()?['fotografiaUrl'] != null)
+              Image.network(conductorDoc['fotografiaUrl'], height: 80),
             Text('Nombre: ${conductorDoc['nombre']}'),
             const SizedBox(height: 8),
             Text('Vehículo: ${vehiculoDoc['marca']} ${vehiculoDoc['modelo']}'),
@@ -245,7 +246,7 @@ class _UbicacionState extends State<Ubicacion> {
         children: [
           GoogleMap(
             initialCameraPosition:
-            CameraPosition(target: widget.origen, zoom: 14),
+                CameraPosition(target: widget.origen, zoom: 14),
             onMapCreated: (c) => _mapController = c,
             markers: {
               ..._marcadores,
@@ -316,11 +317,11 @@ class _UbicacionState extends State<Ubicacion> {
       ),
       floatingActionButton: !_mostrarOpciones
           ? FloatingActionButton.extended(
-        onPressed: () => setState(() => _mostrarOpciones = true),
-        label: const Text('PEDIR RAIT'),
-        icon: const Icon(Icons.directions_car),
-        backgroundColor: Colors.blueAccent,
-      )
+              onPressed: () => setState(() => _mostrarOpciones = true),
+              label: const Text('PEDIR RAIT'),
+              icon: const Icon(Icons.directions_car),
+              backgroundColor: Colors.blueAccent,
+            )
           : null,
     );
   }
@@ -342,7 +343,7 @@ class _UbicacionState extends State<Ubicacion> {
           borderRadius: BorderRadius.circular(10),
         ),
         child:
-        Center(child: Text(metodo, style: const TextStyle(fontSize: 16))),
+            Center(child: Text(metodo, style: const TextStyle(fontSize: 16))),
       ),
     );
   }
