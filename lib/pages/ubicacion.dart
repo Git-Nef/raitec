@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -40,24 +38,23 @@ class _UbicacionState extends State<Ubicacion> {
   Set<Polyline> _polilineas = {};
   List<LatLng> _puntosRuta = [];
 
-  bool _notificado = false;
-  bool _uniendose = false;
-  String _metodoPago = 'Efectivo';
-  bool _mostrarOpciones = false;
-
   LatLng? _paradaSeleccionada;
   bool _paradaEsValida = false;
+  bool _mostrarOpciones = false;
+  String _metodoPago = 'Efectivo';
 
-  double _distanciaTotalKm = 0.0;
-  double _tiempoEstimadoMin = 0.0;
+  double? _distanciaKm;
+  int? _tiempoMin;
+  double? _costoCalculado;
 
-  final double _distanciaMaxPermitida = 400;
+  final double _distanciaMaxPermitida = 300; // más flexible
 
   @override
   void initState() {
     super.initState();
     _inicializarNotificaciones();
     _cargarRutaDesde(widget.origen);
+    _escucharAceptacion();
   }
 
   void _inicializarNotificaciones() async {
@@ -66,19 +63,20 @@ class _UbicacionState extends State<Ubicacion> {
     await flutterLocalNotificationsPlugin.initialize(initSettings);
   }
 
-  void _mostrarNotificacionLlegada() async {
+  void _mostrarNotificacion(String titulo, String cuerpo) async {
     const androidDetails = AndroidNotificationDetails(
-      'canal_ruta',
-      'Llegada a destino',
+      'notificaciones_rait',
+      'Notificaciones de RaiTec',
       importance: Importance.max,
       priority: Priority.high,
     );
     const generalNotificationDetails =
         NotificationDetails(android: androidDetails);
+
     await flutterLocalNotificationsPlugin.show(
       0,
-      '¡Has llegado!',
-      'Estás en tu destino final.',
+      titulo,
+      cuerpo,
       generalNotificationDetails,
     );
   }
@@ -95,17 +93,15 @@ class _UbicacionState extends State<Ubicacion> {
       _puntosRuta =
           result.points.map((p) => LatLng(p.latitude, p.longitude)).toList();
 
-      _distanciaTotalKm = 0;
-      for (int i = 0; i < _puntosRuta.length - 1; i++) {
-        _distanciaTotalKm += Geolocator.distanceBetween(
-              _puntosRuta[i].latitude,
-              _puntosRuta[i].longitude,
-              _puntosRuta[i + 1].latitude,
-              _puntosRuta[i + 1].longitude,
-            ) /
-            1000;
-      }
-      _tiempoEstimadoMin = (_distanciaTotalKm / 30) * 60;
+      final distanciaTotal = Geolocator.distanceBetween(
+        origen.latitude,
+        origen.longitude,
+        widget.destino.latitude,
+        widget.destino.longitude,
+      );
+      _distanciaKm = (distanciaTotal / 1000);
+      _tiempoMin = (_distanciaKm! / 0.7 * 60).round(); // a 40 km/h
+      _costoCalculado = (_distanciaKm! * 5).clamp(10, 100);
 
       setState(() {
         _polilineas.clear();
@@ -133,176 +129,143 @@ class _UbicacionState extends State<Ubicacion> {
           ),
         };
       });
-
-      _verificarLlegada(origen);
     }
   }
 
-  void _verificarLlegada(LatLng actual) {
-    final distancia = Geolocator.distanceBetween(
-      actual.latitude,
-      actual.longitude,
-      widget.destino.latitude,
-      widget.destino.longitude,
-    );
+  void _escucharAceptacion() {
+    FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(widget.uidConductor)
+        .collection('rutas')
+        .doc(widget.rutaId)
+        .collection('pasajeros')
+        .doc(widget.uidPasajero)
+        .snapshots()
+        .listen((doc) {
+      if (doc.exists && doc.data()?['estado'] == 'aceptado') {
+        _mostrarNotificacion('¡Conductor en camino!',
+            'Tu conductor ha aceptado la solicitud y va hacia tu parada.');
 
-    if (distancia <= 20 && !_notificado) {
-      _notificado = true;
-      _mostrarNotificacionLlegada();
-    }
-  }
-
-  Future<void> _pedirRait() async {
-    if (_paradaSeleccionada == null || !_paradaEsValida) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content:
-                Text('Selecciona una parada válida tocando cerca de la ruta')),
-      );
-      return;
-    }
-
-    setState(() => _uniendose = true);
-
-    try {
-      final ref = FirebaseFirestore.instance
-          .collection('usuarios')
-          .doc(widget.uidConductor)
-          .collection('rutas')
-          .doc(widget.rutaId)
-          .collection('pasajeros')
-          .doc(widget.uidPasajero);
-
-      final existe = await ref.get();
-      if (existe.exists) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ya estás unido a esta ruta')),
-        );
-        setState(() => _uniendose = false);
-        return;
+        _mostrarDatosConductor();
       }
+    });
+  }
 
-      await ref.set({
-        'estado': 'pendiente',
-        'metodoPago': _metodoPago,
-        'fechaUnion': Timestamp.now(),
-        'paradaPersonalizada': {
-          'lat': _paradaSeleccionada!.latitude,
-          'lng': _paradaSeleccionada!.longitude,
-        }
-      });
+  void _mostrarDatosConductor() async {
+    final conductorDoc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(widget.uidConductor)
+        .get();
+    final vehiculoDoc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(widget.uidConductor)
+        .collection('vehiculo')
+        .doc('info')
+        .get();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('¡Petición enviada al conductor!')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
-    }
-
-    setState(() => _uniendose = false);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Información del Conductor"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (conductorDoc.data()?['fotoUrl'] != null)
+              Image.network(conductorDoc['fotoUrl'], height: 80),
+            Text('Nombre: ${conductorDoc['nombre']}'),
+            const SizedBox(height: 8),
+            Text('Vehículo: ${vehiculoDoc['marca']} ${vehiculoDoc['modelo']}'),
+            Text('Placas: ${vehiculoDoc['placas']}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar'),
+          )
+        ],
+      ),
+    );
   }
 
   bool _estaCercaDeLaRuta(LatLng punto) {
-    for (final rutaPunto in _puntosRuta) {
-      final distancia = Geolocator.distanceBetween(
+    for (final p in _puntosRuta) {
+      final d = Geolocator.distanceBetween(
         punto.latitude,
         punto.longitude,
-        rutaPunto.latitude,
-        rutaPunto.longitude,
+        p.latitude,
+        p.longitude,
       );
-      if (distancia <= _distanciaMaxPermitida) {
-        return true;
-      }
+      if (d <= _distanciaMaxPermitida) return true;
     }
     return false;
   }
 
-  void _centrarRuta() {
-    if (_puntosRuta.isEmpty || _mapController == null) return;
+  Future<void> _pedirRait() async {
+    if (_paradaSeleccionada == null || !_paradaEsValida) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Selecciona una parada válida sobre la ruta')));
+      return;
+    }
 
-    final bounds = LatLngBounds(
-      southwest: _puntosRuta.reduce((a, b) =>
-          LatLng(min(a.latitude, b.latitude), min(a.longitude, b.longitude))),
-      northeast: _puntosRuta.reduce((a, b) =>
-          LatLng(max(a.latitude, b.latitude), max(a.longitude, b.longitude))),
+    final ref = FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(widget.uidConductor)
+        .collection('rutas')
+        .doc(widget.rutaId)
+        .collection('pasajeros')
+        .doc(widget.uidPasajero);
+
+    await ref.set({
+      'estado': 'pendiente',
+      'metodoPago': _metodoPago,
+      'fechaUnion': Timestamp.now(),
+      'paradaPersonalizada': {
+        'lat': _paradaSeleccionada!.latitude,
+        'lng': _paradaSeleccionada!.longitude,
+      },
+      'distanciaKm': _distanciaKm,
+      'tiempoEstimadoMin': _tiempoMin,
+      'precioEstimado': _costoCalculado,
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('¡Petición enviada al conductor!')),
     );
-
-    _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.nombreRuta),
-      ),
+      appBar: AppBar(title: Text(widget.nombreRuta)),
       body: Stack(
         children: [
           GoogleMap(
             initialCameraPosition:
                 CameraPosition(target: widget.origen, zoom: 14),
-            onMapCreated: (controller) => _mapController = controller,
+            onMapCreated: (c) => _mapController = c,
             markers: {
               ..._marcadores,
               if (_paradaSeleccionada != null)
                 Marker(
                   markerId: const MarkerId("parada"),
                   position: _paradaSeleccionada!,
-                  infoWindow: const InfoWindow(title: "Tu parada"),
-                  icon: BitmapDescriptor.defaultMarkerWithHue(_paradaEsValida
-                      ? BitmapDescriptor.hueGreen
-                      : BitmapDescriptor.hueOrange),
-                ),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(
+                    _paradaEsValida
+                        ? BitmapDescriptor.hueGreen
+                        : BitmapDescriptor.hueOrange,
+                  ),
+                )
             },
             polylines: _polilineas,
             myLocationEnabled: false,
-            zoomControlsEnabled: false,
-            onTap: (LatLng posicion) {
-              final esValida = _estaCercaDeLaRuta(posicion);
+            onTap: (LatLng pos) {
+              final valido = _estaCercaDeLaRuta(pos);
               setState(() {
-                _paradaSeleccionada = posicion;
-                _paradaEsValida = esValida;
+                _paradaSeleccionada = pos;
+                _paradaEsValida = valido;
               });
-
-              if (!esValida) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                        'Esa parada está fuera de la ruta. Selecciona una más cercana.'),
-                    backgroundColor: Colors.redAccent,
-                  ),
-                );
-              }
             },
-          ),
-          Positioned(
-            top: 15,
-            left: 10,
-            right: 10,
-            child: Card(
-              color: Colors.white.withOpacity(0.9),
-              elevation: 3,
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  'Distancia: ${_distanciaTotalKm.toStringAsFixed(2)} km • Estimado: ${_tiempoEstimadoMin.toStringAsFixed(0)} min',
-                  style: const TextStyle(fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 90,
-            right: 10,
-            child: FloatingActionButton(
-              mini: true,
-              onPressed: _centrarRuta,
-              backgroundColor: Colors.white,
-              child: const Icon(Icons.center_focus_strong, color: Colors.blue),
-            ),
           ),
           if (_mostrarOpciones)
             Positioned(
@@ -311,23 +274,32 @@ class _UbicacionState extends State<Ubicacion> {
               right: 0,
               child: Container(
                 color: Colors.white,
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('Selecciona tu método de pago:',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 12),
-                    _metodoPagoOption('Efectivo'),
+                    if (_distanciaKm != null &&
+                        _tiempoMin != null &&
+                        _costoCalculado != null)
+                      Column(
+                        children: [
+                          Text(
+                              'Distancia: ${_distanciaKm!.toStringAsFixed(2)} km'),
+                          Text('Tiempo estimado: $_tiempoMin minutos'),
+                          Text(
+                              'Precio estimado: \$${_costoCalculado!.toStringAsFixed(2)} MXN'),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                    const Text('Selecciona tu método de pago'),
                     const SizedBox(height: 8),
+                    _metodoPagoOption('Efectivo'),
                     _metodoPagoOption('Tarjeta'),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
                     ElevatedButton.icon(
-                      icon: _uniendose
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Icon(Icons.send),
+                      icon: const Icon(Icons.send),
                       label: const Text('Pedir Rait'),
-                      onPressed: _uniendose ? null : _pedirRait,
+                      onPressed: _pedirRait,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
                         minimumSize: const Size(double.infinity, 50),
@@ -355,15 +327,15 @@ class _UbicacionState extends State<Ubicacion> {
       onTap: () => setState(() => _metodoPago = metodo),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: _metodoPago == metodo
               ? Colors.blue.shade100
-              : Colors.grey.shade100,
+              : Colors.grey.shade200,
           border: Border.all(
-            color: _metodoPago == metodo ? Colors.blue : Colors.grey,
-            width: 1.5,
-          ),
+              color: _metodoPago == metodo ? Colors.blue : Colors.grey,
+              width: 1.5),
           borderRadius: BorderRadius.circular(10),
         ),
         child:
