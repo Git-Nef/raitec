@@ -1,10 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:math';
 
 class Ubicacion extends StatefulWidget {
   final LatLng origen;
@@ -47,7 +48,10 @@ class _UbicacionState extends State<Ubicacion> {
   LatLng? _paradaSeleccionada;
   bool _paradaEsValida = false;
 
-  final double _distanciaMaxPermitida = 200; // metros
+  double _distanciaTotalKm = 0.0;
+  double _tiempoEstimadoMin = 0.0;
+
+  final double _distanciaMaxPermitida = 400;
 
   @override
   void initState() {
@@ -71,7 +75,6 @@ class _UbicacionState extends State<Ubicacion> {
     );
     const generalNotificationDetails =
         NotificationDetails(android: androidDetails);
-
     await flutterLocalNotificationsPlugin.show(
       0,
       '¡Has llegado!',
@@ -83,7 +86,7 @@ class _UbicacionState extends State<Ubicacion> {
   Future<void> _cargarRutaDesde(LatLng origen) async {
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI", // Sustituye por tu API Key válida
+      "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI",
       PointLatLng(origen.latitude, origen.longitude),
       PointLatLng(widget.destino.latitude, widget.destino.longitude),
     );
@@ -91,6 +94,18 @@ class _UbicacionState extends State<Ubicacion> {
     if (result.points.isNotEmpty) {
       _puntosRuta =
           result.points.map((p) => LatLng(p.latitude, p.longitude)).toList();
+
+      _distanciaTotalKm = 0;
+      for (int i = 0; i < _puntosRuta.length - 1; i++) {
+        _distanciaTotalKm += Geolocator.distanceBetween(
+              _puntosRuta[i].latitude,
+              _puntosRuta[i].longitude,
+              _puntosRuta[i + 1].latitude,
+              _puntosRuta[i + 1].longitude,
+            ) /
+            1000;
+      }
+      _tiempoEstimadoMin = (_distanciaTotalKm / 30) * 60;
 
       setState(() {
         _polilineas.clear();
@@ -204,6 +219,19 @@ class _UbicacionState extends State<Ubicacion> {
     return false;
   }
 
+  void _centrarRuta() {
+    if (_puntosRuta.isEmpty || _mapController == null) return;
+
+    final bounds = LatLngBounds(
+      southwest: _puntosRuta.reduce((a, b) =>
+          LatLng(min(a.latitude, b.latitude), min(a.longitude, b.longitude))),
+      northeast: _puntosRuta.reduce((a, b) =>
+          LatLng(max(a.latitude, b.latitude), max(a.longitude, b.longitude))),
+    );
+
+    _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -248,6 +276,33 @@ class _UbicacionState extends State<Ubicacion> {
                 );
               }
             },
+          ),
+          Positioned(
+            top: 15,
+            left: 10,
+            right: 10,
+            child: Card(
+              color: Colors.white.withOpacity(0.9),
+              elevation: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Text(
+                  'Distancia: ${_distanciaTotalKm.toStringAsFixed(2)} km • Estimado: ${_tiempoEstimadoMin.toStringAsFixed(0)} min',
+                  style: const TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 90,
+            right: 10,
+            child: FloatingActionButton(
+              mini: true,
+              onPressed: _centrarRuta,
+              backgroundColor: Colors.white,
+              child: const Icon(Icons.center_focus_strong, color: Colors.blue),
+            ),
           ),
           if (_mostrarOpciones)
             Positioned(
