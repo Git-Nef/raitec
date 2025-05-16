@@ -10,8 +10,7 @@ class InfoVehiculo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String? numControl =
-        SessionManager().numControl; // Obtenemos la clave del usuario
+    final String? numControl = SessionManager().numControl;
     final docRef = FirebaseFirestore.instance
         .collection('usuarios')
         .doc(numControl)
@@ -19,154 +18,139 @@ class InfoVehiculo extends StatelessWidget {
         .doc('info');
 
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 2,
-          leading: Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.menu, color: Colors.black),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            ),
-          ),
-          centerTitle: true,
-          title: Image.asset(
-            'assets/LogoPantallas.png',
-            height: 90,
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu, color: Colors.white),
+            onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              DrawerHeader(
-                decoration: const BoxDecoration(color: Colors.blue),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Menú',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Image.asset('assets/LogoPantallas.png', height: 60),
-                  ],
-                ),
-              ),
-              // Aquí puedes agregar los ListTile para navegación
-            ],
-          ),
-        ),
-        body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          future: docRef.get(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (!snapshot.hasData || !snapshot.data!.exists) {
-              return const Center(child: Text("No hay datos del vehículo."));
-            }
-
-            final data = snapshot.data!.data()!;
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+        centerTitle: true,
+        title: Image.asset('assets/LogoPantallas.png', height: 60),
+      ),
+      drawer: Drawer(
+        backgroundColor: Colors.grey[900],
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Colors.blue),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 12),
                   const Text(
-                    '¿No tienes ningún vehículo registrado? Llena el siguiente formulario',
+                    'Menú',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  Image.asset('assets/LogoPantallas.png', height: 50),
+                ],
+              ),
+            ),
+            // Agrega más opciones si lo deseas
+          ],
+        ),
+      ),
+      body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+        future: docRef.get(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: Colors.white));
+          }
+
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return const Center(
+              child: Text("No hay datos del vehículo.",
+                  style: TextStyle(color: Colors.white70)),
+            );
+          }
+
+          final data = snapshot.data!.data()!;
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Información del vehículo',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RegistrarVehiculo(numControl: numControl!),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.add_circle_outline, color: Colors.white),
+                  label: const Text(
+                    'Registrar Vehículo',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Acción para registrar vehículo
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RegistrarVehiculo(
-                                numControl: numControl!), // Pasando numControl
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 4,
-                      ),
-                      child: const Text(
-                        'Registrar Vehículo',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                ),
+                const SizedBox(height: 24),
+                _infoFila(['Marca', 'Modelo', 'Año'], [
+                  data['marca'] ?? 'N/A',
+                  data['modelo'] ?? 'N/A',
+                  data['anio'] ?? 'N/A',
+                ]),
+                const SizedBox(height: 10),
+                _infoFila(['Matrícula', 'Color'], [
+                  data['matricula'] ?? 'N/A',
+                  data['color'] ?? 'N/A',
+                ]),
+                const SizedBox(height: 10),
+                _infoFila(['Seguro', 'Asientos'], [
+                  data['seguro'] ?? 'N/A',
+                  data['asientos'] ?? 'N/A',
+                ]),
+                const SizedBox(height: 10),
+                _infoFila(['Características'], [
+                  data['caracteristicas'] ?? 'N/A',
+                ]),
+                const SizedBox(height: 24),
+                Card(
+                  color: Colors.grey[900],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  const SizedBox(height: 24),
-                  _infoFila(context, [
-                    'Marca del Coche',
-                    'Modelo',
-                    'Año'
-                  ], [
-                    data['marca'] ?? 'N/A',
-                    data['modelo'] ?? 'N/A',
-                    data['anio'] ?? 'N/A',
-                  ]),
-                  const SizedBox(height: 8),
-                  _infoFila(context, [
-                    'Matrícula',
-                    'Color del Coche'
-                  ], [
-                    data['matricula'] ?? 'N/A',
-                    data['color'] ?? 'N/A',
-                  ]),
-                  const SizedBox(height: 8),
-                  _infoFila(context, [
-                    'Seguro del Vehículo',
-                    'Número de Asientos'
-                  ], [
-                    data['seguro'] ?? 'N/A',
-                    data['asientos'] ?? 'N/A',
-                  ]),
-                  const SizedBox(height: 8),
-                  _infoFila(context, [
-                    'Características'
-                  ], [
-                    data['caracteristicas'] ?? 'N/A',
-                  ]),
-                  const SizedBox(height: 24),
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade400),
-                    ),
+                  elevation: 6,
+                  child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
                         const Text(
                           'FOTOGRAFÍA DEL VEHÍCULO',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
+                            color: Colors.white70,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 14),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: Image.network(
@@ -179,112 +163,103 @@ class InfoVehiculo extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
-                ],
-              ),
-            );
-          },
-        ),
-        bottomNavigationBar: BottomAppBar(
-          color: Colors.lightBlue,
-          elevation: 8,
-          child: SizedBox(
-            height: 70,
-            child: Stack(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 16.0),
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back,
-                          size: 42, color: Colors.white),
-                      onPressed: () {
-                        Navigator.pop(context); // Este botón navega hacia atrás
-                      },
-                    ),
-                  ),
                 ),
-                Align(
-                  alignment: Alignment.center,
-                  child: IconButton(
-                    icon: const Icon(Icons.home, size: 42, color: Colors.white),
-                    onPressed: () {
-                      // Redirige a la pantalla principal
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => PrincipalUsuario(
-                                numControl: SessionManager().numControl!)),
-                      );
-                    },
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 16.0),
-                    child: IconButton(
-                      icon: const Icon(Icons.account_circle,
-                          size: 42, color: Colors.white),
-                      onPressed: () {
-                        // Redirige a la pantalla de información del usuario
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => InfoUsuario()),
-                        );
-                      },
-                    ),
-                  ),
-                ),
+                const SizedBox(height: 40),
               ],
             ),
+          );
+        },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.black,
+        elevation: 10,
+        child: SizedBox(
+          height: 70,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new,
+                    size: 28, color: Colors.white),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.home_outlined,
+                    size: 28, color: Colors.white),
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          PrincipalUsuario(numControl: numControl!),
+                    ),
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.person_outline,
+                    size: 28, color: Colors.white),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const InfoUsuario()),
+                  );
+                },
+              ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
-  Widget _infoFila(
-      BuildContext context, List<String> labels, List<String> values) {
+  Widget _infoFila(List<String> labels, List<String> values) {
     return Column(
       children: [
         Row(
           children: labels
-              .map((text) => Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.blueGrey[50],
-                        border: Border.all(color: Colors.grey.shade300),
-                      ),
-                      child: Text(
-                        text,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ))
+              .map((label) => Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.grey[850],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white70,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ))
               .toList(),
         ),
+        const SizedBox(height: 4),
         Row(
           children: values
-              .map((text) => Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          left: BorderSide(color: Colors.grey.shade300),
-                          right: BorderSide(color: Colors.grey.shade300),
-                          bottom: BorderSide(color: Colors.grey.shade300),
-                        ),
-                      ),
-                      child: Text(
-                        text,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ),
-                  ))
+              .map((value) => Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.grey[800],
+              ),
+              child: Text(
+                value,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ))
               .toList(),
         ),
       ],

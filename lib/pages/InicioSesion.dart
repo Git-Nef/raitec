@@ -14,167 +14,172 @@ class InicioSesion extends StatelessWidget {
     final TextEditingController nipController = TextEditingController();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.black,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
-        title: const Text(''),
+        backgroundColor: Colors.black,
       ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Image.asset(
-                'assets/LogoPantallas.png',
-                height: 180,
+              Center(
+                child: Image.asset(
+                  'assets/LogoPantallas.png',
+                  height: 140,
+                ),
               ),
               const SizedBox(height: 40),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Ingresa tu número de control',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              const Text(
+                'Número de control',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               TextField(
                 controller: claveController,
+                style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
+                  hintText: 'Ingresa tu número',
+                  hintStyle: const TextStyle(color: Colors.white38),
+                  filled: true,
+                  fillColor: Colors.grey[900],
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
                   ),
-                  hintText: 'Número de control',
                 ),
               ),
-              const SizedBox(height: 24),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Ingresa tu NIP',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              const SizedBox(height: 20),
+              const Text(
+                'NIP',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               TextField(
                 controller: nipController,
                 obscureText: true,
+                style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
+                  hintText: 'Ingresa tu NIP',
+                  hintStyle: const TextStyle(color: Colors.white38),
+                  filled: true,
+                  fillColor: Colors.grey[900],
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
                   ),
-                  hintText: 'NIP',
                 ),
               ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 4,
-                  ),
-                  onPressed: () async {
-                    final clave = claveController.text.trim();
-                    final nip = nipController.text.trim();
+              const SizedBox(height: 30),
+              _mainButton(
+                text: 'Iniciar Sesión',
+                onPressed: () async {
+                  final clave = claveController.text.trim();
+                  final nip = nipController.text.trim();
 
-                    if (clave.isEmpty || nip.isEmpty) {
+                  if (clave.isEmpty || nip.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Completa ambos campos'),
+                      ),
+                    );
+                    return;
+                  }
+
+                  try {
+                    final doc = await FirebaseFirestore.instance
+                        .collection('usuarios')
+                        .doc(clave)
+                        .get();
+
+                    if (!doc.exists) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Completa ambos campos')),
+                        const SnackBar(content: Text('Usuario no encontrado')),
                       );
                       return;
                     }
 
-                    try {
-                      final doc = await FirebaseFirestore.instance
-                          .collection('usuarios')
-                          .doc(clave)
-                          .get();
-
-                      if (!doc.exists) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Usuario no encontrado')),
-                        );
-                        return;
-                      }
-
-                      final data = doc.data();
-                      if (data?['nip'] == nip) {
-                        SessionManager().setNumControl(clave);
-                        if(data?['esConductor']==false){
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
+                    final data = doc.data();
+                    if (data?['nip'] == nip) {
+                      SessionManager().setNumControl(clave);
+                      if (data?['esConductor'] == false) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
                               builder: (context) =>
-                                  PrincipalUsuario(numControl: clave),
-
-                            ),
-                          );
-
-                        }else{
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PrincipalConductor(numControl: clave),
-                            ),
-                          );
-                        }
+                                  PrincipalUsuario(numControl: clave)),
+                        );
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('NIP incorrecto')),
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  PrincipalConductor(numControl: clave)),
                         );
                       }
-                    } catch (e) {
+                    } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: $e')),
+                        const SnackBar(content: Text('NIP incorrecto')),
                       );
                     }
-                  },
-                  child: const Text(
-                    'Iniciar Sesión',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 4,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Registro()),
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: $e')),
                     );
-                  },
-                  child: const Text(
-                    'Crear Cuenta',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                  }
+                },
+              ),
+              const SizedBox(height: 12),
+              _mainButton(
+                text: 'Crear Cuenta',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const Registro()),
+                  );
+                },
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _mainButton({
+    required String text,
+    required VoidCallback onPressed,
+    Color color = Colors.blueAccent,
+  }) {
+    return Center(
+      child: SizedBox(
+        width: 240, // Ancho reducido para un look más elegante
+        height: 44,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: color,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            elevation: 2,
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              letterSpacing: 1.0,
+            ),
           ),
         ),
       ),
