@@ -23,8 +23,7 @@ class Ubicacion extends StatefulWidget {
 
 class _UbicacionState extends State<Ubicacion> {
   GoogleMapController? _mapController;
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   Set<Marker> _marcadores = {};
   Set<Polyline> _polilineas = {};
@@ -44,24 +43,20 @@ class _UbicacionState extends State<Ubicacion> {
   }
 
   void _inicializarNotificaciones() async {
-    const AndroidInitializationSettings androidInit =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initSettings =
-        InitializationSettings(android: androidInit);
+    const AndroidInitializationSettings androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const InitializationSettings initSettings = InitializationSettings(android: androidInit);
     await flutterLocalNotificationsPlugin.initialize(initSettings);
   }
 
   void _mostrarNotificacionLlegada() async {
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
+    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'canal_ruta',
       'Llegada a destino',
       importance: Importance.max,
       priority: Priority.high,
     );
 
-    const NotificationDetails generalNotificationDetails =
-        NotificationDetails(android: androidDetails);
+    const NotificationDetails generalNotificationDetails = NotificationDetails(android: androidDetails);
 
     await flutterLocalNotificationsPlugin.show(
       0,
@@ -80,9 +75,7 @@ class _UbicacionState extends State<Ubicacion> {
     );
 
     if (result.points.isNotEmpty) {
-      _puntosRuta = result.points
-          .map((punto) => LatLng(punto.latitude, punto.longitude))
-          .toList();
+      _puntosRuta = result.points.map((punto) => LatLng(punto.latitude, punto.longitude)).toList();
 
       double distanciaTotal = 0;
       for (int i = 0; i < _puntosRuta.length - 1; i++) {
@@ -91,11 +84,10 @@ class _UbicacionState extends State<Ubicacion> {
               _puntosRuta[i].longitude,
               _puntosRuta[i + 1].latitude,
               _puntosRuta[i + 1].longitude,
-            ) /
-            1000; // metros a kilómetros
+            ) / 1000;
       }
 
-      double tiempoEstimado = distanciaTotal / 0.333; // 20 km/h ≈ 0.333 km/min
+      double tiempoEstimado = distanciaTotal / 0.333;
 
       setState(() {
         _precioCalculado = tarifaBase + (distanciaTotal * costoPorKm) + (tiempoEstimado * costoPorMinuto);
@@ -116,15 +108,13 @@ class _UbicacionState extends State<Ubicacion> {
             markerId: const MarkerId("origen"),
             position: widget.origen,
             infoWindow: const InfoWindow(title: "Origen"),
-            icon:
-                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           ),
           Marker(
             markerId: const MarkerId("destino"),
             position: widget.destino,
             infoWindow: const InfoWindow(title: "Destino"),
-            icon:
-                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
           ),
         };
       });
@@ -150,44 +140,70 @@ class _UbicacionState extends State<Ubicacion> {
   void _mostrarModalPedirRait() {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Confirmar Rait',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              const Text('Desglose del costo:'),
-              Text('Tarifa base: \$${tarifaBase.toStringAsFixed(2)}'),
-              Text('Costo por distancia: \$${(_precioCalculado - tarifaBase).toStringAsFixed(2)}'),
-              const SizedBox(height: 10),
-              Text('Total: \$${_precioCalculado.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('¡Rait solicitado por \$${_precioCalculado.toStringAsFixed(2)}! 🚗💨'),
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.4,
+          minChildSize: 0.2,
+          maxChildSize: 0.75,
+          builder: (_, controller) => Padding(
+            padding: const EdgeInsets.all(24),
+            child: ListView(
+              controller: controller,
+              children: [
+                Center(
+                  child: Container(
+                    width: 50,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[400],
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  );
-                },
-                icon: const Icon(Icons.check),
-                label: const Text('Confirmar'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                const Text('Resumen del viaje', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: const Icon(Icons.location_on, color: Colors.blue),
+                  title: const Text('Punto de partida'),
+                  subtitle: Text(widget.origen.toString()),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.flag, color: Colors.red),
+                  title: const Text('Destino'),
+                  subtitle: Text(widget.destino.toString()),
+                ),
+                const Divider(height: 32),
+                const Text('Costo estimado', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                Text('Tarifa base: \$${tarifaBase.toStringAsFixed(2)}'),
+                Text('Total estimado: \$${_precioCalculado.toStringAsFixed(2)}'),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('¡Rait solicitado por \$${_precioCalculado.toStringAsFixed(2)}! 🚗💨'),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.check),
+                  label: const Text('Confirmar Rait'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    textStyle: const TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
