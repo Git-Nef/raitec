@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:raitec/pages/sesion.dart';
-import 'package:raitec/pages/unirseRuta.dart';
 import 'ubicacion.dart';
 
 class RutasOfrecidas extends StatefulWidget {
@@ -108,18 +107,21 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   elevation: 6,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(ruta['ruta'],
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: raitecBlue,
-                            )),
+                        Text(
+                          ruta['ruta'],
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: raitecBlue,
+                          ),
+                        ),
                         const SizedBox(height: 8),
                         _infoRow(Icons.person, ruta['nombreConductor'],
                             Colors.blueGrey),
@@ -134,31 +136,6 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                         const SizedBox(height: 10),
                         Row(
                           children: [
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => Ubicacion(
-                                        origen: ruta['origen'],
-                                        destino: ruta['destino'],
-                                        nombreRuta: ruta['ruta'],
-                                      ),
-                                    ),
-                                  );
-                                },
-                                icon: Icon(Icons.map, color: raitecBlue),
-                                label: const Text("Ver ruta"),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  foregroundColor: raitecBlue,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
                             Expanded(
                               child: ElevatedButton.icon(
                                 onPressed: () {
@@ -177,17 +154,20 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => UnirseRuta(
+                                      builder: (context) => Ubicacion(
+                                        origen: ruta['origen'],
+                                        destino: ruta['destino'],
+                                        nombreRuta: ruta['ruta'],
                                         rutaId: ruta['rutaId'],
-                                        datosRuta: ruta,
                                         uidConductor: ruta['uidConductor'],
                                         uidPasajero: uidPasajero,
+                                        datosRuta: ruta,
                                       ),
                                     ),
                                   );
                                 },
                                 icon: const Icon(Icons.directions_car),
-                                label: const Text("Pedir Rait"),
+                                label: const Text("Ver mapa y pedir Rait"),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: raitecBlue,
                                   foregroundColor: Colors.white,
@@ -202,11 +182,14 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('\$${ruta['precio']} MXN',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.black87)),
+                            Text(
+                              '\$${ruta['precio']} MXN',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                            ),
                             Row(
                               children: [
                                 Icon(Icons.map, color: raitecBlue),
@@ -221,7 +204,8 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                     ),
                   ),
                 );
-              }),
+              },
+            ),
     );
   }
 
@@ -232,7 +216,12 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
         children: [
           Icon(icon, size: 20, color: iconColor),
           const SizedBox(width: 8),
-          Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
         ],
       ),
     );

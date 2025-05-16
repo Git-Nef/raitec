@@ -77,6 +77,21 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
       return;
     }
 
+    // Construir lista de días seleccionados con hora
+    final diasSeleccionados = dias.where((dia) => diasActivos[dia]!).map((dia) {
+      return {
+        'dia': dia,
+        'horaInicio': horaInicio[dia]!.format(context),
+      };
+    }).toList();
+
+    if (diasSeleccionados.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Debes seleccionar al menos un día')),
+      );
+      return;
+    }
+
     final docRef = FirebaseFirestore.instance
         .collection('usuarios')
         .doc(clave)
@@ -84,7 +99,6 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         .doc('info');
 
     try {
-      var diasSeleccionados;
       await docRef.set({
         'lugaresDisponibles': int.parse(_asientosController.text),
         'origen': {
@@ -96,16 +110,20 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
           'lng': destinoFijo.longitude,
         },
         'horarios': diasSeleccionados,
+        'nombreRuta': 'Ruta de $clave'
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Ruta guardada exitosamente')),
       );
+
       _asientosController.clear();
       setState(() {
         origenSeleccionado = null;
-        for (var d in dias) diasActivos[d] = false;
-        for (var d in dias) diasActivos[d] = false;
+        for (var d in dias) {
+          diasActivos[d] = false;
+          horaInicio[d] = const TimeOfDay(hour: 9, minute: 0);
+        }
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -154,7 +172,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                                 const EdgeInsets.symmetric(horizontal: 16.0),
                             child: Row(
                               children: [
-                                Text('Inicio:'),
+                                const Text('Hora de entrada:'),
                                 TextButton(
                                   onPressed: () => _seleccionarHora(dia),
                                   child: Text(horaInicio[dia]!.format(context)),
@@ -169,41 +187,6 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                 ),
               ),
               const SizedBox(height: 16),
-              Expanded(
-                child: ListView(
-                  children: dias.map((dia) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SwitchListTile(
-                          title: Text(dia),
-                          value: diasActivos[dia]!,
-                          onChanged: (bool value) {
-                            setState(() {
-                              diasActivos[dia] = value;
-                            });
-                          },
-                        ),
-                        if (diasActivos[dia]!)
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Row(
-                              children: [
-                                Text('Inicio:'),
-                                TextButton(
-                                  onPressed: () => _seleccionarHora(dia),
-                                  child: Text(horaInicio[dia]!.format(context)),
-                                ),
-                              ],
-                            ),
-                          ),
-                        const Divider(),
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ),
               ElevatedButton.icon(
                 onPressed: _seleccionarUbicacion,
                 icon: const Icon(Icons.location_pin),
