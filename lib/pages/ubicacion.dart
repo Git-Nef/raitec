@@ -4,6 +4,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Ubicacion extends StatefulWidget {
   final LatLng origen;
@@ -52,32 +53,49 @@ class _UbicacionState extends State<Ubicacion> {
   @override
   void initState() {
     super.initState();
+    _solicitarPermisosNotificacion();
     _inicializarNotificaciones();
     _cargarRutaDesde(widget.origen);
     _escucharAceptacion();
   }
 
+  void _solicitarPermisosNotificacion() async {
+    final status = await Permission.notification.status;
+    if (!status.isGranted) {
+      await Permission.notification.request();
+    }
+  }
+
   void _inicializarNotificaciones() async {
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettings = InitializationSettings(android: androidInit);
-    await flutterLocalNotificationsPlugin.initialize(initSettings);
+    const initializationSettings = InitializationSettings(
+      android: androidInit,
+    );
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (response) {},
+    );
   }
 
   void _mostrarNotificacion(String titulo, String cuerpo) async {
     const androidDetails = AndroidNotificationDetails(
-      'notificaciones_rait',
+      'canal_ruta',
       'Notificaciones de RaiTec',
+      channelDescription: 'Notificaciones sobre el estado del viaje',
       importance: Importance.max,
       priority: Priority.high,
+      playSound: true,
+      enableLights: true,
+      color: Colors.blue,
     );
-    const generalNotificationDetails =
-    NotificationDetails(android: androidDetails);
+
+    const notificationDetails = NotificationDetails(android: androidDetails);
 
     await flutterLocalNotificationsPlugin.show(
       0,
       titulo,
       cuerpo,
-      generalNotificationDetails,
+      notificationDetails,
     );
   }
 
@@ -86,14 +104,16 @@ class _UbicacionState extends State<Ubicacion> {
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       request: PolylineRequest(
         origin: PointLatLng(origen.latitude, origen.longitude),
-        destination: PointLatLng(widget.destino.latitude, widget.destino.longitude),
+        destination:
+        PointLatLng(widget.destino.latitude, widget.destino.longitude),
         mode: TravelMode.driving,
       ),
       googleApiKey: "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI",
     );
 
     if (result.points.isNotEmpty) {
-      _puntosRuta = result.points.map((p) => LatLng(p.latitude, p.longitude)).toList();
+      _puntosRuta =
+          result.points.map((p) => LatLng(p.latitude, p.longitude)).toList();
 
       setState(() {
         _polilineas = {
@@ -109,12 +129,14 @@ class _UbicacionState extends State<Ubicacion> {
           Marker(
             markerId: const MarkerId("origen"),
             position: widget.origen,
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            icon:
+            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           ),
           Marker(
             markerId: const MarkerId("destino"),
             position: widget.destino,
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+            icon:
+            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
           ),
         };
       });
@@ -193,7 +215,7 @@ class _UbicacionState extends State<Ubicacion> {
     if (_paradaSeleccionada == null) return;
 
     PolylinePoints polylinePoints = PolylinePoints();
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+    await polylinePoints.getRouteBetweenCoordinates(
       request: PolylineRequest(
         origin: PointLatLng(
             _paradaSeleccionada!.latitude, _paradaSeleccionada!.longitude),
@@ -204,19 +226,17 @@ class _UbicacionState extends State<Ubicacion> {
       googleApiKey: "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI",
     );
 
-    if (result.points.isNotEmpty) {
-      final distanciaTotal = Geolocator.distanceBetween(
-        _paradaSeleccionada!.latitude,
-        _paradaSeleccionada!.longitude,
-        widget.destino.latitude,
-        widget.destino.longitude,
-      );
-      setState(() {
-        _distanciaKm = distanciaTotal / 1000;
-        _tiempoMin = (_distanciaKm! / 0.7 * 60).round();
-        _costoCalculado = (_distanciaKm! * 5).clamp(10, 100);
-      });
-    }
+    final distanciaTotal = Geolocator.distanceBetween(
+      _paradaSeleccionada!.latitude,
+      _paradaSeleccionada!.longitude,
+      widget.destino.latitude,
+      widget.destino.longitude,
+    );
+    setState(() {
+      _distanciaKm = distanciaTotal / 1000;
+      _tiempoMin = (_distanciaKm! / 0.7 * 60).round();
+      _costoCalculado = (_distanciaKm! * 5).clamp(10, 100);
+    });
   }
 
   Future<void> _pedirRait() async {
@@ -262,7 +282,8 @@ class _UbicacionState extends State<Ubicacion> {
       body: Stack(
         children: [
           GoogleMap(
-            initialCameraPosition: CameraPosition(target: widget.origen, zoom: 14),
+            initialCameraPosition:
+            CameraPosition(target: widget.origen, zoom: 14),
             onMapCreated: (controller) => _mapController = controller,
             markers: {
               ..._marcadores,
@@ -301,9 +322,11 @@ class _UbicacionState extends State<Ubicacion> {
                     if (_distanciaKm != null)
                       Column(
                         children: [
-                          Text('Distancia: ${_distanciaKm!.toStringAsFixed(2)} km'),
+                          Text(
+                              'Distancia: ${_distanciaKm!.toStringAsFixed(2)} km'),
                           Text('Tiempo: $_tiempoMin min'),
-                          Text('Precio: \$${_costoCalculado!.toStringAsFixed(2)} MXN'),
+                          Text(
+                              'Precio: \$${_costoCalculado!.toStringAsFixed(2)} MXN'),
                           const SizedBox(height: 10),
                         ],
                       ),
@@ -345,7 +368,9 @@ class _UbicacionState extends State<Ubicacion> {
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: _metodoPago == metodo ? Colors.blue.shade100 : Colors.grey.shade200,
+          color: _metodoPago == metodo
+              ? Colors.blue.shade100
+              : Colors.grey.shade200,
           border: Border.all(
               color: _metodoPago == metodo ? Colors.blue : Colors.grey,
               width: 1.5),

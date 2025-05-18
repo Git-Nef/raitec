@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:raitec/pages/sesion.dart';
+import 'package:raitec/pages/SeguimientoViaje.dart';
 
 class PasajerosPendientes extends StatefulWidget {
   const PasajerosPendientes({super.key});
@@ -134,6 +135,22 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
             },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => SeguimientoViaje(
+                uidConductor: uidConductor,
+                rutaId: 'info',
+              ),
+            ),
+          );
+        },
+        label: const Text('Comenzar Viaje'),
+        icon: const Icon(Icons.directions_car),
+        backgroundColor: Colors.green,
       ),
     );
   }

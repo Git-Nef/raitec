@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:raitec/pages/MisSolicitudes.dart';
 import 'package:raitec/pages/sesion.dart';
 import 'package:raitec/pages/unirseRuta.dart';
 import 'ubicacion.dart';
@@ -306,6 +307,17 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                   ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MisSolicitudes()),
+          );
+        },
+        label: const Text('Solicitudes de Rait'),
+        icon: const Icon(Icons.receipt_long),
+        backgroundColor: Colors.blueAccent[500],
       ),
     );
   }
