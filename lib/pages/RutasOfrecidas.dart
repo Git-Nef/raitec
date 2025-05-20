@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:raitec/pages/MisSolicitudes.dart';
 import 'package:raitec/pages/sesion.dart';
 import 'package:raitec/pages/unirseRuta.dart';
 import 'ubicacion.dart';
@@ -71,9 +72,7 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
       rutasTemp.add({
         'ruta': nombreRuta,
         'nombreConductor': doc.data()['nombre'] ?? 'Sin nombre',
-        'email': doc.data().containsKey('email')
-            ? doc.data()['email']
-            : 'Sin correo',
+        'email': doc.data()['email'] ?? 'Sin correo',
         'telefono': doc.data()['telefono'] ?? 'Sin número',
         'horario': horarioTexto,
         'precio': 25,
@@ -235,32 +234,6 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                                   Expanded(
                                     child: ElevatedButton.icon(
                                       onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => Ubicacion(
-                                              origen: ruta['origen'],
-                                              destino: ruta['destino'],
-                                              nombreRuta: ruta['ruta'],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      icon: Icon(Icons.map, color: raitecBlue),
-                                      label: const Text("Ver ruta"),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.white,
-                                        foregroundColor: raitecBlue,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12)),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: ElevatedButton.icon(
-                                      onPressed: () {
                                         final uidPasajero =
                                             SessionManager().numControl;
                                         if (uidPasajero == null ||
@@ -276,18 +249,22 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => UnirseRuta(
+                                            builder: (_) => Ubicacion(
+                                              origen: ruta['origen'],
+                                              destino: ruta['destino'],
+                                              nombreRuta: ruta['ruta'],
                                               rutaId: ruta['rutaId'],
-                                              datosRuta: ruta,
                                               uidConductor:
                                                   ruta['uidConductor'],
                                               uidPasajero: uidPasajero,
+                                              datosRuta: ruta,
                                             ),
                                           ),
                                         );
                                       },
-                                      icon: const Icon(Icons.directions_car),
-                                      label: const Text("Pedir Rait"),
+                                      icon: const Icon(Icons.map),
+                                      label:
+                                          const Text("Ver ruta y pedir Rait"),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: raitecBlue,
                                         foregroundColor: Colors.white,
@@ -331,29 +308,16 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        elevation: 10,
-        shape: const CircularNotchedRectangle(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new,
-                    size: 28, color: Colors.blueGrey),
-                onPressed: () => Navigator.pop(context),
-              ),
-              IconButton(
-                icon: const Icon(Icons.home_filled,
-                    size: 30, color: Colors.blueAccent),
-                onPressed: () => Navigator.popUntil(context, (r) => r.isFirst),
-              ),
-              const SizedBox(width: 28),
-            ],
-          ),
-        ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const MisSolicitudes()),
+          );
+        },
+        label: const Text('Solicitudes de Rait'),
+        icon: const Icon(Icons.receipt_long),
+        backgroundColor: Colors.blueAccent[500],
       ),
     );
   }

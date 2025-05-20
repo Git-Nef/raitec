@@ -3,18 +3,25 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
-import 'dart:math';
 
 class Ubicacion extends StatefulWidget {
   final LatLng origen;
   final LatLng destino;
-  final String? nombreRuta;
+  final String nombreRuta;
+  final String rutaId;
+  final String uidConductor;
+  final String uidPasajero;
+  final Map<String, dynamic> datosRuta;
 
   const Ubicacion({
     super.key,
     required this.origen,
     required this.destino,
-    this.nombreRuta,
+    required this.nombreRuta,
+    required this.rutaId,
+    required this.uidConductor,
+    required this.uidPasajero,
+    required this.datosRuta,
   });
 
   @override
@@ -30,75 +37,66 @@ class _UbicacionState extends State<Ubicacion> {
   Set<Polyline> _polilineas = {};
   List<LatLng> _puntosRuta = [];
   bool _notificado = false;
-  double _precioCalculado = 0;
-
-  final double tarifaBase = 5.0;
-  final double costoPorKm = 2.0;
-  final double costoPorMinuto = 0.30;
 
   @override
   void initState() {
     super.initState();
+    _solicitarPermisosNotificacion();
     _inicializarNotificaciones();
     _cargarRutaDesde(widget.origen);
+    _escucharAceptacion();
+  }
+
+  void _solicitarPermisosNotificacion() async {
+    final status = await Permission.notification.status;
+    if (!status.isGranted) {
+      await Permission.notification.request();
+    }
   }
 
   void _inicializarNotificaciones() async {
     const AndroidInitializationSettings androidInit =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const InitializationSettings initSettings =
-    InitializationSettings(android: androidInit);
+        InitializationSettings(android: androidInit);
     await flutterLocalNotificationsPlugin.initialize(initSettings);
   }
 
   void _mostrarNotificacionLlegada() async {
     const AndroidNotificationDetails androidDetails =
-    AndroidNotificationDetails(
+        AndroidNotificationDetails(
       'canal_ruta',
-      'Llegada a destino',
+      'Notificaciones de RaiTec',
+      channelDescription: 'Notificaciones sobre el estado del viaje',
       importance: Importance.max,
       priority: Priority.high,
-      color: Colors.blue,
     );
 
     const NotificationDetails generalNotificationDetails =
-    NotificationDetails(android: androidDetails);
+        NotificationDetails(android: androidDetails);
 
     await flutterLocalNotificationsPlugin.show(
       0,
-      '¡Has llegado!',
-      'Estás en tu destino final.',
-      generalNotificationDetails,
+      titulo,
+      cuerpo,
+      notificationDetails,
     );
   }
 
   Future<void> _cargarRutaDesde(LatLng origen) async {
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI", // Reemplaza con tu API Key
+      "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI", // reemplaza con tu propia API key
       PointLatLng(origen.latitude, origen.longitude),
       PointLatLng(widget.destino.latitude, widget.destino.longitude),
     );
 
     if (result.points.isNotEmpty) {
-      _puntosRuta = result.points.map((punto) => LatLng(punto.latitude, punto.longitude)).toList();
-
-      double distanciaTotal = 0;
-      for (int i = 0; i < _puntosRuta.length - 1; i++) {
-        distanciaTotal += Geolocator.distanceBetween(
-              _puntosRuta[i].latitude,
-              _puntosRuta[i].longitude,
-              _puntosRuta[i + 1].latitude,
-              _puntosRuta[i + 1].longitude,
-            ) / 1000;
-      }
-
-      double tiempoEstimado = distanciaTotal / 0.333;
+      _puntosRuta = result.points
+          .map((punto) => LatLng(punto.latitude, punto.longitude))
+          .toList();
 
       setState(() {
-        _precioCalculado = tarifaBase + (distanciaTotal * costoPorKm) + (tiempoEstimado * costoPorMinuto);
-        _precioCalculado = double.parse(_precioCalculado.toStringAsFixed(2));
-
         _polilineas.clear();
         _polilineas.add(
           Polyline(
@@ -106,41 +104,159 @@ class _UbicacionState extends State<Ubicacion> {
             color: Colors.blueAccent,
             width: 5,
             points: _puntosRuta,
-          ),
-        );
+          )
+        };
 
         _marcadores = {
           Marker(
             markerId: const MarkerId("origen"),
             position: widget.origen,
             infoWindow: const InfoWindow(title: "Origen"),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            icon:
+                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           ),
           Marker(
             markerId: const MarkerId("destino"),
             position: widget.destino,
             infoWindow: const InfoWindow(title: "Destino"),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+            icon:
+                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
           ),
         };
       });
-
-      _verificarLlegada(origen);
     }
   }
 
-  void _verificarLlegada(LatLng actual) {
-    final double distancia = Geolocator.distanceBetween(
-      actual.latitude,
-      actual.longitude,
+  void _escucharAceptacion() {
+    FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(widget.uidConductor)
+        .collection('rutas')
+        .doc(widget.rutaId)
+        .collection('pasajeros')
+        .doc(widget.uidPasajero)
+        .snapshots()
+        .listen((doc) {
+      if (doc.exists && doc.data()?['estado'] == 'aceptado') {
+        _mostrarNotificacion('¡Conductor en camino!',
+            'Tu conductor ha aceptado la solicitud y va hacia tu parada.');
+        _mostrarDatosConductor();
+      }
+    });
+  }
+
+  void _mostrarDatosConductor() async {
+    final conductorDoc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(widget.uidConductor)
+        .get();
+    final vehiculoDoc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(widget.uidConductor)
+        .collection('vehiculo')
+        .doc('info')
+        .get();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Información del Conductor"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (conductorDoc.data()?['fotografiaUrl'] != null)
+              Image.network(conductorDoc['fotografiaUrl'], height: 80),
+            Text('Nombre: ${conductorDoc['nombre']}'),
+            const SizedBox(height: 8),
+            Text('Vehículo: ${vehiculoDoc['marca']} ${vehiculoDoc['modelo']}'),
+            Text('Placas: ${vehiculoDoc['matricula']}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar'),
+          )
+        ],
+      ),
+    );
+  }
+
+  bool _estaCercaDeLaRuta(LatLng punto) {
+    for (final p in _puntosRuta) {
+      final d = Geolocator.distanceBetween(
+        punto.latitude,
+        punto.longitude,
+        p.latitude,
+        p.longitude,
+      );
+      if (d <= _distanciaMaxPermitida) return true;
+    }
+    return false;
+  }
+
+  Future<void> _calcularPrecioDesdeParada() async {
+    if (_paradaSeleccionada == null) return;
+
+    PolylinePoints polylinePoints = PolylinePoints();
+    await polylinePoints.getRouteBetweenCoordinates(
+      request: PolylineRequest(
+        origin: PointLatLng(
+            _paradaSeleccionada!.latitude, _paradaSeleccionada!.longitude),
+        destination:
+        PointLatLng(widget.destino.latitude, widget.destino.longitude),
+        mode: TravelMode.driving,
+      ),
+      googleApiKey: "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI",
+    );
+
+    final distanciaTotal = Geolocator.distanceBetween(
+      _paradaSeleccionada!.latitude,
+      _paradaSeleccionada!.longitude,
       widget.destino.latitude,
       widget.destino.longitude,
     );
+    setState(() {
+      _distanciaKm = distanciaTotal / 1000;
+      _tiempoMin = (_distanciaKm! / 0.7 * 60).round();
+      _costoCalculado = (_distanciaKm! * 5).clamp(10, 100);
+    });
+  }
 
-    if (distancia <= 20 && !_notificado) {
-      _notificado = true;
-      _mostrarNotificacionLlegada();
+  Future<void> _pedirRait() async {
+    if (_paradaSeleccionada == null || !_paradaEsValida) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecciona una parada válida')),
+      );
+      return;
     }
+
+    await _calcularPrecioDesdeParada();
+
+    final ref = FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(widget.uidConductor)
+        .collection('rutas')
+        .doc(widget.rutaId)
+        .collection('pasajeros')
+        .doc(widget.uidPasajero);
+
+    await ref.set({
+      'estado': 'pendiente',
+      'metodoPago': _metodoPago,
+      'fechaUnion': Timestamp.now(),
+      'paradaPersonalizada': {
+        'lat': _paradaSeleccionada!.latitude,
+        'lng': _paradaSeleccionada!.longitude,
+      },
+      'distanciaKm': _distanciaKm,
+      'tiempoEstimadoMin': _tiempoMin,
+      'precioEstimado': _costoCalculado,
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('¡Petición enviada al conductor!')),
+    );
   }
 
   void _mostrarModalPedirRait() {
@@ -219,20 +335,8 @@ class _UbicacionState extends State<Ubicacion> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Text(
-          widget.nombreRuta ?? 'Ruta en mapa',
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 18,
-            color: Colors.white,
-          ),
-        ),
+        title: Text(widget.nombreRuta ?? 'Ruta en mapa'),
       ),
       body: GoogleMap(
         initialCameraPosition: CameraPosition(
@@ -242,8 +346,7 @@ class _UbicacionState extends State<Ubicacion> {
         onMapCreated: (controller) => _mapController = controller,
         markers: _marcadores,
         polylines: _polilineas,
-        myLocationEnabled: true,
-        myLocationButtonEnabled: false,
+        myLocationEnabled: false,
         zoomControlsEnabled: false,
       ),
       bottomSheet: Container(

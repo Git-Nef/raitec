@@ -43,9 +43,9 @@ class _MisRutasState extends State<MisRutas> {
       final destino = data['destino'];
       final horarios = data['horarios'] as List<dynamic>?;
       lugaresDisponibles = data['lugaresDisponibles'] ?? 0;
-      nombreRuta = data['nombreRuta'] ?? 'Sin nombre';
+      nombreRuta = data['nombreRuta'] ?? 'Ruta Programada';
 
-      if (horarios != null) {
+      if (horarios != null && horarios.isNotEmpty) {
         horarioTexto = horarios.map((h) {
           return '${h['dia']} (${h['horaInicio']})';
         }).join(', ');
@@ -93,8 +93,8 @@ class _MisRutasState extends State<MisRutas> {
                 const Icon(Icons.location_on, color: Colors.red),
                 const SizedBox(width: 8),
                 Expanded(
-                    child:
-                        Text(origenTxt, style: const TextStyle(fontSize: 14))),
+                  child: Text(origenTxt, style: const TextStyle(fontSize: 14)),
+                ),
               ],
             ),
             const SizedBox(height: 5),
@@ -103,8 +103,8 @@ class _MisRutasState extends State<MisRutas> {
                 const Icon(Icons.flag, color: Colors.green),
                 const SizedBox(width: 8),
                 Expanded(
-                    child:
-                        Text(destinoTxt, style: const TextStyle(fontSize: 14))),
+                  child: Text(destinoTxt, style: const TextStyle(fontSize: 14)),
+                ),
               ],
             ),
             const Divider(height: 25),
@@ -208,7 +208,8 @@ class _MisRutasState extends State<MisRutas> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const PasajerosPendientes()),
+                          builder: (context) => const PasajerosPendientes(),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.group),

@@ -22,7 +22,7 @@ class PrincipalUsuario extends StatelessWidget {
         elevation: 1,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
+            icon: const Icon(Icons.menu, color: Colors.black),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
@@ -33,7 +33,8 @@ class PrincipalUsuario extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.white),
+            icon:
+                const Icon(Icons.notifications, size: 30, color: Colors.black),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Notificaciones abiertas')),
@@ -52,42 +53,69 @@ class PrincipalUsuario extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Menú',
-                      style: TextStyle(color: Colors.white, fontSize: 24)),
-                  const SizedBox(height: 10),
-                  Image.asset('assets/LogoPantallas.png', height: 50),
+                  const Text(
+                    'Menú',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Image.asset('assets/LogoPantallas.png', height: 60),
                 ],
               ),
             ),
-            _drawerItem(Icons.directions_car, 'Registrar Vehículo', () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => RegistrarVehiculo(numControl: numControl),
-                ),
-              );
-            }),
-            _drawerItem(Icons.info, 'Info Vehículo', () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => InfoVehiculo()),
-              );
-            }),
-            _drawerItem(Icons.account_circle, 'Mi Información', () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => InfoUsuario()),
-              );
-            }),
-            _drawerItem(Icons.map, 'Mis Rutas', () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MisRutas()),
-              );
-            }),
-            _drawerItem(Icons.logout, 'Cerrar sesión', () {
-              _confirmarCerrarSesion(context);
-            }, color: Colors.redAccent),
+            ListTile(
+              leading: const Icon(Icons.directions_car),
+              title: const Text('Registrar Vehículo'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        RegistrarVehiculo(numControl: numControl),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('Info Vehículo'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoVehiculo()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.account_circle),
+              title: const Text('Mi Información'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoUsuario()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.map),
+              title: const Text('Mis Rutas'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MisRutas()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.exit_to_app),
+              title: const Text('Cerrar sesión'),
+              onTap: () {
+                _confirmarCerrarSesion(context);
+              },
+            ),
           ],
         ),
       ),
@@ -110,54 +138,48 @@ class PrincipalUsuario extends StatelessWidget {
                     color: Colors.white),
               ),
               const SizedBox(height: 24),
-              _actionCard(
-                context,
-                icon: Icons.search,
-                text: 'Buscar una ruta',
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RutasOfrecidas())),
-              ),
-              _actionCard(
-                context,
-                icon: Icons.attach_money,
-                text: 'Costos',
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => InfoCostos())),
-              ),
-              _actionCard(
-                context,
-                icon: Icons.person,
-                text: 'Mi información',
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => InfoUsuario())),
-              ),
-              const SizedBox(height: 30),
-              const Text(
-                '¿Quieres ser conductor?',
-                style: TextStyle(color: Colors.white70, fontSize: 16),
-              ),
-              _actionCard(
-                context,
-                icon: Icons.drive_eta,
-                text: 'Elaborar petición',
-                onTap: () => Navigator.push(
+              buildBoton('BUSCAR UNA RUTA', onPressed: () {
+                Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => Aspirar(numControl: numControl)),
+                  MaterialPageRoute(builder: (context) => RutasOfrecidas()),
+                );
+              }),
+              const SizedBox(height: 16),
+              buildBoton('COSTOS', onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoCostos()),
+                );
+              }),
+              const SizedBox(height: 16),
+              buildBoton('MI INFORMACIÓN', onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoUsuario()),
+                );
+              }),
+              const SizedBox(height: 24),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '¿Quieres ser conductor?',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
-              const Spacer(),
-              _actionCard(
-                context,
-                icon: Icons.logout,
-                text: 'Cerrar sesión',
-                color: Colors.red,
-                onTap: () => _confirmarCerrarSesion(context),
-              ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
+              buildBoton('Elaborar Petición', onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Aspirar(numControl: numControl),
+                  ),
+                );
+              }),
+              const SizedBox(height: 30),
+              buildBoton('CERRAR SESIÓN', color: Colors.red, onPressed: () {
+                _confirmarCerrarSesion(context);
+              }),
+              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -165,19 +187,44 @@ class PrincipalUsuario extends StatelessWidget {
     );
   }
 
-  Widget _actionCard(BuildContext context,
-      {required IconData icon,
-        required String text,
-        required VoidCallback onTap,
-        Color color = Colors.blueAccent}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[850],
+  void _confirmarCerrarSesion(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirmación"),
+          content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Cancelar"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text("Aceptar"),
+              onPressed: () {
+                SessionManager().setNumControl('');
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const InicioSesion()),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget buildBoton(String texto,
+      {Color color = Colors.blue, VoidCallback? onPressed}) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed ?? () {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),

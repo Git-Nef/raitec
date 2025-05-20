@@ -16,9 +16,8 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
   final TextEditingController _nombreRutaController = TextEditingController();
   final TextEditingController _asientosController = TextEditingController();
   LatLng? origenSeleccionado;
-
   final LatLng destinoFijo =
-  const LatLng(24.03265897848829, -104.64678790491564);
+      const LatLng(24.03265897848829, -104.64678790491564);
 
   final List<String> dias = [
     'Lunes',
@@ -74,19 +73,25 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         clave.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Completa todos los campos y selecciona una ubicación'),
-        ),
+            content: Text(
+                'Por favor completa todos los campos y selecciona una ubicación')),
       );
       return;
     }
 
-    final horariosSeleccionados = {
-      for (var dia in dias)
-        if (diasActivos[dia] == true)
-          dia: {
-            'horaInicio': horaInicio[dia]!.format(context),
-          }
-    };
+    final diasSeleccionados = dias.where((dia) => diasActivos[dia]!).map((dia) {
+      return {
+        'dia': dia,
+        'horaInicio': horaInicio[dia]!.format(context),
+      };
+    }).toList();
+
+    if (diasSeleccionados.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecciona al menos un día y hora')),
+      );
+      return;
+    }
 
     final docRef = FirebaseFirestore.instance
         .collection('usuarios')
@@ -113,6 +118,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         const SnackBar(content: Text('Ruta guardada exitosamente')),
       );
 
+      _nombreRutaController.clear();
       _asientosController.clear();
       setState(() {
         origenSeleccionado = null;
@@ -144,10 +150,9 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
               TextFormField(
                 controller: _nombreRutaController,
                 decoration: const InputDecoration(
-                  labelText: 'Nombre de la ruta ejemplo: (Jardines)',
-                ),
+                    labelText: 'Nombre de la ruta (Ejemplo: Jardines)'),
                 validator: (value) =>
-                value!.isEmpty ? 'Escribe un nombre para la ruta' : null,
+                    value!.isEmpty ? 'Escribe un nombre para la ruta' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
@@ -162,7 +167,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) =>
-                value!.isEmpty ? 'Escribe los asientos' : null,
+                    value!.isEmpty ? 'Escribe los asientos' : null,
               ),
               const SizedBox(height: 20),
               Expanded(
@@ -186,11 +191,11 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                         ),
                         if (diasActivos[dia]!)
                           Padding(
-                            padding: const EdgeInsets.only(left: 16),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
                             child: Row(
                               children: [
-                                const Text('Inicio:',
-                                    style: TextStyle(color: Colors.white70)),
+                                const Text('Hora de entrada:'),
                                 const SizedBox(width: 10),
                                 TextButton.icon(
                                   onPressed: () => _seleccionarHora(dia),

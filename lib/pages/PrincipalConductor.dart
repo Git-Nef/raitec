@@ -22,7 +22,7 @@ class PrincipalConductor extends StatelessWidget {
         elevation: 1,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
+            icon: const Icon(Icons.menu, color: Colors.black),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
@@ -35,9 +35,7 @@ class PrincipalConductor extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.notifications_none, color: Colors.white),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('No hay notificaciones nuevas')),
-              );
+              // Aquí puedes manejar futuras notificaciones
             },
           ),
         ],
@@ -198,24 +196,28 @@ class PrincipalConductor extends StatelessWidget {
   void _confirmarCerrarSesion(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Confirmación"),
-        content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
-        actions: [
-          TextButton(
-            child: const Text("Cancelar"),
-            onPressed: () => Navigator.pop(context),
-          ),
-          TextButton(
-            child: const Text("Aceptar"),
-            onPressed: () {
-              SessionManager().setNumControl('');
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (_) => const InicioSesion()));
-            },
-          ),
-        ],
-      ),
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirmación"),
+          content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Cancelar"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text("Aceptar"),
+              onPressed: () {
+                SessionManager().setNumControl('');
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const InicioSesion()),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
