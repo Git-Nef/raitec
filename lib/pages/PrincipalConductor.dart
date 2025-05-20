@@ -93,54 +93,6 @@ class PrincipalConductor extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-<<<<<<< HEAD
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 32),
-              Center(
-                child: Image.asset(
-                  'assets/SplashScreen.png',
-                  height: 180,
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Bienvenido al servicio de conductor de RaiTec',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 40),
-              buildButton('Mi información', () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => InfoUsuario()),
-                );
-              }),
-              const SizedBox(height: 24),
-              buildButton('Mi vehículo', () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => InfoVehiculo()),
-                );
-              }),
-              const SizedBox(height: 24),
-              buildButton('Mis rutas', () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MisRutas()),
-                );
-              }),
-              const SizedBox(height: 40),
-              buildButton('CERRAR SESIÓN', () {
-                _confirmarCerrarSesion(context);
-              }, color: Colors.red),
-              const SizedBox(height: 40),
-=======
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -191,7 +143,6 @@ class PrincipalConductor extends StatelessWidget {
                 onTap: () => _confirmarCerrarSesion(context),
               ),
               const SizedBox(height: 20),
->>>>>>> neftali
             ],
           ),
         ),

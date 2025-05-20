@@ -23,12 +23,8 @@ class Ubicacion extends StatefulWidget {
 
 class _UbicacionState extends State<Ubicacion> {
   GoogleMapController? _mapController;
-<<<<<<< HEAD
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-=======
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
->>>>>>> neftali
 
   Set<Marker> _marcadores = {};
   Set<Polyline> _polilineas = {};
@@ -48,25 +44,16 @@ class _UbicacionState extends State<Ubicacion> {
   }
 
   void _inicializarNotificaciones() async {
-<<<<<<< HEAD
-    const AndroidInitializationSettings androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings initSettings = InitializationSettings(android: androidInit);
-=======
     const AndroidInitializationSettings androidInit =
     AndroidInitializationSettings('@mipmap/ic_launcher');
     const InitializationSettings initSettings =
     InitializationSettings(android: androidInit);
->>>>>>> neftali
     await flutterLocalNotificationsPlugin.initialize(initSettings);
   }
 
   void _mostrarNotificacionLlegada() async {
-<<<<<<< HEAD
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-=======
     const AndroidNotificationDetails androidDetails =
     AndroidNotificationDetails(
->>>>>>> neftali
       'canal_ruta',
       'Llegada a destino',
       importance: Importance.max,
@@ -74,12 +61,8 @@ class _UbicacionState extends State<Ubicacion> {
       color: Colors.blue,
     );
 
-<<<<<<< HEAD
-    const NotificationDetails generalNotificationDetails = NotificationDetails(android: androidDetails);
-=======
     const NotificationDetails generalNotificationDetails =
     NotificationDetails(android: androidDetails);
->>>>>>> neftali
 
     await flutterLocalNotificationsPlugin.show(
       0,
@@ -92,11 +75,7 @@ class _UbicacionState extends State<Ubicacion> {
   Future<void> _cargarRutaDesde(LatLng origen) async {
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-<<<<<<< HEAD
-      "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI",
-=======
       "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI", // Reemplaza con tu API Key
->>>>>>> neftali
       PointLatLng(origen.latitude, origen.longitude),
       PointLatLng(widget.destino.latitude, widget.destino.longitude),
     );

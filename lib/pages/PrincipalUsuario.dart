@@ -92,17 +92,10 @@ class PrincipalUsuario extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-<<<<<<< HEAD
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-=======
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
->>>>>>> neftali
             children: [
               const SizedBox(height: 10),
               Center(
@@ -110,30 +103,18 @@ class PrincipalUsuario extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               const Text(
-<<<<<<< HEAD
-                'BIENVENIDO A RaiTec',
-                textAlign: TextAlign.center,
-=======
                 'Bienvenido a RaiTec',
->>>>>>> neftali
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white),
               ),
               const SizedBox(height: 24),
-<<<<<<< HEAD
-              buildBoton(
-                'BUSCAR UNA RUTA',
-                onPressed: () {
-                  Navigator.push(
-=======
               _actionCard(
                 context,
                 icon: Icons.search,
                 text: 'Buscar una ruta',
                 onTap: () => Navigator.push(
->>>>>>> neftali
                     context,
                     MaterialPageRoute(builder: (context) => RutasOfrecidas())),
               ),
@@ -168,29 +149,6 @@ class PrincipalUsuario extends StatelessWidget {
                       builder: (context) => Aspirar(numControl: numControl)),
                 ),
               ),
-<<<<<<< HEAD
-              const SizedBox(height: 10),
-              buildBoton(
-                'Elaborar Petición',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Aspirar(numControl: numControl),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 30),
-              buildBoton(
-                'CERRAR SESIÓN',
-                color: Colors.red,
-                onPressed: () {
-                  _confirmarCerrarSesion(context);
-                },
-              ),
-              const SizedBox(height: 40),
-=======
               const Spacer(),
               _actionCard(
                 context,
@@ -200,7 +158,6 @@ class PrincipalUsuario extends StatelessWidget {
                 onTap: () => _confirmarCerrarSesion(context),
               ),
               const SizedBox(height: 20),
->>>>>>> neftali
             ],
           ),
         ),

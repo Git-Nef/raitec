@@ -74,31 +74,8 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         clave.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-<<<<<<< HEAD
-          content: Text(
-              'Por favor completa todos los campos y selecciona una ubicación'),
-        ),
-      );
-      return;
-    }
-
-    final List<Map<String, String>> diasSeleccionados = [];
-    for (var dia in dias) {
-      if (diasActivos[dia] == true) {
-        diasSeleccionados.add({
-          'dia': dia,
-          'horaInicio': horaInicio[dia]!.format(context),
-        });
-      }
-    }
-
-    if (diasSeleccionados.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecciona al menos un día y hora')),
-=======
           content: Text('Completa todos los campos y selecciona una ubicación'),
         ),
->>>>>>> neftali
       );
       return;
     }
@@ -136,22 +113,10 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         const SnackBar(content: Text('Ruta guardada exitosamente')),
       );
 
-<<<<<<< HEAD
-      // Limpiar todo
-      _nombreRutaController.clear();
-      _asientosController.clear();
-      setState(() {
-        origenSeleccionado = null;
-        for (var d in dias) {
-          diasActivos[d] = false;
-          horaInicio[d] = const TimeOfDay(hour: 9, minute: 0);
-        }
-=======
       _asientosController.clear();
       setState(() {
         origenSeleccionado = null;
         for (var d in dias) diasActivos[d] = false;
->>>>>>> neftali
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -221,17 +186,6 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                         ),
                         if (diasActivos[dia]!)
                           Padding(
-<<<<<<< HEAD
-                            padding:
-                            const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Row(
-                              children: [
-                                const Text('Inicio:'),
-                                const SizedBox(width: 10),
-                                TextButton(
-                                  onPressed: () => _seleccionarHora(dia),
-                                  child: Text(horaInicio[dia]!.format(context)),
-=======
                             padding: const EdgeInsets.only(left: 16),
                             child: Row(
                               children: [
@@ -248,26 +202,16 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500),
                                   ),
->>>>>>> neftali
                                 ),
                               ],
                             ),
                           ),
-<<<<<<< HEAD
-                        const Divider(),
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ),
-=======
                       ],
                     );
                   },
                 ),
               ),
               const SizedBox(height: 16),
->>>>>>> neftali
               ElevatedButton.icon(
                 onPressed: _seleccionarUbicacion,
                 icon: const Icon(Icons.place_outlined, size: 20, color: Colors.white),
