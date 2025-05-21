@@ -22,7 +22,7 @@ class PrincipalUsuario extends StatelessWidget {
         elevation: 1,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.black),
+            icon: const Icon(Icons.menu, color: Colors.white),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
@@ -33,8 +33,7 @@ class PrincipalUsuario extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon:
-                const Icon(Icons.notifications, size: 30, color: Colors.black),
+            icon: const Icon(Icons.notifications, size: 30, color: Colors.white),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Notificaciones abiertas')),
@@ -67,21 +66,20 @@ class PrincipalUsuario extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.directions_car),
-              title: const Text('Registrar Vehículo'),
+              leading: const Icon(Icons.directions_car, color: Colors.white),
+              title: const Text('Registrar Vehículo', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        RegistrarVehiculo(numControl: numControl),
+                    builder: (context) => RegistrarVehiculo(numControl: numControl),
                   ),
                 );
               },
             ),
             ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('Info Vehículo'),
+              leading: const Icon(Icons.info, color: Colors.white),
+              title: const Text('Info Vehículo', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -90,8 +88,8 @@ class PrincipalUsuario extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.account_circle),
-              title: const Text('Mi Información'),
+              leading: const Icon(Icons.account_circle, color: Colors.white),
+              title: const Text('Mi Información', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -100,8 +98,8 @@ class PrincipalUsuario extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.map),
-              title: const Text('Mis Rutas'),
+              leading: const Icon(Icons.map, color: Colors.white),
+              title: const Text('Mis Rutas', style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -110,8 +108,8 @@ class PrincipalUsuario extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.exit_to_app),
-              title: const Text('Cerrar sesión'),
+              leading: const Icon(Icons.exit_to_app, color: Colors.white),
+              title: const Text('Cerrar sesión', style: TextStyle(color: Colors.white)),
               onTap: () {
                 _confirmarCerrarSesion(context);
               },
@@ -138,21 +136,21 @@ class PrincipalUsuario extends StatelessWidget {
                     color: Colors.white),
               ),
               const SizedBox(height: 24),
-              buildBoton('BUSCAR UNA RUTA', onPressed: () {
+              buildBoton(context, 'BUSCAR UNA RUTA', onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => RutasOfrecidas()),
                 );
               }),
               const SizedBox(height: 16),
-              buildBoton('COSTOS', onPressed: () {
+              buildBoton(context, 'COSTOS', onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => InfoCostos()),
                 );
               }),
               const SizedBox(height: 16),
-              buildBoton('MI INFORMACIÓN', onPressed: () {
+              buildBoton(context, 'MI INFORMACIÓN', onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => InfoUsuario()),
@@ -163,11 +161,11 @@ class PrincipalUsuario extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   '¿Quieres ser conductor?',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
                 ),
               ),
               const SizedBox(height: 10),
-              buildBoton('Elaborar Petición', onPressed: () {
+              buildBoton(context, 'Elaborar Petición', onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -176,7 +174,7 @@ class PrincipalUsuario extends StatelessWidget {
                 );
               }),
               const SizedBox(height: 30),
-              buildBoton('CERRAR SESIÓN', color: Colors.red, onPressed: () {
+              buildBoton(context, 'CERRAR SESIÓN', color: Colors.red, onPressed: () {
                 _confirmarCerrarSesion(context);
               }),
               const SizedBox(height: 40),
@@ -215,7 +213,7 @@ class PrincipalUsuario extends StatelessWidget {
     );
   }
 
-  Widget buildBoton(String texto,
+  Widget buildBoton(BuildContext context, String text,
       {Color color = Colors.blue, VoidCallback? onPressed}) {
     return SizedBox(
       width: double.infinity,
@@ -227,57 +225,15 @@ class PrincipalUsuario extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-          child: Row(
-            children: [
-              Icon(icon, color: color, size: 28),
-              const SizedBox(width: 16),
-              Text(
-                text,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500),
-              ),
-              const Spacer(),
-              const Icon(Icons.arrow_forward_ios, color: Colors.white38, size: 16),
-            ],
-          ),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w500),
         ),
       ),
     );
   }
-
-  Widget _drawerItem(IconData icon, String title, VoidCallback onTap,
-      {Color color = Colors.white}) {
-    return ListTile(
-      leading: Icon(icon, color: color),
-      title: Text(title, style: TextStyle(color: color)),
-      onTap: onTap,
-    );
-  }
-
-  void _confirmarCerrarSesion(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Confirmación"),
-        content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
-        actions: [
-          TextButton(
-            child: const Text("Cancelar"),
-            onPressed: () => Navigator.pop(context),
-          ),
-          TextButton(
-            child: const Text("Aceptar"),
-            onPressed: () {
-              SessionManager().setNumControl('');
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (_) => const InicioSesion()));
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
+} 
