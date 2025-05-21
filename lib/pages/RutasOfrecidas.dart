@@ -44,7 +44,7 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
       final origen = data['origen'];
       final destino = data['destino'];
       final horarios = data['horarios'] as List<dynamic>?;
-      final lugares = data['lugaresDisponibles'];
+      final lugares = data['lugaresDisponibles'] ?? 0;
       final nombreRuta = data['nombreRuta'] ?? 'Sin nombre';
 
       if (origen == null || destino == null || horarios == null) continue;
@@ -78,7 +78,7 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
         'precio': 25,
         'origen': LatLng(origen['lat'], origen['lng']),
         'destino': LatLng(destino['lat'], destino['lng']),
-        'lugaresDisponibles': lugares ?? 0,
+        'lugaresDisponibles': lugares,
         'direccion': direccion,
         'codigoPostal': cp,
         'rutaId': rutasRef.id,
@@ -233,40 +233,48 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                                 children: [
                                   Expanded(
                                     child: ElevatedButton.icon(
-                                      onPressed: () {
-                                        final uidPasajero =
-                                            SessionManager().numControl;
-                                        if (uidPasajero == null ||
-                                            uidPasajero.isEmpty) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                                content: Text(
-                                                    'Inicia sesión para pedir un rait')),
-                                          );
-                                          return;
-                                        }
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => Ubicacion(
-                                              origen: ruta['origen'],
-                                              destino: ruta['destino'],
-                                              nombreRuta: ruta['ruta'],
-                                              rutaId: ruta['rutaId'],
-                                              uidConductor:
-                                                  ruta['uidConductor'],
-                                              uidPasajero: uidPasajero,
-                                              datosRuta: ruta,
-                                            ),
-                                          ),
-                                        );
-                                      },
+                                      onPressed: ruta['lugaresDisponibles'] > 0
+                                          ? () {
+                                              final uidPasajero =
+                                                  SessionManager().numControl;
+                                              if (uidPasajero == null ||
+                                                  uidPasajero.isEmpty) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                      content: Text(
+                                                          'Inicia sesión para pedir un rait')),
+                                                );
+                                                return;
+                                              }
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => Ubicacion(
+                                                    origen: ruta['origen'],
+                                                    destino: ruta['destino'],
+                                                    nombreRuta: ruta['ruta'],
+                                                    rutaId: ruta['rutaId'],
+                                                    uidConductor:
+                                                        ruta['uidConductor'],
+                                                    uidPasajero: uidPasajero,
+                                                    datosRuta: ruta,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          : null,
                                       icon: const Icon(Icons.map),
-                                      label:
-                                          const Text("Ver ruta y pedir Rait"),
+                                      label: Text(
+                                        ruta['lugaresDisponibles'] > 0
+                                            ? "Ver ruta y pedir Rait"
+                                            : "Sin asientos disponibles",
+                                      ),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: raitecBlue,
+                                        backgroundColor:
+                                            ruta['lugaresDisponibles'] > 0
+                                                ? raitecBlue
+                                                : Colors.grey.shade400,
                                         foregroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
                                             borderRadius:

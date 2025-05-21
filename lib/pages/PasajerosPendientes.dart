@@ -166,9 +166,32 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
 
     await ref.update({'estado': nuevoEstado});
 
+    if (nuevoEstado == 'aceptado') {
+      await _restarAsiento(uidConductor);
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Pasajero $nuevoEstado')),
     );
+  }
+
+  Future<void> _restarAsiento(String uid) async {
+    final rutaRef = FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(uid)
+        .collection('rutas')
+        .doc('info');
+
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      final snapshot = await transaction.get(rutaRef);
+      final disponibles = snapshot.get('lugaresDisponibles') as int;
+
+      if (disponibles > 0) {
+        transaction.update(rutaRef, {
+          'lugaresDisponibles': disponibles - 1,
+        });
+      }
+    });
   }
 
   Future<void> _rechazarPasajero(String uidPasajero, String metodoPago) async {
@@ -186,7 +209,6 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
         .get();
     final nombreConductor = conductorDoc.data()?['nombre'] ?? 'Desconocido';
 
-    // Guardar en historial del pasajero
     await FirebaseFirestore.instance
         .collection('usuarios')
         .doc(uidPasajero)
