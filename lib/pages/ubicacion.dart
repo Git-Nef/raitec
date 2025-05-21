@@ -234,7 +234,8 @@ class _UbicacionState extends State<Ubicacion> {
     );
     setState(() {
       _distanciaKm = distanciaTotal / 1000;
-      _tiempoMin = (_distanciaKm! / 0.7 * 60).round();
+      const velocidadKmH = 40.0; // Puedes cambiarlo si quieres simular tráfico
+      _tiempoMin = ((_distanciaKm! / velocidadKmH) * 60).round();
       _costoCalculado = (_distanciaKm! * 5).clamp(10, 100);
     });
   }
@@ -300,12 +301,22 @@ class _UbicacionState extends State<Ubicacion> {
             },
             polylines: _polilineas,
             myLocationEnabled: false,
-            onTap: (pos) {
+            onTap: (pos) async {
               final valido = _estaCercaDeLaRuta(pos);
               setState(() {
                 _paradaSeleccionada = pos;
                 _paradaEsValida = valido;
               });
+
+              if (valido) {
+                await _calcularPrecioDesdeParada();
+              } else {
+                setState(() {
+                  _distanciaKm = null;
+                  _tiempoMin = null;
+                  _costoCalculado = null;
+                });
+              }
             },
           ),
           if (_mostrarOpciones)
@@ -336,7 +347,7 @@ class _UbicacionState extends State<Ubicacion> {
                     _metodoPagoOption('Tarjeta'),
                     const SizedBox(height: 10),
                     ElevatedButton.icon(
-                      onPressed: _pedirRait,
+                      onPressed: (_paradaEsValida && _costoCalculado != null) ? _pedirRait : null,
                       icon: const Icon(Icons.send),
                       label: const Text('Pedir Rait'),
                       style: ElevatedButton.styleFrom(
