@@ -4,6 +4,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Ubicacion extends StatefulWidget {
   final LatLng origen;
@@ -32,7 +33,7 @@ class Ubicacion extends StatefulWidget {
 class _UbicacionState extends State<Ubicacion> {
   GoogleMapController? _mapController;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin();
 
   Set<Marker> _marcadores = {};
   Set<Polyline> _polilineas = {};
@@ -47,37 +48,54 @@ class _UbicacionState extends State<Ubicacion> {
   int? _tiempoMin;
   double? _costoCalculado;
 
-  final double _distanciaMaxPermitida = 300; // más flexible
+  final double _distanciaMaxPermitida = 300;
 
   @override
   void initState() {
     super.initState();
+    _solicitarPermisosNotificacion();
     _inicializarNotificaciones();
     _cargarRutaDesde(widget.origen);
     _escucharAceptacion();
   }
 
+  void _solicitarPermisosNotificacion() async {
+    final status = await Permission.notification.status;
+    if (!status.isGranted) {
+      await Permission.notification.request();
+    }
+  }
+
   void _inicializarNotificaciones() async {
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettings = InitializationSettings(android: androidInit);
-    await flutterLocalNotificationsPlugin.initialize(initSettings);
+    const initializationSettings = InitializationSettings(
+      android: androidInit,
+    );
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (response) {},
+    );
   }
 
   void _mostrarNotificacion(String titulo, String cuerpo) async {
     const androidDetails = AndroidNotificationDetails(
-      'notificaciones_rait',
+      'canal_ruta',
       'Notificaciones de RaiTec',
+      channelDescription: 'Notificaciones sobre el estado del viaje',
       importance: Importance.max,
       priority: Priority.high,
+      playSound: true,
+      enableLights: true,
+      color: Colors.blue,
     );
-    const generalNotificationDetails =
-        NotificationDetails(android: androidDetails);
+
+    const notificationDetails = NotificationDetails(android: androidDetails);
 
     await flutterLocalNotificationsPlugin.show(
       0,
       titulo,
       cuerpo,
-      generalNotificationDetails,
+      notificationDetails,
     );
   }
 
@@ -87,7 +105,7 @@ class _UbicacionState extends State<Ubicacion> {
       request: PolylineRequest(
         origin: PointLatLng(origen.latitude, origen.longitude),
         destination:
-            PointLatLng(widget.destino.latitude, widget.destino.longitude),
+        PointLatLng(widget.destino.latitude, widget.destino.longitude),
         mode: TravelMode.driving,
       ),
       googleApiKey: "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI",
@@ -97,39 +115,28 @@ class _UbicacionState extends State<Ubicacion> {
       _puntosRuta =
           result.points.map((p) => LatLng(p.latitude, p.longitude)).toList();
 
-      final distanciaTotal = Geolocator.distanceBetween(
-        origen.latitude,
-        origen.longitude,
-        widget.destino.latitude,
-        widget.destino.longitude,
-      );
-      _distanciaKm = (distanciaTotal / 1000);
-      _tiempoMin = (_distanciaKm! / 0.7 * 60).round(); // a 40 km/h
-      _costoCalculado = (_distanciaKm! * 5).clamp(10, 100);
-
       setState(() {
-        _polilineas.clear();
-        _polilineas.add(Polyline(
-          polylineId: const PolylineId("ruta"),
-          color: Colors.blue,
-          width: 5,
-          points: _puntosRuta,
-        ));
+        _polilineas = {
+          Polyline(
+            polylineId: const PolylineId("ruta"),
+            color: Colors.blue,
+            width: 5,
+            points: _puntosRuta,
+          )
+        };
 
         _marcadores = {
           Marker(
             markerId: const MarkerId("origen"),
             position: widget.origen,
-            infoWindow: const InfoWindow(title: "Origen"),
             icon:
-                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           ),
           Marker(
             markerId: const MarkerId("destino"),
             position: widget.destino,
-            infoWindow: const InfoWindow(title: "Destino"),
             icon:
-                BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
           ),
         };
       });
@@ -149,7 +156,6 @@ class _UbicacionState extends State<Ubicacion> {
       if (doc.exists && doc.data()?['estado'] == 'aceptado') {
         _mostrarNotificacion('¡Conductor en camino!',
             'Tu conductor ha aceptado la solicitud y va hacia tu parada.');
-
         _mostrarDatosConductor();
       }
     });
@@ -205,12 +211,44 @@ class _UbicacionState extends State<Ubicacion> {
     return false;
   }
 
+  Future<void> _calcularPrecioDesdeParada() async {
+    if (_paradaSeleccionada == null) return;
+
+    PolylinePoints polylinePoints = PolylinePoints();
+    await polylinePoints.getRouteBetweenCoordinates(
+      request: PolylineRequest(
+        origin: PointLatLng(
+            _paradaSeleccionada!.latitude, _paradaSeleccionada!.longitude),
+        destination:
+        PointLatLng(widget.destino.latitude, widget.destino.longitude),
+        mode: TravelMode.driving,
+      ),
+      googleApiKey: "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI",
+    );
+
+    final distanciaTotal = Geolocator.distanceBetween(
+      _paradaSeleccionada!.latitude,
+      _paradaSeleccionada!.longitude,
+      widget.destino.latitude,
+      widget.destino.longitude,
+    );
+    setState(() {
+      _distanciaKm = distanciaTotal / 1000;
+      const velocidadKmH = 40.0; // Puedes cambiarlo si quieres simular tráfico
+      _tiempoMin = ((_distanciaKm! / velocidadKmH) * 60).round();
+      _costoCalculado = (_distanciaKm! * 5).clamp(10, 100);
+    });
+  }
+
   Future<void> _pedirRait() async {
     if (_paradaSeleccionada == null || !_paradaEsValida) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Selecciona una parada válida sobre la ruta')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecciona una parada válida')),
+      );
       return;
     }
+
+    await _calcularPrecioDesdeParada();
 
     final ref = FirebaseFirestore.instance
         .collection('usuarios')
@@ -246,8 +284,8 @@ class _UbicacionState extends State<Ubicacion> {
         children: [
           GoogleMap(
             initialCameraPosition:
-                CameraPosition(target: widget.origen, zoom: 14),
-            onMapCreated: (c) => _mapController = c,
+            CameraPosition(target: widget.origen, zoom: 14),
+            onMapCreated: (controller) => _mapController = controller,
             markers: {
               ..._marcadores,
               if (_paradaSeleccionada != null)
@@ -259,16 +297,26 @@ class _UbicacionState extends State<Ubicacion> {
                         ? BitmapDescriptor.hueGreen
                         : BitmapDescriptor.hueOrange,
                   ),
-                )
+                ),
             },
             polylines: _polilineas,
             myLocationEnabled: false,
-            onTap: (LatLng pos) {
+            onTap: (pos) async {
               final valido = _estaCercaDeLaRuta(pos);
               setState(() {
                 _paradaSeleccionada = pos;
                 _paradaEsValida = valido;
               });
+
+              if (valido) {
+                await _calcularPrecioDesdeParada();
+              } else {
+                setState(() {
+                  _distanciaKm = null;
+                  _tiempoMin = null;
+                  _costoCalculado = null;
+                });
+              }
             },
           ),
           if (_mostrarOpciones)
@@ -282,33 +330,31 @@ class _UbicacionState extends State<Ubicacion> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (_distanciaKm != null &&
-                        _tiempoMin != null &&
-                        _costoCalculado != null)
+                    if (_distanciaKm != null)
                       Column(
                         children: [
                           Text(
                               'Distancia: ${_distanciaKm!.toStringAsFixed(2)} km'),
-                          Text('Tiempo estimado: $_tiempoMin minutos'),
+                          Text('Tiempo: $_tiempoMin min'),
                           Text(
-                              'Precio estimado: \$${_costoCalculado!.toStringAsFixed(2)} MXN'),
+                              'Precio: \$${_costoCalculado!.toStringAsFixed(2)} MXN'),
                           const SizedBox(height: 10),
                         ],
                       ),
                     const Text('Selecciona tu método de pago'),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     _metodoPagoOption('Efectivo'),
                     _metodoPagoOption('Tarjeta'),
                     const SizedBox(height: 10),
                     ElevatedButton.icon(
+                      onPressed: (_paradaEsValida && _costoCalculado != null) ? _pedirRait : null,
                       icon: const Icon(Icons.send),
                       label: const Text('Pedir Rait'),
-                      onPressed: _pedirRait,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
                         minimumSize: const Size(double.infinity, 50),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -317,11 +363,11 @@ class _UbicacionState extends State<Ubicacion> {
       ),
       floatingActionButton: !_mostrarOpciones
           ? FloatingActionButton.extended(
-              onPressed: () => setState(() => _mostrarOpciones = true),
-              label: const Text('PEDIR RAIT'),
-              icon: const Icon(Icons.directions_car),
-              backgroundColor: Colors.blueAccent,
-            )
+        onPressed: () => setState(() => _mostrarOpciones = true),
+        label: const Text('PEDIR RAIT'),
+        icon: const Icon(Icons.directions_car),
+        backgroundColor: Colors.blueAccent,
+      )
           : null,
     );
   }
@@ -330,7 +376,6 @@ class _UbicacionState extends State<Ubicacion> {
     return GestureDetector(
       onTap: () => setState(() => _metodoPago = metodo),
       child: Container(
-        width: double.infinity,
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
@@ -342,8 +387,9 @@ class _UbicacionState extends State<Ubicacion> {
               width: 1.5),
           borderRadius: BorderRadius.circular(10),
         ),
-        child:
-            Center(child: Text(metodo, style: const TextStyle(fontSize: 16))),
+        child: Center(
+          child: Text(metodo, style: const TextStyle(fontSize: 16)),
+        ),
       ),
     );
   }
