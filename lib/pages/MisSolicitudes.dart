@@ -129,13 +129,14 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
     final snapshot = await FirebaseFirestore.instance
         .collection('usuarios')
         .doc(uidConductor)
-        .collection('rutas')
-        .doc('info')
-        .collection('ubicacionTiempoReal')
+        .collection('ubicacion')
         .doc('actual')
         .get();
 
-    return snapshot.exists && snapshot.data()!.containsKey('lat') && snapshot.data()!.containsKey('lng');
+    return snapshot.exists &&
+        snapshot.data() != null &&
+        snapshot.data()!.containsKey('lat') &&
+        snapshot.data()!.containsKey('lng');
   }
 
   Widget _iconoEstado(String estado) {

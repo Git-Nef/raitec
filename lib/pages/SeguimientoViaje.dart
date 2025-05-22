@@ -3,6 +3,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:location/location.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geolocator/geolocator.dart';
+import 'dart:async';
+import 'package:raitec/pages/ViajeFinalizado.dart';
 
 class SeguimientoViaje extends StatefulWidget {
   final String uidConductor;
@@ -21,6 +24,7 @@ class SeguimientoViaje extends StatefulWidget {
 class _SeguimientoViajeState extends State<SeguimientoViaje> {
   GoogleMapController? _mapController;
   Location location = Location();
+  StreamSubscription<LocationData>? _locationSubscription;
   LatLng? _ubicacionActual;
   List<LatLng> _paradas = [];
   LatLng? _destinoFinal;
@@ -28,6 +32,10 @@ class _SeguimientoViajeState extends State<SeguimientoViaje> {
   Set<Polyline> _polilineas = {};
   Set<Marker> _marcadores = {};
   BitmapDescriptor? _autoIcono;
+  Map<String, LatLng> _paradasConPasajero = {}; // uidPasajero -> LatLng
+  Set<String> _confirmados = {}; // uidPasajero
+  bool _dialogoMostrado = false;
+  bool _viajeFinalizado = false;
 
   @override
   void initState() {
@@ -35,6 +43,12 @@ class _SeguimientoViajeState extends State<SeguimientoViaje> {
     _cargarIconoAuto();
     _obtenerDatosYCalcularRuta();
     _iniciarSeguimiento();
+  }
+
+  @override
+  void dispose() {
+    _locationSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _cargarIconoAuto() async {
@@ -66,10 +80,15 @@ class _SeguimientoViajeState extends State<SeguimientoViaje> {
         .where('estado', isEqualTo: 'aceptado')
         .get();
 
-    List<LatLng> paradas = pasajerosSnapshot.docs.map((doc) {
-      final parada = doc['paradaPersonalizada'];
-      return LatLng(parada['lat'], parada['lng']);
-    }).toList();
+    List<LatLng> paradas = [];
+    for (var doc in pasajerosSnapshot.docs) {
+      final data = doc.data();
+      final uidPasajero = doc.id;
+      final parada = data['paradaPersonalizada'];
+      final latLng = LatLng(parada['lat'], parada['lng']);
+      paradas.add(latLng);
+      _paradasConPasajero[uidPasajero] = latLng;
+    }
 
     final origenLatLng = LatLng(origen['lat'], origen['lng']);
     paradas.sort((a, b) {
@@ -96,7 +115,6 @@ class _SeguimientoViajeState extends State<SeguimientoViaje> {
     List<LatLng> rutaCompleta = [];
     Set<Marker> nuevosMarcadores = {};
 
-    // Agrega marcador del destino final
     nuevosMarcadores.add(
       Marker(
         markerId: const MarkerId('destino'),
@@ -106,7 +124,6 @@ class _SeguimientoViajeState extends State<SeguimientoViaje> {
       ),
     );
 
-    // Agrega marcadores para las paradas
     for (int i = 0; i < _paradas.length; i++) {
       nuevosMarcadores.add(
         Marker(
@@ -118,7 +135,6 @@ class _SeguimientoViajeState extends State<SeguimientoViaje> {
       );
     }
 
-    // Construcción de la ruta
     for (int i = 0; i < puntos.length - 1; i++) {
       final origen = puntos[i];
       final destino = puntos[i + 1];
@@ -151,7 +167,9 @@ class _SeguimientoViajeState extends State<SeguimientoViaje> {
   }
 
   void _iniciarSeguimiento() {
-    location.onLocationChanged.listen((loc) async {
+    _locationSubscription = location.onLocationChanged.listen((loc) async {
+      if (!mounted) return;
+
       final nuevaUbicacion = LatLng(loc.latitude!, loc.longitude!);
 
       setState(() {
@@ -166,6 +184,38 @@ class _SeguimientoViajeState extends State<SeguimientoViaje> {
           ),
         );
       });
+
+      for (final entry in _paradasConPasajero.entries) {
+        final uidPasajero = entry.key;
+        final parada = entry.value;
+        final distancia = Geolocator.distanceBetween(
+          nuevaUbicacion.latitude,
+          nuevaUbicacion.longitude,
+          parada.latitude,
+          parada.longitude,
+        );
+
+        if (distancia < 15 && !_confirmados.contains(uidPasajero) && !_dialogoMostrado) {
+          _dialogoMostrado = true;
+          _mostrarDialogoConfirmacion(uidPasajero);
+          break;
+        }
+      }
+
+      if (_destinoFinal != null && !_viajeFinalizado) {
+        final distanciaADestino = Geolocator.distanceBetween(
+          nuevaUbicacion.latitude,
+          nuevaUbicacion.longitude,
+          _destinoFinal!.latitude,
+          _destinoFinal!.longitude,
+        );
+
+        if (distanciaADestino < 30) {
+          _viajeFinalizado = true;
+          _finalizarViaje();
+        }
+      }
+
       await FirebaseFirestore.instance
           .collection('usuarios')
           .doc(widget.uidConductor)
@@ -179,6 +229,58 @@ class _SeguimientoViajeState extends State<SeguimientoViaje> {
 
       _mapController?.animateCamera(CameraUpdate.newLatLng(nuevaUbicacion));
     });
+  }
+
+  void _finalizarViaje() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ViajeFinalizado(
+          uidConductor: widget.uidConductor,
+          rutaId: widget.rutaId,
+        ),
+      ),
+    );
+  }
+
+  void _mostrarDialogoConfirmacion(String uidPasajero) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Confirmar abordaje'),
+        content: const Text('¿El pasajero ya abordó el vehículo?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              _dialogoMostrado = false;
+              Navigator.pop(context);
+            },
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              _confirmados.add(uidPasajero);
+              _dialogoMostrado = false;
+
+              await FirebaseFirestore.instance
+                  .collection('usuarios')
+                  .doc(widget.uidConductor)
+                  .collection('rutas')
+                  .doc(widget.rutaId)
+                  .collection('pasajeros')
+                  .doc(uidPasajero)
+                  .update({'abordado': true});
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Pasajero marcado como abordado')),
+              );
+            },
+            child: const Text('Confirmar'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
