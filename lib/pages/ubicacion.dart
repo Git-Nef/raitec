@@ -33,7 +33,7 @@ class Ubicacion extends StatefulWidget {
 class _UbicacionState extends State<Ubicacion> {
   GoogleMapController? _mapController;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  FlutterLocalNotificationsPlugin();
 
   Set<Marker> _marcadores = {};
   Set<Polyline> _polilineas = {};
@@ -105,7 +105,7 @@ class _UbicacionState extends State<Ubicacion> {
       request: PolylineRequest(
         origin: PointLatLng(origen.latitude, origen.longitude),
         destination:
-            PointLatLng(widget.destino.latitude, widget.destino.longitude),
+        PointLatLng(widget.destino.latitude, widget.destino.longitude),
         mode: TravelMode.driving,
       ),
       googleApiKey: "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI",
@@ -131,14 +131,12 @@ class _UbicacionState extends State<Ubicacion> {
             position: widget.origen,
             icon:
             BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
->>>>>>>>> Temporary merge branch 2
           ),
           Marker(
             markerId: const MarkerId("destino"),
             position: widget.destino,
             icon:
             BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
->>>>>>>>> Temporary merge branch 2
           ),
         };
       });
@@ -222,7 +220,7 @@ class _UbicacionState extends State<Ubicacion> {
         origin: PointLatLng(
             _paradaSeleccionada!.latitude, _paradaSeleccionada!.longitude),
         destination:
-            PointLatLng(widget.destino.latitude, widget.destino.longitude),
+        PointLatLng(widget.destino.latitude, widget.destino.longitude),
         mode: TravelMode.driving,
       ),
       googleApiKey: "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI",
@@ -286,7 +284,7 @@ class _UbicacionState extends State<Ubicacion> {
         children: [
           GoogleMap(
             initialCameraPosition:
-                CameraPosition(target: widget.origen, zoom: 14),
+            CameraPosition(target: widget.origen, zoom: 14),
             onMapCreated: (controller) => _mapController = controller,
             markers: {
               ..._marcadores,
@@ -349,9 +347,7 @@ class _UbicacionState extends State<Ubicacion> {
                     _metodoPagoOption('Tarjeta'),
                     const SizedBox(height: 10),
                     ElevatedButton.icon(
-                      onPressed: (_paradaEsValida && _costoCalculado != null)
-                          ? _pedirRait
-                          : null,
+                      onPressed: (_paradaEsValida && _costoCalculado != null) ? _pedirRait : null,
                       icon: const Icon(Icons.send),
                       label: const Text('Pedir Rait'),
                       style: ElevatedButton.styleFrom(
@@ -367,11 +363,11 @@ class _UbicacionState extends State<Ubicacion> {
       ),
       floatingActionButton: !_mostrarOpciones
           ? FloatingActionButton.extended(
-              onPressed: () => setState(() => _mostrarOpciones = true),
-              label: const Text('PEDIR RAIT'),
-              icon: const Icon(Icons.directions_car),
-              backgroundColor: Colors.blueAccent,
-            )
+        onPressed: () => setState(() => _mostrarOpciones = true),
+        label: const Text('PEDIR RAIT'),
+        icon: const Icon(Icons.directions_car),
+        backgroundColor: Colors.blueAccent,
+      )
           : null,
     );
   }

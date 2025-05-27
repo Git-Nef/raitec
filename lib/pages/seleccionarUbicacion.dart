@@ -47,8 +47,6 @@ class _SeleccionarUbicacionState extends State<SeleccionarUbicacion> {
     setState(() {
       _ubicacionSeleccionada = posicion;
     });
-
-    _mapController?.animateCamera(CameraUpdate.newLatLng(posicion));
   }
 
   void _confirmarUbicacion() {
@@ -60,19 +58,9 @@ class _SeleccionarUbicacionState extends State<SeleccionarUbicacion> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        title: const Text(
-          'Selecciona tu punto de partida',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.white),
-        centerTitle: true,
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Selecciona tu punto de partida')),
       body: _ubicacionSeleccionada == null
-          ? const Center(child: CircularProgressIndicator(color: Colors.white))
+          ? const Center(child: CircularProgressIndicator())
           : Stack(
         children: [
           GoogleMap(
@@ -82,38 +70,24 @@ class _SeleccionarUbicacionState extends State<SeleccionarUbicacion> {
             ),
             onMapCreated: (controller) => _mapController = controller,
             onTap: _alTocarMapa,
-            markers: {
+            markers: _ubicacionSeleccionada != null
+                ? {
               Marker(
                 markerId: const MarkerId('origen'),
                 position: _ubicacionSeleccionada!,
                 infoWindow: const InfoWindow(title: 'Tu punto de partida'),
               ),
-            },
-            myLocationButtonEnabled: false,
-            myLocationEnabled: true,
+            }
+                : {},
           ),
           Positioned(
-            bottom: 30,
+            bottom: 20,
             left: 20,
             right: 20,
             child: ElevatedButton.icon(
               onPressed: _confirmarUbicacion,
-              icon: const Icon(Icons.check_circle_outline, color: Colors.white),
-              label: const Text(
-                'Confirmar ubicación',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
+              icon: const Icon(Icons.check),
+              label: const Text('Confirmar ubicación'),
             ),
           ),
         ],

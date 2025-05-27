@@ -62,20 +62,21 @@ class PrincipalUsuario extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.directions_car, color: Colors.white),
-              title: const Text('Registrar Vehículo', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.directions_car),
+              title: const Text('Registrar Vehículo'),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => RegistrarVehiculo(numControl: numControl),
+                    builder: (context) =>
+                        RegistrarVehiculo(numControl: numControl),
                   ),
                 );
               },
             ),
             ListTile(
-              leading: const Icon(Icons.info, color: Colors.white),
-              title: const Text('Info Vehículo', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.info),
+              title: const Text('Info Vehículo'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -84,8 +85,8 @@ class PrincipalUsuario extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.account_circle, color: Colors.white),
-              title: const Text('Mi Información', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.account_circle),
+              title: const Text('Mi Información'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -94,8 +95,8 @@ class PrincipalUsuario extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.map, color: Colors.white),
-              title: const Text('Mis Rutas', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.map),
+              title: const Text('Mis Rutas'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -104,8 +105,8 @@ class PrincipalUsuario extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.exit_to_app, color: Colors.white),
-              title: const Text('Cerrar sesión', style: TextStyle(color: Colors.white)),
+              leading: const Icon(Icons.exit_to_app),
+              title: const Text('Cerrar sesión'),
               onTap: () {
                 _confirmarCerrarSesion(context);
               },
@@ -143,14 +144,14 @@ class PrincipalUsuario extends StatelessWidget {
                 );
               }),
               const SizedBox(height: 16),
-              buildBoton(context, 'COSTOS', onPressed: () {
+              buildBoton('COSTOS', onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => InfoCostos()),
                 );
               }),
               const SizedBox(height: 16),
-              buildBoton(context, 'MI INFORMACIÓN', onPressed: () {
+              buildBoton('MI INFORMACIÓN', onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => InfoUsuario()),
@@ -161,11 +162,11 @@ class PrincipalUsuario extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   '¿Quieres ser conductor?',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
               const SizedBox(height: 10),
-              buildBoton(context, 'Elaborar Petición', onPressed: () {
+              buildBoton('Elaborar Petición', onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -174,7 +175,7 @@ class PrincipalUsuario extends StatelessWidget {
                 );
               }),
               const SizedBox(height: 30),
-              buildBoton(context, 'CERRAR SESIÓN', color: Colors.red, onPressed: () {
+              buildBoton('CERRAR SESIÓN', color: Colors.red, onPressed: () {
                 _confirmarCerrarSesion(context);
               }),
               const SizedBox(height: 40),
@@ -213,7 +214,7 @@ class PrincipalUsuario extends StatelessWidget {
     );
   }
 
-  Widget buildBoton(BuildContext context, String text,
+  Widget buildBoton(String texto,
       {Color color = Colors.blue, VoidCallback? onPressed}) {
     return SizedBox(
       width: double.infinity,
