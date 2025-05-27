@@ -22,7 +22,7 @@ class PrincipalConductor extends StatelessWidget {
         elevation: 1,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
+            icon: const Icon(Icons.menu, color: Colors.black),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
@@ -35,9 +35,7 @@ class PrincipalConductor extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.notifications_none, color: Colors.white),
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('No hay notificaciones nuevas')),
-              );
+              // Aquí puedes manejar futuras notificaciones
             },
           ),
         ],
@@ -93,56 +91,52 @@ class PrincipalConductor extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(child: Image.asset('assets/SplashScreen.png', height: 140)),
-              const SizedBox(height: 20),
+              const SizedBox(height: 32),
+              Center(
+                child: Image.asset(
+                  'assets/SplashScreen.png',
+                  height: 180,
+                ),
+              ),
+              const SizedBox(height: 24),
               const Text(
-                'Bienvenido conductor',
+                'Bienvenido al servicio de conductor de RaiTec',
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              const SizedBox(height: 8),
-              const Text(
-                'Administra tu información, vehículo y rutas fácilmente.',
-                style: TextStyle(color: Colors.white70),
-              ),
-              const SizedBox(height: 30),
-              _actionCard(
-                context,
-                icon: Icons.person_outline,
-                text: 'Mi información',
-                onTap: () => Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => InfoUsuario())),
-              ),
-              _actionCard(
-                context,
-                icon: Icons.directions_car,
-                text: 'Mi vehículo',
-                onTap: () => Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => InfoVehiculo())),
-              ),
-              _actionCard(
-                context,
-                icon: Icons.map_outlined,
-                text: 'Mis rutas',
-                onTap: () => Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => MisRutas())),
-              ),
-              const Spacer(),
-              _actionCard(
-                context,
-                icon: Icons.logout,
-                text: 'Cerrar sesión',
-                color: Colors.red,
-                onTap: () => _confirmarCerrarSesion(context),
-              ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
+              buildButton('Mi información', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoUsuario()),
+                );
+              }),
+              const SizedBox(height: 24),
+              buildButton('Mi vehículo', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoVehiculo()),
+                );
+              }),
+              const SizedBox(height: 24),
+              buildButton('Mis rutas', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MisRutas()),
+                );
+              }),
+              const SizedBox(height: 40),
+              buildButton('CERRAR SESIÓN', () {
+                _confirmarCerrarSesion(context);
+              }, color: Colors.red),
+              const SizedBox(height: 40),
             ],
           ),
         ),
@@ -152,9 +146,9 @@ class PrincipalConductor extends StatelessWidget {
 
   Widget _actionCard(BuildContext context,
       {required IconData icon,
-        required String text,
-        required VoidCallback onTap,
-        Color color = Colors.blueAccent}) {
+      required String text,
+      required VoidCallback onTap,
+      Color color = Colors.blueAccent}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: InkWell(
@@ -178,7 +172,8 @@ class PrincipalConductor extends StatelessWidget {
                     fontWeight: FontWeight.w500),
               ),
               const Spacer(),
-              const Icon(Icons.arrow_forward_ios, color: Colors.white38, size: 16),
+              const Icon(Icons.arrow_forward_ios,
+                  color: Colors.white38, size: 16),
             ],
           ),
         ),
@@ -198,24 +193,28 @@ class PrincipalConductor extends StatelessWidget {
   void _confirmarCerrarSesion(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Confirmación"),
-        content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
-        actions: [
-          TextButton(
-            child: const Text("Cancelar"),
-            onPressed: () => Navigator.pop(context),
-          ),
-          TextButton(
-            child: const Text("Aceptar"),
-            onPressed: () {
-              SessionManager().setNumControl('');
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (_) => const InicioSesion()));
-            },
-          ),
-        ],
-      ),
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Confirmación"),
+          content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Cancelar"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text("Aceptar"),
+              onPressed: () {
+                SessionManager().setNumControl('');
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const InicioSesion()),
+                );
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

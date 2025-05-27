@@ -13,10 +13,11 @@ class CapturarHorarioRuta extends StatefulWidget {
 
 class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nombreRutaController = TextEditingController();
   final TextEditingController _asientosController = TextEditingController();
   LatLng? origenSeleccionado;
   final LatLng destinoFijo =
-  const LatLng(24.03265897848829, -104.64678790491564);
+      const LatLng(24.03265897848829, -104.64678790491564);
 
   final List<String> dias = [
     'Lunes',
@@ -78,13 +79,19 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
       return;
     }
 
-    final horariosSeleccionados = {
-      for (var dia in dias)
-        if (diasActivos[dia] == true)
-          dia: {
-            'horaInicio': horaInicio[dia]!.format(context),
-          }
-    };
+    final diasSeleccionados = dias.where((dia) => diasActivos[dia]!).map((dia) {
+      return {
+        'dia': dia,
+        'horaInicio': horaInicio[dia]!.format(context),
+      };
+    }).toList();
+
+    if (diasSeleccionados.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecciona al menos un día y hora')),
+      );
+      return;
+    }
 
     final docRef = FirebaseFirestore.instance
         .collection('usuarios')
@@ -94,6 +101,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
 
     try {
       await docRef.set({
+        'nombreRuta': _nombreRutaController.text.trim(),
         'lugaresDisponibles': int.parse(_asientosController.text),
         'origen': {
           'lat': origenSeleccionado!.latitude,
@@ -110,10 +118,14 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         const SnackBar(content: Text('Ruta guardada exitosamente')),
       );
 
+      _nombreRutaController.clear();
       _asientosController.clear();
       setState(() {
         origenSeleccionado = null;
-        for (var d in dias) diasActivos[d] = false;
+        for (var d in dias) {
+          diasActivos[d] = false;
+          horaInicio[d] = const TimeOfDay(hour: 9, minute: 0);
+        }
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -139,6 +151,14 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
           child: Column(
             children: [
               TextFormField(
+                controller: _nombreRutaController,
+                decoration: const InputDecoration(
+                    labelText: 'Nombre de la ruta (Ejemplo: Jardines)'),
+                validator: (value) =>
+                    value!.isEmpty ? 'Escribe un nombre para la ruta' : null,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
                 controller: _asientosController,
                 style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
@@ -150,20 +170,22 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                 ),
                 keyboardType: TextInputType.number,
                 validator: (value) =>
-                value!.isEmpty ? 'Escribe los asientos' : null,
+                    value!.isEmpty ? 'Escribe los asientos' : null,
               ),
               const SizedBox(height: 20),
               Expanded(
                 child: ListView.separated(
                   itemCount: dias.length,
-                  separatorBuilder: (_, __) => const Divider(color: Colors.grey),
+                  separatorBuilder: (_, __) =>
+                      const Divider(color: Colors.grey),
                   itemBuilder: (context, index) {
                     final dia = dias[index];
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SwitchListTile(
-                          title: Text(dia, style: const TextStyle(color: Colors.white)),
+                          title: Text(dia,
+                              style: const TextStyle(color: Colors.white)),
                           value: diasActivos[dia]!,
                           onChanged: (bool value) {
                             setState(() {
@@ -177,12 +199,12 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                             padding: const EdgeInsets.only(left: 16),
                             child: Row(
                               children: [
-                                const Text('Inicio:',
-                                    style: TextStyle(color: Colors.white70)),
+                                const Text('Hora de entrada:'),
                                 const SizedBox(width: 10),
-                                TextButton.icon(
+                                TextButton(
                                   onPressed: () => _seleccionarHora(dia),
-                                  icon: const Icon(Icons.access_time, size: 20, color: Colors.white),
+                                  icon: const Icon(Icons.access_time,
+                                      size: 20, color: Colors.white),
                                   label: Text(
                                     horaInicio[dia]!.format(context),
                                     style: const TextStyle(
@@ -202,7 +224,8 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: _seleccionarUbicacion,
-                icon: const Icon(Icons.place_outlined, size: 20, color: Colors.white),
+                icon: const Icon(Icons.place_outlined,
+                    size: 20, color: Colors.white),
                 label: Text(
                   origenSeleccionado == null
                       ? 'Seleccionar punto de partida'
@@ -215,7 +238,8 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[850],
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -224,7 +248,8 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: _guardarRuta,
-                icon: const Icon(Icons.check_circle_outline, size: 20, color: Colors.white),
+                icon: const Icon(Icons.check_circle_outline,
+                    size: 20, color: Colors.white),
                 label: const Text(
                   'Guardar ruta',
                   style: TextStyle(
@@ -235,7 +260,8 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),

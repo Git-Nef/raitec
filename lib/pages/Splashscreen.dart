@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:raitec/pages/InicioSesion.dart';
 import 'package:raitec/pages/RutasOfrecidas.dart';
-import 'package:raitec/pages/mapa.dart';
 import 'package:raitec/pages/ubicacion.dart';
 
 class SplashScreen extends StatefulWidget {
