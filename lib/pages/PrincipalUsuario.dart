@@ -16,24 +16,21 @@ class PrincipalUsuario extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 1,
+        backgroundColor: Colors.white,
+        elevation: 2,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
+            icon: const Icon(Icons.menu, color: Colors.black),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
         centerTitle: true,
-        title: const Text(
-          'RaiTec',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications, size: 30, color: Colors.white),
+            icon:
+                const Icon(Icons.notifications, size: 30, color: Colors.black),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Notificaciones abiertas')),
@@ -43,7 +40,6 @@ class PrincipalUsuario extends StatelessWidget {
         ],
       ),
       drawer: Drawer(
-        backgroundColor: Colors.grey[900],
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -118,25 +114,29 @@ class PrincipalUsuario extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 10),
               Center(
-                child: Image.asset('assets/SplashScreen.png', height: 140),
+                child: Image.asset(
+                  'assets/SplashScreen.png',
+                  height: 180,
+                ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               const Text(
-                'Bienvenido a RaiTec',
+                'BIENVENIDO A RaiTec',
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
               const SizedBox(height: 24),
-              buildBoton(context, 'BUSCAR UNA RUTA', onPressed: () {
+              buildBoton('BUSCAR UNA RUTA', onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => RutasOfrecidas()),
@@ -225,15 +225,18 @@ class PrincipalUsuario extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
+          elevation: 3,
         ),
         child: Text(
-          text,
+          texto,
           style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w500),
+            fontSize: 16,
+            letterSpacing: 1.5,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
   }
-} 
+}
