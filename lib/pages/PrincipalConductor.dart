@@ -16,10 +16,10 @@ class PrincipalConductor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 1,
+        backgroundColor: Colors.white,
+        elevation: 2,
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu, color: Colors.black),
@@ -27,13 +27,9 @@ class PrincipalConductor extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        title: const Text(
-          'RaiTec - Conductor',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.white),
+            icon: const Icon(Icons.notifications_none, color: Colors.black),
             onPressed: () {
               // Aquí puedes manejar futuras notificaciones
             },
@@ -41,7 +37,6 @@ class PrincipalConductor extends StatelessWidget {
         ],
       ),
       drawer: Drawer(
-        backgroundColor: Colors.grey[900],
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -50,43 +45,86 @@ class PrincipalConductor extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Menú',
-                      style: TextStyle(color: Colors.white, fontSize: 24)),
-                  const SizedBox(height: 10),
-                  Image.asset('assets/LogoPantallas.png', height: 50),
+                  const Text(
+                    'Menú',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Image.asset(
+                    'assets/LogoPantallas.png',
+                    height: 60,
+                  ),
                 ],
               ),
             ),
-            _drawerItem(Icons.person, 'Mi información', () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => InfoUsuario()));
-            }),
-            _drawerItem(Icons.directions_car, 'Mi vehículo', () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => InfoVehiculo()));
-            }),
-            _drawerItem(Icons.map, 'Mis rutas', () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => MisRutas()));
-            }),
-            _drawerItem(Icons.swap_horiz, 'Cambiar a usuario', () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => PrincipalUsuario(numControl: numControl)),
-              );
-            }),
-            _drawerItem(Icons.app_registration, 'Registro', () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => Registro()));
-            }),
-            _drawerItem(Icons.verified_user, 'Identifícate', () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => ISConductores()));
-            }),
-            _drawerItem(Icons.logout, 'Cerrar sesión', () {
-              _confirmarCerrarSesion(context);
-            }, color: Colors.redAccent),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Mi información'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoUsuario()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.directions_car),
+              title: const Text('Mi vehículo'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => InfoVehiculo()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.map),
+              title: const Text('Mis rutas'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MisRutas()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Principal Usuario'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PrincipalUsuario(
+                      numControl: numControl,
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.app_registration),
+              title: const Text('Registro'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Registro()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.drive_eta),
+              title: const Text('Identifícate'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ISConductores()),
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -144,49 +182,29 @@ class PrincipalConductor extends StatelessWidget {
     );
   }
 
-  Widget _actionCard(BuildContext context,
-      {required IconData icon,
-      required String text,
-      required VoidCallback onTap,
-      Color color = Colors.blueAccent}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[850],
+  Widget buildButton(String text, VoidCallback onPressed,
+      {Color color = Colors.blue}) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-          child: Row(
-            children: [
-              Icon(icon, color: color, size: 28),
-              const SizedBox(width: 16),
-              Text(
-                text,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500),
-              ),
-              const Spacer(),
-              const Icon(Icons.arrow_forward_ios,
-                  color: Colors.white38, size: 16),
-            ],
+          elevation: 4,
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
-    );
-  }
-
-  Widget _drawerItem(IconData icon, String title, VoidCallback onTap,
-      {Color color = Colors.white}) {
-    return ListTile(
-      leading: Icon(icon, color: color),
-      title: Text(title, style: TextStyle(color: color)),
-      onTap: onTap,
     );
   }
 

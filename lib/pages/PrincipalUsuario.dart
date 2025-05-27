@@ -16,10 +16,10 @@ class PrincipalUsuario extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 1,
+        backgroundColor: Colors.white,
+        elevation: 2,
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu, color: Colors.black),
@@ -27,10 +27,6 @@ class PrincipalUsuario extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        title: const Text(
-          'RaiTec',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
         actions: [
           IconButton(
             icon:
@@ -44,7 +40,6 @@ class PrincipalUsuario extends StatelessWidget {
         ],
       ),
       drawer: Drawer(
-        backgroundColor: Colors.grey[900],
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -127,16 +122,19 @@ class PrincipalUsuario extends StatelessWidget {
             children: [
               const SizedBox(height: 10),
               Center(
-                child: Image.asset('assets/SplashScreen.png', height: 140),
+                child: Image.asset(
+                  'assets/SplashScreen.png',
+                  height: 180,
+                ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               const Text(
                 'BIENVENIDO A RaiTec',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
               const SizedBox(height: 24),
               buildBoton('BUSCAR UNA RUTA', onPressed: () {
@@ -228,57 +226,17 @@ class PrincipalUsuario extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-          child: Row(
-            children: [
-              Icon(icon, color: color, size: 28),
-              const SizedBox(width: 16),
-              Text(
-                text,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500),
-              ),
-              const Spacer(),
-              const Icon(Icons.arrow_forward_ios,
-                  color: Colors.white38, size: 16),
-            ],
+          elevation: 3,
+        ),
+        child: Text(
+          texto,
+          style: const TextStyle(
+            fontSize: 16,
+            letterSpacing: 1.5,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _drawerItem(IconData icon, String title, VoidCallback onTap,
-      {Color color = Colors.white}) {
-    return ListTile(
-      leading: Icon(icon, color: color),
-      title: Text(title, style: TextStyle(color: color)),
-      onTap: onTap,
-    );
-  }
-
-  void _confirmarCerrarSesion(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Confirmación"),
-        content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
-        actions: [
-          TextButton(
-            child: const Text("Cancelar"),
-            onPressed: () => Navigator.pop(context),
-          ),
-          TextButton(
-            child: const Text("Aceptar"),
-            onPressed: () {
-              SessionManager().setNumControl('');
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (_) => const InicioSesion()));
-            },
-          ),
-        ],
       ),
     );
   }
