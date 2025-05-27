@@ -28,113 +28,159 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
         .doc('info')
         .collection('pasajeros');
 
+    final rutaRef = FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(uidConductor)
+        .collection('rutas')
+        .doc('info');
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Solicitudes de Pasajeros'),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: pasajerosRef.snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Column(
+        children: [
+          StreamBuilder<DocumentSnapshot>(
+            stream: rutaRef.snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData || !snapshot.data!.exists) {
+                return const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text('Cargando asientos disponibles...'),
+                );
+              }
 
-          final docs = snapshot.data!.docs;
+              final data = snapshot.data!.data() as Map<String, dynamic>;
+              final disponibles = data['asientosDisponibles'] ?? 0;
+              final originales = data['asientosOriginales'] ?? disponibles;
 
-          if (docs.isEmpty) {
-            return const Center(child: Text('No hay pasajeros registrados.'));
-          }
-
-          return ListView.builder(
-            itemCount: docs.length,
-            itemBuilder: (context, index) {
-              final pasajeroDoc = docs[index];
-              final uidPasajero = pasajeroDoc.id;
-              final estado = pasajeroDoc['estado'];
-              final metodoPago = pasajeroDoc['metodoPago'];
-
-              return FutureBuilder<DocumentSnapshot>(
-                future: FirebaseFirestore.instance
-                    .collection('usuarios')
-                    .doc(uidPasajero)
-                    .get(),
-                builder: (context, snapshotUser) {
-                  if (!snapshotUser.hasData) {
-                    return const ListTile(title: Text("Cargando pasajero..."));
-                  }
-
-                  final userData =
-                      snapshotUser.data!.data() as Map<String, dynamic>?;
-
-                  if (userData == null) {
-                    return ListTile(
-                        title: Text("Pasajero no encontrado ($uidPasajero)"));
-                  }
-
-                  final nombre = userData['nombre'] ?? 'Sin nombre';
-                  final foto = userData['fotografiaUrl'] ?? null;
-
-                  return Card(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(12),
-                      leading: CircleAvatar(
-                        radius: 28,
-                        backgroundColor: Colors.grey.shade200,
-                        backgroundImage: (foto != null && foto != '')
-                            ? NetworkImage(foto)
-                            : null,
-                        child: (foto == null || foto == '')
-                            ? const Icon(Icons.person,
-                                size: 28, color: Colors.grey)
-                            : null,
-                      ),
-                      title: Text(nombre,
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('No. Control: $uidPasajero'),
-                          Text('Método de pago: $metodoPago'),
-                          Text('Estado: $estado'),
-                        ],
-                      ),
-                      trailing: estado == 'pendiente'
-                          ? Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.check_circle,
-                                      color: Colors.green),
-                                  onPressed: () =>
-                                      _cambiarEstado(uidPasajero, 'aceptado'),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.cancel,
-                                      color: Colors.red),
-                                  onPressed: () => _rechazarPasajero(
-                                      uidPasajero, metodoPago),
-                                ),
-                              ],
-                            )
-                          : Icon(
-                              estado == 'aceptado'
-                                  ? Icons.check_circle
-                                  : Icons.cancel,
-                              color: estado == 'aceptado'
-                                  ? Colors.green
-                                  : Colors.red,
-                            ),
+              return Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    const Icon(Icons.event_seat, color: Colors.deepPurple),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Asientos disponibles: $disponibles de $originales',
+                      style: const TextStyle(fontSize: 16),
                     ),
-                  );
-                },
+                  ],
+                ),
               );
             },
-          );
-        },
+          ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: pasajerosRef.snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final docs = snapshot.data!.docs;
+
+                if (docs.isEmpty) {
+                  return const Center(
+                      child: Text('No hay pasajeros registrados.'));
+                }
+
+                return ListView.builder(
+                  itemCount: docs.length,
+                  itemBuilder: (context, index) {
+                    final pasajeroDoc = docs[index];
+                    final uidPasajero = pasajeroDoc.id;
+                    final estado = pasajeroDoc['estado'];
+                    final metodoPago = pasajeroDoc['metodoPago'];
+
+                    return FutureBuilder<DocumentSnapshot>(
+                      future: FirebaseFirestore.instance
+                          .collection('usuarios')
+                          .doc(uidPasajero)
+                          .get(),
+                      builder: (context, snapshotUser) {
+                        if (!snapshotUser.hasData) {
+                          return const ListTile(
+                              title: Text("Cargando pasajero..."));
+                        }
+
+                        final userData =
+                            snapshotUser.data!.data() as Map<String, dynamic>?;
+
+                        if (userData == null) {
+                          return ListTile(
+                              title: Text(
+                                  "Pasajero no encontrado ($uidPasajero)"));
+                        }
+
+                        final nombre = userData['nombre'] ?? 'Sin nombre';
+                        final foto = userData['fotografiaUrl'] ?? null;
+
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.all(12),
+                            leading: CircleAvatar(
+                              radius: 28,
+                              backgroundColor: Colors.grey.shade200,
+                              backgroundImage: (foto != null && foto != '')
+                                  ? NetworkImage(foto)
+                                  : null,
+                              child: (foto == null || foto == '')
+                                  ? const Icon(Icons.person,
+                                      size: 28, color: Colors.grey)
+                                  : null,
+                            ),
+                            title: Text(nombre,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('No. Control: $uidPasajero'),
+                                Text('Método de pago: $metodoPago'),
+                                Text('Estado: $estado'),
+                              ],
+                            ),
+                            trailing: estado == 'pendiente'
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.check_circle,
+                                            color: Colors.green),
+                                        onPressed: () => _cambiarEstado(
+                                            uidPasajero, 'aceptado'),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.cancel,
+                                            color: Colors.red),
+                                        onPressed: () => _rechazarPasajero(
+                                            uidPasajero, metodoPago),
+                                      ),
+                                    ],
+                                  )
+                                : Icon(
+                                    estado == 'aceptado'
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color: estado == 'aceptado'
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -184,11 +230,11 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
 
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       final snapshot = await transaction.get(rutaRef);
-      final disponibles = snapshot.get('lugaresDisponibles') as int;
+      final disponibles = snapshot.get('asientosDisponibles') as int;
 
       if (disponibles > 0) {
         transaction.update(rutaRef, {
-          'lugaresDisponibles': disponibles - 1,
+          'asientosDisponibles': disponibles - 1,
         });
       }
     });
