@@ -23,6 +23,8 @@ class _VerRutaConductorState extends State<VerRutaConductor> {
   bool _cargando = true;
   BitmapDescriptor? _iconoAuto;
 
+  final LatLng _paradaFinal = const LatLng(24.032835356592006, -104.64682009142419);
+
   @override
   void initState() {
     super.initState();
@@ -33,7 +35,7 @@ class _VerRutaConductorState extends State<VerRutaConductor> {
   Future<void> _cargarIconoAuto() async {
     final icono = await BitmapDescriptor.fromAssetImage(
       const ImageConfiguration(size: Size(48, 48)),
-      'assets/auto.png', // Asegúrate que el nombre y la ruta coincidan
+      'assets/auto.png',
     );
     setState(() {
       _iconoAuto = icono;
@@ -72,11 +74,20 @@ class _VerRutaConductorState extends State<VerRutaConductor> {
     );
 
     _marcadores = {
+      // Parada personalizada del pasajero
       Marker(
         markerId: const MarkerId('parada'),
         position: paradaLatLng,
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
         infoWindow: const InfoWindow(title: 'Tu parada'),
+      ),
+
+      // Parada final fija
+      Marker(
+        markerId: const MarkerId('parada_final'),
+        position: _paradaFinal,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+        infoWindow: const InfoWindow(title: 'Destino final'),
       ),
     };
 
