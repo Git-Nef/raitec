@@ -269,8 +269,21 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
           .orderBy('fecha', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const SizedBox();
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.only(top: 60),
+              child: Text(
+                'No hay solicitudes todavía 🕊️',
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
         }
 
         final docs = snapshot.data!.docs;

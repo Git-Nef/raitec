@@ -27,14 +27,7 @@ class PrincipalConductor extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.black),
-            onPressed: () {
-              // Aquí puedes manejar futuras notificaciones
-            },
-          ),
-        ],
+
       ),
       drawer: Drawer(
         child: ListView(
@@ -93,7 +86,7 @@ class PrincipalConductor extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text('Principal Usuario'),
+              title: const Text('Cambiar a pasajero'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -112,16 +105,6 @@ class PrincipalConductor extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => Registro()),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.drive_eta),
-              title: const Text('Identifícate'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ISConductores()),
                 );
               },
             ),

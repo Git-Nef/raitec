@@ -34,6 +34,9 @@ class _RegistroState extends State<Registro> {
   String? fotografiaUrl;
   String? firmaUrl;
 
+  bool _mostrarNip = false;
+  bool _mostrarConfirmNip = false;
+
   Future<void> seleccionarImagen(String tipo) async {
     final picker = ImagePicker();
 
@@ -50,7 +53,7 @@ class _RegistroState extends State<Registro> {
                 onTap: () async {
                   Navigator.pop(context);
                   final XFile? imagen =
-                      await picker.pickImage(source: ImageSource.camera);
+                  await picker.pickImage(source: ImageSource.camera);
                   if (imagen != null) await _subirImagen(imagen, tipo);
                 },
               ),
@@ -60,7 +63,7 @@ class _RegistroState extends State<Registro> {
                 onTap: () async {
                   Navigator.pop(context);
                   final XFile? imagen =
-                      await picker.pickImage(source: ImageSource.gallery);
+                  await picker.pickImage(source: ImageSource.gallery);
                   if (imagen != null) await _subirImagen(imagen, tipo);
                 },
               ),
@@ -74,7 +77,7 @@ class _RegistroState extends State<Registro> {
   Future<void> _subirImagen(XFile imagen, String tipo) async {
     final nombreArchivo = '$tipo-${DateTime.now().millisecondsSinceEpoch}.jpg';
     final ref =
-        FirebaseStorage.instance.ref().child('usuarios/$tipo/$nombreArchivo');
+    FirebaseStorage.instance.ref().child('usuarios/$tipo/$nombreArchivo');
     await ref.putFile(File(imagen.path));
     final url = await ref.getDownloadURL();
 
@@ -126,14 +129,61 @@ class _RegistroState extends State<Registro> {
                 const SizedBox(height: 10),
                 const Text('Registro de Usuario',
                     style:
-                        TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
                 _input('Número de Control', _numControl),
-                _input('NIP', _nip, obscure: true),
-                _input('Confirmar NIP', _confirmNip, obscure: true),
+                _input(
+                  'NIP',
+                  _nip,
+                  obscure: !_mostrarNip,
+                  validator: (value) {
+                    final password = value ?? '';
+                    if (password.isEmpty) return 'El NIP es obligatorio';
+                    if (!RegExp(
+                        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%^&*()_+\-=\[\]{};:\\|,.<>\/?]).{8,}$')
+                        .hasMatch(password)) {
+                      return 'Debe tener 8 caracteres, mayúscula, número y símbolo';
+                    }
+                    return null;
+                  },
+                  icon: IconButton(
+                    icon: Icon(_mostrarNip
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: () => setState(() {
+                      _mostrarNip = !_mostrarNip;
+                    }),
+                  ),
+                ),
+                _input(
+                  'Confirmar NIP',
+                  _confirmNip,
+                  obscure: !_mostrarConfirmNip,
+                  validator: (value) {
+                    if (value != _nip.text) return 'Los NIP no coinciden';
+                    return null;
+                  },
+                  icon: IconButton(
+                    icon: Icon(_mostrarConfirmNip
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: () => setState(() {
+                      _mostrarConfirmNip = !_mostrarConfirmNip;
+                    }),
+                  ),
+                ),
                 _input('Nombre Completo', _nombre),
                 _input('Correo Electrónico', _email,
-                    keyboard: TextInputType.emailAddress),
+                    keyboard: TextInputType.emailAddress,
+                    validator: (value) {
+                      final email = value ?? '';
+                      if (email.isEmpty) return 'Correo requerido';
+                      if (!RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
+                          .hasMatch(email)) {
+                        return 'Correo inválido';
+                      }
+                      return null;
+                    }),
                 _input('Edad', _edad, keyboard: TextInputType.number),
                 _input('Carrera', _carrera),
                 _input('Dirección', _direccion),
@@ -142,8 +192,8 @@ class _RegistroState extends State<Registro> {
                 GestureDetector(
                   onTap: _seleccionarFechaNacimiento,
                   child: AbsorbPointer(
-                    child: _input(
-                        'Fecha de Nacimiento (YYYY-MM-DD)', _fechaNacimiento),
+                    child: _input('Fecha de Nacimiento (YYYY-MM-DD)',
+                        _fechaNacimiento),
                   ),
                 ),
                 _input('Tel. Emergencia', _telefonoEmergencia,
@@ -161,7 +211,7 @@ class _RegistroState extends State<Registro> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
-                          camposCompletos ? Colors.blue : Colors.grey,
+                      camposCompletos ? Colors.blue : Colors.grey,
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -170,66 +220,44 @@ class _RegistroState extends State<Registro> {
                     ),
                     onPressed: camposCompletos
                         ? () async {
-                            final nip = _nip.text.trim();
-                            final confirm = _confirmNip.text.trim();
-                            final email = _email.text.trim();
-
-                            if (nip != confirm) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Los NIP no coinciden')),
-                              );
-                              return;
-                            }
-
-                            final emailValido =
-                                RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
-                                    .hasMatch(email);
-                            if (!emailValido) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Correo inválido')),
-                              );
-                              return;
-                            }
-
-                            try {
-                              await firestore.crearUsuario(
-                                _numControl.text.trim(),
-                                {
-                                  'numControl': _numControl.text.trim(),
-                                  'nip': nip,
-                                  'nombre': _nombre.text.trim(),
-                                  'email': email,
-                                  'edad': int.tryParse(_edad.text.trim()) ?? 0,
-                                  'carrera': _carrera.text.trim(),
-                                  'direccion': _direccion.text.trim(),
-                                  'telefono': _telefono.text.trim(),
-                                  'nacionalidad': _nacionalidad.text.trim(),
-                                  'fechaNacimiento':
-                                      _fechaNacimiento.text.trim(),
-                                  'telefonoEmergencia':
-                                      _telefonoEmergencia.text.trim(),
-                                  'fotografiaUrl': fotografiaUrl ?? '',
-                                  'firmaUrl': firmaUrl ?? '',
-                                  'esConductor': false,
-                                },
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text('Usuario registrado')),
-                              );
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const InicioSesion()),
-                              );
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Error: $e')),
-                              );
-                            }
-                          }
+                      if (!_formKey.currentState!.validate()) return;
+                      try {
+                        await firestore.crearUsuario(
+                          _numControl.text.trim(),
+                          {
+                            'numControl': _numControl.text.trim(),
+                            'nip': _nip.text.trim(),
+                            'nombre': _nombre.text.trim(),
+                            'email': _email.text.trim(),
+                            'edad': int.tryParse(_edad.text.trim()) ?? 0,
+                            'carrera': _carrera.text.trim(),
+                            'direccion': _direccion.text.trim(),
+                            'telefono': _telefono.text.trim(),
+                            'nacionalidad': _nacionalidad.text.trim(),
+                            'fechaNacimiento':
+                            _fechaNacimiento.text.trim(),
+                            'telefonoEmergencia':
+                            _telefonoEmergencia.text.trim(),
+                            'fotografiaUrl': fotografiaUrl ?? '',
+                            'firmaUrl': firmaUrl ?? '',
+                            'esConductor': false,
+                          },
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Usuario registrado')),
+                        );
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const InicioSesion()),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error: $e')),
+                        );
+                      }
+                    }
                         : null,
                     child: const Text(
                       'REGISTRARME',
@@ -276,18 +304,24 @@ class _RegistroState extends State<Registro> {
   }
 
   Widget _input(String label, TextEditingController controller,
-      {bool obscure = false, TextInputType keyboard = TextInputType.text}) {
+      {bool obscure = false,
+        TextInputType keyboard = TextInputType.text,
+        String? Function(String?)? validator,
+        Widget? icon}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: TextField(
+      child: TextFormField(
         controller: controller,
-        onChanged: (_) => actualizarEstado(),
         obscureText: obscure,
         keyboardType: keyboard,
+        validator: validator,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        onChanged: (_) => actualizarEstado(),
         decoration: InputDecoration(
           labelText: label,
           filled: true,
           fillColor: const Color(0xFFF0F0F0),
+          suffixIcon: icon,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
@@ -330,7 +364,7 @@ class _RegistroState extends State<Registro> {
     if (picked != null) {
       setState(() {
         _fechaNacimiento.text =
-            '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+        '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
       });
     }
   }
