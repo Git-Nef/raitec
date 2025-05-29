@@ -51,18 +51,17 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
               }
 
               final data = snapshot.data!.data() as Map<String, dynamic>;
-              final disponibles = data['asientosDisponibles'] ?? 0;
+              final disponibles = data['lugaresDisponibles'] ?? 0;
               final originales = data['asientosOriginales'] ?? disponibles;
 
               return Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
                     const Icon(Icons.event_seat, color: Colors.deepPurple),
                     const SizedBox(width: 10),
                     Text(
-                      'Asientos disponibles: $disponibles de $originales',
+                      'Lugares disponibles: $disponibles de $originales',
                       style: const TextStyle(fontSize: 16),
                     ),
                   ],
@@ -210,6 +209,22 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
         .collection('pasajeros')
         .doc(uidPasajero);
 
+    final rutaDoc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(uidConductor)
+        .collection('rutas')
+        .doc('info')
+        .get();
+
+    final disponibles = rutaDoc['lugaresDisponibles'] ?? 0;
+
+    if (nuevoEstado == 'aceptado' && disponibles <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No hay lugares disponibles')),
+      );
+      return;
+    }
+
     await ref.update({'estado': nuevoEstado});
 
     if (nuevoEstado == 'aceptado') {
@@ -230,11 +245,11 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
 
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       final snapshot = await transaction.get(rutaRef);
-      final disponibles = snapshot.get('asientosDisponibles') as int;
+      final disponibles = snapshot.get('lugaresDisponibles') as int;
 
       if (disponibles > 0) {
         transaction.update(rutaRef, {
-          'asientosDisponibles': disponibles - 1,
+          'lugaresDisponibles': disponibles - 1,
         });
       }
     });
