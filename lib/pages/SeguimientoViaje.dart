@@ -210,7 +210,7 @@ class _SeguimientoViajeState extends State<SeguimientoViaje> {
           _destinoFinal!.longitude,
         );
 
-        if (distanciaADestino < 15) {
+        if (distanciaADestino < 30) {
           _viajeFinalizado = true;
           _finalizarViaje();
         }

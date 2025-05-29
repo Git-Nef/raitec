@@ -17,7 +17,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
   final TextEditingController _asientosController = TextEditingController();
   LatLng? origenSeleccionado;
   final LatLng destinoFijo =
-      const LatLng(24.03265897848829, -104.64678790491564);
+  const LatLng(24.03265897848829, -104.64678790491564);
 
   final List<String> dias = [
     'Lunes',
@@ -100,12 +100,9 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         .doc('info');
 
     try {
-      int asientos = int.parse(_asientosController.text);
-
       await docRef.set({
         'nombreRuta': _nombreRutaController.text.trim(),
-        'lugaresDisponibles': asientos,
-        'asientosOriginales': asientos,
+        'lugaresDisponibles': int.parse(_asientosController.text),
         'origen': {
           'lat': origenSeleccionado!.latitude,
           'lng': origenSeleccionado!.longitude,
@@ -152,7 +149,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                 decoration: const InputDecoration(
                     labelText: 'Nombre de la ruta (Ejemplo: Jardines)'),
                 validator: (value) =>
-                    value!.isEmpty ? 'Escribe un nombre para la ruta' : null,
+                value!.isEmpty ? 'Escribe un nombre para la ruta' : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
@@ -161,7 +158,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                     labelText: 'Asientos traseros disponibles'),
                 keyboardType: TextInputType.number,
                 validator: (value) =>
-                    value!.isEmpty ? 'Escribe los asientos' : null,
+                value!.isEmpty ? 'Escribe los asientos' : null,
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -182,7 +179,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                         if (diasActivos[dia]!)
                           Padding(
                             padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            const EdgeInsets.symmetric(horizontal: 16.0),
                             child: Row(
                               children: [
                                 const Text('Hora de entrada:'),
