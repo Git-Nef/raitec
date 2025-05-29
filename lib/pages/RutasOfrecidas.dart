@@ -289,14 +289,7 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    '\$${ruta['precio']} MXN',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
+
                                   Row(
                                     children: [
                                       Icon(Icons.map, color: raitecBlue),

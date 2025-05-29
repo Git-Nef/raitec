@@ -20,48 +20,6 @@ class InfoVehiculo extends StatelessWidget {
 
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 2,
-          leading: Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.menu, color: Colors.black),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            ),
-          ),
-          centerTitle: true,
-          title: Image.asset(
-            'assets/LogoPantallas.png',
-            height: 90,
-          ),
-        ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              DrawerHeader(
-                decoration: const BoxDecoration(color: Colors.blue),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Menú',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Image.asset('assets/LogoPantallas.png', height: 60),
-                  ],
-                ),
-              ),
-              // Aquí puedes agregar los ListTile para navegación
-            ],
-          ),
-        ),
         body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
           future: docRef.get(),
           builder: (context, snapshot) {
@@ -201,39 +159,6 @@ class InfoVehiculo extends StatelessWidget {
                           size: 42, color: Colors.white),
                       onPressed: () {
                         Navigator.pop(context); // Este botón navega hacia atrás
-                      },
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: IconButton(
-                    icon: const Icon(Icons.home, size: 42, color: Colors.white),
-                    onPressed: () {
-                      // Redirige a la pantalla principal
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => PrincipalUsuario(
-                                numControl: SessionManager().numControl!)),
-                      );
-                    },
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 16.0),
-                    child: IconButton(
-                      icon: const Icon(Icons.account_circle,
-                          size: 42, color: Colors.white),
-                      onPressed: () {
-                        // Redirige a la pantalla de información del usuario
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => InfoUsuario()),
-                        );
                       },
                     ),
                   ),

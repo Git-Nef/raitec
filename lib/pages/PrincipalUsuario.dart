@@ -27,17 +27,7 @@ class PrincipalUsuario extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon:
-                const Icon(Icons.notifications, size: 30, color: Colors.black),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Notificaciones abiertas')),
-              );
-            },
-          ),
-        ],
+
       ),
       drawer: Drawer(
         child: ListView(
