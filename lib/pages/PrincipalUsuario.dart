@@ -192,9 +192,9 @@ class PrincipalUsuario extends StatelessWidget {
               child: const Text("Aceptar"),
               onPressed: () {
                 SessionManager().setNumControl('');
-                Navigator.pushReplacement(
-                  context,
+                Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const InicioSesion()),
+                      (Route<dynamic> route) => false,
                 );
               },
             ),

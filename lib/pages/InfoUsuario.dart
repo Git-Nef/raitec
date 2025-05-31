@@ -27,7 +27,7 @@ class InfoUsuario extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new,
@@ -36,15 +36,6 @@ class InfoUsuario extends StatelessWidget {
                   Navigator.pop(context);
                 },
               ),
-              IconButton(
-                icon: const Icon(Icons.home_filled,
-                    size: 30, color: Colors.blueAccent),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              const SizedBox(
-                  width: 28), // Relleno donde estaba el icono de usuario
             ],
           ),
         ),

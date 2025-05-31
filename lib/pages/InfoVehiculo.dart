@@ -143,30 +143,27 @@ class InfoVehiculo extends StatelessWidget {
             );
           },
         ),
-        bottomNavigationBar: BottomAppBar(
-          color: Colors.lightBlue,
-          elevation: 8,
-          child: SizedBox(
-            height: 70,
-            child: Stack(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 16.0),
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back,
-                          size: 42, color: Colors.white),
-                      onPressed: () {
-                        Navigator.pop(context); // Este botón navega hacia atrás
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.white,
+        elevation: 10,
+        shape: const CircularNotchedRectangle(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new,
+                    size: 28, color: Colors.blueGrey),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _infoFila(
