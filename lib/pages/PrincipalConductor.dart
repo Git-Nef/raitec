@@ -7,6 +7,7 @@ import 'package:raitec/pages/Registro.dart';
 import 'package:raitec/pages/ISConductores.dart';
 import 'package:raitec/pages/InicioSesion.dart';
 import 'package:raitec/pages/sesion.dart';
+import 'package:raitec/pages/HistorialViajes.dart'; // <- Asegúrate de que exista
 
 class PrincipalConductor extends StatelessWidget {
   final String numControl;
@@ -27,7 +28,6 @@ class PrincipalConductor extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-
       ),
       drawer: Drawer(
         child: ListView(
@@ -85,14 +85,23 @@ class PrincipalConductor extends StatelessWidget {
               },
             ),
             ListTile(
+              leading: const Icon(Icons.history),
+              title: const Text('Historial de viajes'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HistorialViajes()),
+                );
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.home),
               title: const Text('Cambiar a pasajero'),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PrincipalUsuario(
-                    ),
+                    builder: (context) => const PrincipalUsuario(),
                   ),
                 );
               },
@@ -140,6 +149,13 @@ class PrincipalConductor extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => MisRutas()),
+                );
+              }),
+              const SizedBox(height: 24),
+              buildButton('Historial de viajes', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HistorialViajes()),
                 );
               }),
               const SizedBox(height: 40),
