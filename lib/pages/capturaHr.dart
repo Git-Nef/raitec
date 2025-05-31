@@ -100,9 +100,12 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         .doc('info');
 
     try {
+      final int asientos = int.parse(_asientosController.text);
+
       await docRef.set({
         'nombreRuta': _nombreRutaController.text.trim(),
-        'lugaresDisponibles': int.parse(_asientosController.text),
+        'lugaresDisponibles': asientos,
+        'lugaresTotales': asientos,
         'origen': {
           'lat': origenSeleccionado!.latitude,
           'lng': origenSeleccionado!.longitude,

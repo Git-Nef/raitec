@@ -52,7 +52,7 @@ class _ViajeFinalizadoState extends State<ViajeFinalizado> {
           .get();
 
       final List<Map<String, dynamic>> listaPasajeros = [];
-      int totalPasajeros = 0;
+      final totalPasajeros = pasajerosSnapshot.docs.length;
 
       for (var p in pasajerosSnapshot.docs) {
         final data = p.data();
@@ -84,8 +84,6 @@ class _ViajeFinalizadoState extends State<ViajeFinalizado> {
           'destino': rutaDoc['destino'],
           'nombreRuta': rutaDoc['nombreRuta'],
         });
-
-        totalPasajeros++;
       }
 
       await FirebaseFirestore.instance
@@ -100,11 +98,53 @@ class _ViajeFinalizadoState extends State<ViajeFinalizado> {
         'pasajeros': listaPasajeros,
       });
 
+      final rutaRef = FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(widget.uidConductor)
+          .collection('rutas')
+          .doc(widget.rutaId);
+
+      final rutaSnapshot = await rutaRef.get();
+      final lugaresTotales =
+          rutaSnapshot['lugaresTotales'] ?? rutaSnapshot['lugaresDisponibles'];
+
+      await rutaRef.update({'lugaresDisponibles': lugaresTotales});
+
+      final pasajerosCollection = FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(widget.uidConductor)
+          .collection('rutas')
+          .doc(widget.rutaId)
+          .collection('pasajeros');
+
+      for (var doc in pasajerosSnapshot.docs) {
+        await pasajerosCollection.doc(doc.id).delete();
+      }
+
+      final buffer = StringBuffer();
+      buffer.writeln('Resumen del viaje');
+      buffer.writeln('--------------------------');
+      buffer.writeln('Ruta: ${rutaDoc['nombreRuta']}');
+      buffer.writeln('Total de pasajeros: $totalPasajeros\n');
+
+      for (final p in listaPasajeros) {
+        buffer.writeln('• ${p['nombre']}');
+        buffer.writeln('  Método de pago: ${p['metodoPago']}');
+        buffer.writeln('  Costo: \$${p['precio']}\n');
+      }
+
       setState(() {
         _guardando = false;
-        _mensajeResumen =
-        'Ruta "${rutaDoc['nombreRuta']}" finalizada. Total de pasajeros: $totalPasajeros';
+        _mensajeResumen = buffer.toString();
       });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Los asientos ya están disponibles para nuevas solicitudes.',
+          ),
+        ),
+      );
     } catch (e) {
       setState(() {
         _guardando = false;

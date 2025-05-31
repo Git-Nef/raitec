@@ -235,35 +235,30 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                                     child: ElevatedButton.icon(
                                       onPressed: ruta['lugaresDisponibles'] > 0
                                           ? () {
-                                              final uidPasajero =
-                                                  SessionManager().numControl;
-                                              if (uidPasajero == null ||
-                                                  uidPasajero.isEmpty) {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  const SnackBar(
-                                                      content: Text(
-                                                          'Inicia sesión para pedir un rait')),
-                                                );
-                                                return;
-                                              }
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (_) => Ubicacion(
-                                                    origen: ruta['origen'],
-                                                    destino: ruta['destino'],
-                                                    nombreRuta: ruta['ruta'],
-                                                    rutaId: ruta['rutaId'],
-                                                    uidConductor:
-                                                        ruta['uidConductor'],
-                                                    uidPasajero: uidPasajero,
-                                                    datosRuta: ruta,
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                          : null,
+                                        final uidPasajero = SessionManager().numControl;
+                                        if (uidPasajero == null || uidPasajero.isEmpty) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                                content: Text('Inicia sesión para pedir un rait')),
+                                          );
+                                          return;
+                                        }
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => Ubicacion(
+                                              origen: ruta['origen'],
+                                              destino: ruta['destino'],
+                                              nombreRuta: ruta['ruta'],
+                                              rutaId: ruta['rutaId'],
+                                              uidConductor: ruta['uidConductor'],
+                                              uidPasajero: uidPasajero,
+                                              datosRuta: ruta,
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                      : null,
                                       icon: const Icon(Icons.map),
                                       label: Text(
                                         ruta['lugaresDisponibles'] > 0
@@ -271,14 +266,15 @@ class _RutasOfrecidasState extends State<RutasOfrecidas> {
                                             : "Sin asientos disponibles",
                                       ),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            ruta['lugaresDisponibles'] > 0
-                                                ? raitecBlue
-                                                : Colors.grey.shade400,
+                                        backgroundColor: ruta['lugaresDisponibles'] > 0
+                                            ? raitecBlue
+                                            : Colors.grey.shade400,
                                         foregroundColor: Colors.white,
+                                        disabledBackgroundColor: Colors.grey.shade400,
+                                        disabledForegroundColor: Colors.white,
                                         shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12)),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
                                       ),
                                     ),
                                   ),

@@ -166,6 +166,24 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
 
     await ref.update({'estado': nuevoEstado});
 
+    if (nuevoEstado == 'aceptado') {
+      final rutaRef = FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(uidConductor)
+          .collection('rutas')
+          .doc('info');
+
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final snapshot = await transaction.get(rutaRef);
+        final disponibles = snapshot['lugaresDisponibles'] ?? 0;
+        if (disponibles > 0) {
+          transaction.update(rutaRef, {
+            'lugaresDisponibles': disponibles - 1,
+          });
+        }
+      });
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Pasajero $nuevoEstado')),
     );
