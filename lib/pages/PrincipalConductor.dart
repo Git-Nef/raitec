@@ -92,19 +92,8 @@ class PrincipalConductor extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => PrincipalUsuario(
-                      numControl: numControl,
                     ),
                   ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.app_registration),
-              title: const Text('Registro'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Registro()),
                 );
               },
             ),

@@ -112,7 +112,7 @@ class InicioSesion extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  PrincipalUsuario(numControl: clave),
+                                  PrincipalUsuario(),
 
                             ),
                           );
