@@ -16,162 +16,157 @@ class PrincipalConductor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return WillPopScope(
+      onWillPop: () async => false, // 🔒 Bloquea botón físico de retroceso
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 2,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.black),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 2,
+          automaticallyImplyLeading: false, // ❌ Oculta flecha de atrás
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.black),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
+          ),
+          centerTitle: true,
+        ),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: const BoxDecoration(color: Colors.blue),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Menú',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Image.asset('assets/LogoPantallas.png', height: 60),
+                  ],
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text('Mi información'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InfoUsuario()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.directions_car),
+                title: const Text('Mi vehículo'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InfoVehiculo()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.map),
+                title: const Text('Mis rutas'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MisRutas()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.history),
+                title: const Text('Historial de viajes'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HistorialViajes()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.home),
+                title: const Text('Cambiar a pasajero'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const PrincipalUsuario()),
+                  );
+                },
+              ),
+            ],
           ),
         ),
-        centerTitle: true,
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(color: Colors.blue),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Menú',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Image.asset(
-                    'assets/LogoPantallas.png',
-                    height: 60,
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Mi información'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => InfoUsuario()),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.directions_car),
-              title: const Text('Mi vehículo'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => InfoVehiculo()),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.map),
-              title: const Text('Mis rutas'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MisRutas()),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.history),
-              title: const Text('Historial de viajes'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HistorialViajes()),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Cambiar a pasajero'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const PrincipalUsuario(),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 32),
-              Center(
-                child: Image.asset(
-                  'assets/SplashScreen.png',
-                  height: 180,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 32),
+                Center(
+                  child: Image.asset('assets/SplashScreen.png', height: 180),
                 ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Bienvenido al servicio de conductor de RaiTec',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
+                const SizedBox(height: 24),
+                const Text(
+                  'Bienvenido al servicio de conductor de RaiTec',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 40),
-              buildButton('Mi información', () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => InfoUsuario()),
-                );
-              }),
-              const SizedBox(height: 24),
-              buildButton('Mi vehículo', () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => InfoVehiculo()),
-                );
-              }),
-              const SizedBox(height: 24),
-              buildButton('Mis rutas', () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MisRutas()),
-                );
-              }),
-              const SizedBox(height: 24),
-              buildButton('Historial de viajes', () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HistorialViajes()),
-                );
-              }),
-              const SizedBox(height: 40),
-              buildButton('CERRAR SESIÓN', () {
-                _confirmarCerrarSesion(context);
-              }, color: Colors.red),
-              const SizedBox(height: 40),
-            ],
+                const SizedBox(height: 40),
+                buildButton('Mi información', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InfoUsuario()),
+                  );
+                }),
+                const SizedBox(height: 24),
+                buildButton('Mi vehículo', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InfoVehiculo()),
+                  );
+                }),
+                const SizedBox(height: 24),
+                buildButton('Mis rutas', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MisRutas()),
+                  );
+                }),
+                const SizedBox(height: 24),
+                buildButton('Historial de viajes', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HistorialViajes()),
+                  );
+                }),
+                const SizedBox(height: 40),
+                buildButton('CERRAR SESIÓN', () {
+                  _confirmarCerrarSesion(context);
+                }, color: Colors.red),
+                const SizedBox(height: 40),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget buildButton(String text, VoidCallback onPressed,
-      {Color color = Colors.blue}) {
+  Widget buildButton(String text, VoidCallback onPressed, {Color color = Colors.blue}) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -212,9 +207,10 @@ class PrincipalConductor extends StatelessWidget {
               child: const Text("Aceptar"),
               onPressed: () {
                 SessionManager().setNumControl('');
-                Navigator.pushReplacement(
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => const InicioSesion()),
+                      (Route<dynamic> route) => false,
                 );
               },
             ),

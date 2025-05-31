@@ -40,143 +40,145 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return WillPopScope(
+      onWillPop: () async => false, // 🚫 Bloquea retroceso físico
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 2,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Colors.black),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 2,
+          automaticallyImplyLeading: false, // 🚫 Quita la flecha
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.black),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
           ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(color: Colors.blue),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Menú',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: const BoxDecoration(color: Colors.blue),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Menú',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Image.asset('assets/LogoPantallas.png', height: 60),
-                ],
+                    const SizedBox(height: 8),
+                    Image.asset('assets/LogoPantallas.png', height: 60),
+                  ],
+                ),
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.account_circle),
-              title: const Text('Mi Información'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => InfoUsuario()),
-                );
-              },
-            ),
-            if (esConductor)
               ListTile(
-                leading: const Icon(Icons.directions_car),
-                title: const Text('Cambiar a vista conductor'),
+                leading: const Icon(Icons.account_circle),
+                title: const Text('Mi Información'),
                 onTap: () {
-                  String clave = SessionManager().numControl ?? '';
-
-                  Navigator.pushReplacement(
+                  Navigator.push(
                     context,
-
-                    MaterialPageRoute(builder: (_) =>  PrincipalConductor(numControl: clave,)),
+                    MaterialPageRoute(builder: (context) => InfoUsuario()),
                   );
                 },
               ),
-            ListTile(
-              leading: const Icon(Icons.exit_to_app),
-              title: const Text('Cerrar sesión'),
-              onTap: () {
-                _confirmarCerrarSesion(context);
-              },
-            ),
-          ],
+              if (esConductor)
+                ListTile(
+                  leading: const Icon(Icons.directions_car),
+                  title: const Text('Cambiar a vista conductor'),
+                  onTap: () {
+                    String clave = SessionManager().numControl ?? '';
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => PrincipalConductor(numControl: clave)),
+                    );
+                  },
+                ),
+              ListTile(
+                leading: const Icon(Icons.exit_to_app),
+                title: const Text('Cerrar sesión'),
+                onTap: () {
+                  _confirmarCerrarSesion(context);
+                },
+              ),
+            ],
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 10),
-              Center(
-                child: Image.asset(
-                  'assets/SplashScreen.png',
-                  height: 180,
-                ),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'BIENVENIDO A RaiTec',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 24),
-              buildBoton('BUSCAR UNA RUTA', onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => RutasOfrecidas()),
-                );
-              }),
-              const SizedBox(height: 16),
-              buildBoton('COSTOS', onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => InfoCostos()),
-                );
-              }),
-              const SizedBox(height: 16),
-              buildBoton('MI INFORMACIÓN', onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => InfoUsuario()),
-                );
-              }),
-              const SizedBox(height: 24),
-              if (!esConductor) ...[
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    '¿Quieres ser conductor?',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 10),
+                Center(
+                  child: Image.asset(
+                    'assets/SplashScreen.png',
+                    height: 180,
                   ),
                 ),
-                const SizedBox(height: 10),
-                buildBoton('Elaborar Petición', onPressed: () {
+                const SizedBox(height: 12),
+                const Text(
+                  'BIENVENIDO A RaiTec',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                buildBoton('BUSCAR UNA RUTA', onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => Aspirar(numControl: numControl ?? ''),
-                    ),
+                    MaterialPageRoute(builder: (context) => RutasOfrecidas()),
                   );
                 }),
+                const SizedBox(height: 16),
+                buildBoton('COSTOS', onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InfoCostos()),
+                  );
+                }),
+                const SizedBox(height: 16),
+                buildBoton('MI INFORMACIÓN', onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InfoUsuario()),
+                  );
+                }),
+                const SizedBox(height: 24),
+                if (!esConductor) ...[
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '¿Quieres ser conductor?',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  buildBoton('Elaborar Petición', onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Aspirar(numControl: numControl ?? ''),
+                      ),
+                    );
+                  }),
+                ],
+                const SizedBox(height: 30),
+                buildBoton('CERRAR SESIÓN', color: Colors.red, onPressed: () {
+                  _confirmarCerrarSesion(context);
+                }),
+                const SizedBox(height: 40),
               ],
-              const SizedBox(height: 30),
-              buildBoton('CERRAR SESIÓN', color: Colors.red, onPressed: () {
-                _confirmarCerrarSesion(context);
-              }),
-              const SizedBox(height: 40),
-            ],
+            ),
           ),
         ),
       ),
@@ -211,8 +213,7 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
     );
   }
 
-  Widget buildBoton(String texto,
-      {Color color = Colors.blue, VoidCallback? onPressed}) {
+  Widget buildBoton(String texto, {Color color = Colors.blue, VoidCallback? onPressed}) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
