@@ -92,7 +92,6 @@ class PrincipalConductor extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => PrincipalUsuario(
-                      numControl: numControl,
                     ),
                   ),
                 );

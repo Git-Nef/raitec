@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:raitec/pages/InfoCostos.dart';
 import 'package:raitec/pages/InfoUsuario.dart';
 import 'package:raitec/pages/InicioSesion.dart';
@@ -9,9 +10,32 @@ import 'package:raitec/pages/InfoVehiculo.dart';
 import 'package:raitec/pages/RegistrarVehiculo.dart';
 import 'package:raitec/pages/sesion.dart';
 
-class PrincipalUsuario extends StatelessWidget {
-  final String numControl;
-  const PrincipalUsuario({super.key, required this.numControl});
+class PrincipalUsuario extends StatefulWidget {
+  const PrincipalUsuario({super.key});
+
+  @override
+  State<PrincipalUsuario> createState() => _PrincipalUsuarioState();
+}
+
+class _PrincipalUsuarioState extends State<PrincipalUsuario> {
+  String? numControl = SessionManager().numControl;
+  bool esConductor = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _verificarSiEsConductor();
+  }
+
+  Future<void> _verificarSiEsConductor() async {
+    if (numControl == null || numControl!.isEmpty) return;
+    final doc = await FirebaseFirestore.instance.collection('usuarios').doc(numControl).get();
+    if (doc.exists) {
+      setState(() {
+        esConductor = doc.data()?['esConductor'] == true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +51,6 @@ class PrincipalUsuario extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-
       ),
       drawer: Drawer(
         child: ListView(
@@ -51,29 +74,43 @@ class PrincipalUsuario extends StatelessWidget {
                 ],
               ),
             ),
-            ListTile(
-              leading: const Icon(Icons.directions_car),
-              title: const Text('Registrar Vehículo'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        RegistrarVehiculo(numControl: numControl),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('Info Vehículo'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => InfoVehiculo()),
-                );
-              },
-            ),
+
+            if (!esConductor) ...[
+              ListTile(
+                leading: const Icon(Icons.directions_car),
+                title: const Text('Registrar Vehículo'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          RegistrarVehiculo(numControl: numControl ?? ''),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.info),
+                title: const Text('Info Vehículo'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InfoVehiculo()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.map),
+                title: const Text('Mis Rutas'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MisRutas()),
+                  );
+                },
+              ),
+            ],
+
             ListTile(
               leading: const Icon(Icons.account_circle),
               title: const Text('Mi Información'),
@@ -81,16 +118,6 @@ class PrincipalUsuario extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => InfoUsuario()),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.map),
-              title: const Text('Mis Rutas'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MisRutas()),
                 );
               },
             ),
@@ -148,22 +175,26 @@ class PrincipalUsuario extends StatelessWidget {
                 );
               }),
               const SizedBox(height: 24),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '¿Quieres ser conductor?',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-              ),
-              const SizedBox(height: 10),
-              buildBoton('Elaborar Petición', onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Aspirar(numControl: numControl),
+
+              if (!esConductor) ...[
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '¿Quieres ser conductor?',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
-                );
-              }),
+                ),
+                const SizedBox(height: 10),
+                buildBoton('Elaborar Petición', onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Aspirar(numControl: numControl ?? ''),
+                    ),
+                  );
+                }),
+              ],
+
               const SizedBox(height: 30),
               buildBoton('CERRAR SESIÓN', color: Colors.red, onPressed: () {
                 _confirmarCerrarSesion(context);
