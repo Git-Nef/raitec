@@ -9,6 +9,7 @@ import 'package:raitec/pages/aspirar.dart';
 import 'package:raitec/pages/InfoVehiculo.dart';
 import 'package:raitec/pages/RegistrarVehiculo.dart';
 import 'package:raitec/pages/sesion.dart';
+import 'package:raitec/pages/PrincipalConductor.dart';
 
 class PrincipalUsuario extends StatefulWidget {
   const PrincipalUsuario({super.key});
@@ -74,43 +75,6 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
                 ],
               ),
             ),
-
-            if (!esConductor) ...[
-              ListTile(
-                leading: const Icon(Icons.directions_car),
-                title: const Text('Registrar Vehículo'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          RegistrarVehiculo(numControl: numControl ?? ''),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.info),
-                title: const Text('Info Vehículo'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => InfoVehiculo()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.map),
-                title: const Text('Mis Rutas'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => MisRutas()),
-                  );
-                },
-              ),
-            ],
-
             ListTile(
               leading: const Icon(Icons.account_circle),
               title: const Text('Mi Información'),
@@ -121,6 +85,20 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
                 );
               },
             ),
+            if (esConductor)
+              ListTile(
+                leading: const Icon(Icons.directions_car),
+                title: const Text('Cambiar a vista conductor'),
+                onTap: () {
+                  String clave = SessionManager().numControl ?? '';
+
+                  Navigator.pushReplacement(
+                    context,
+
+                    MaterialPageRoute(builder: (_) =>  PrincipalConductor(numControl: clave,)),
+                  );
+                },
+              ),
             ListTile(
               leading: const Icon(Icons.exit_to_app),
               title: const Text('Cerrar sesión'),
@@ -175,7 +153,6 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
                 );
               }),
               const SizedBox(height: 24),
-
               if (!esConductor) ...[
                 const Align(
                   alignment: Alignment.centerLeft,
@@ -194,7 +171,6 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
                   );
                 }),
               ],
-
               const SizedBox(height: 30),
               buildBoton('CERRAR SESIÓN', color: Colors.red, onPressed: () {
                 _confirmarCerrarSesion(context);
