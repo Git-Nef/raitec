@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:raitec/pages/InfoUsuario.dart';
 import 'package:raitec/pages/misrutas.dart';
 import 'package:raitec/pages/InfoVehiculo.dart';
 import 'package:raitec/pages/PrincipalUsuario.dart';
-import 'package:raitec/pages/Registro.dart';
-import 'package:raitec/pages/ISConductores.dart';
 import 'package:raitec/pages/InicioSesion.dart';
 import 'package:raitec/pages/sesion.dart';
-import 'package:raitec/pages/HistorialViajes.dart'; // <- Asegúrate de que exista
+import 'package:raitec/pages/HistorialViajes.dart';
 
 class PrincipalConductor extends StatelessWidget {
   final String numControl;
@@ -17,22 +16,27 @@ class PrincipalConductor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => false, // 🔒 Bloquea botón físico de retroceso
+      onWillPop: () async => false,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 2,
-          automaticallyImplyLeading: false, // ❌ Oculta flecha de atrás
+          backgroundColor: Colors.black,
+          elevation: 0,
+          automaticallyImplyLeading: false,
           leading: Builder(
             builder: (context) => IconButton(
-              icon: const Icon(Icons.menu, color: Colors.black),
+              icon: const Icon(Icons.menu, color: Colors.white),
               onPressed: () => Scaffold.of(context).openDrawer(),
             ),
           ),
           centerTitle: true,
+          title: Text(
+            'Modo Conductor',
+            style: GoogleFonts.poppins(color: Colors.white, fontSize: 20),
+          ),
         ),
         drawer: Drawer(
+          backgroundColor: Colors.grey[900],
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
@@ -41,122 +45,96 @@ class PrincipalConductor extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Menú',
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         color: Colors.white,
-                        fontSize: 24,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Image.asset('assets/LogoPantallas.png', height: 60),
+                    Image.asset('assets/LogoPantallas.png', height: 50),
                   ],
                 ),
               ),
-              ListTile(
-                leading: const Icon(Icons.person),
-                title: const Text('Mi información'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => InfoUsuario()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.directions_car),
-                title: const Text('Mi vehículo'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => InfoVehiculo()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.map),
-                title: const Text('Mis rutas'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => MisRutas()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.history),
-                title: const Text('Historial de viajes'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HistorialViajes()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.home),
-                title: const Text('Cambiar a pasajero'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const PrincipalUsuario()),
-                  );
-                },
-              ),
+              _drawerItem(Icons.person, 'Mi información', () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => InfoUsuario()));
+              }),
+              _drawerItem(Icons.directions_car, 'Mi vehículo', () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => InfoVehiculo()));
+              }),
+              _drawerItem(Icons.map, 'Mis rutas', () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => MisRutas()));
+              }),
+              _drawerItem(Icons.history, 'Historial de viajes', () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const HistorialViajes()));
+              }),
+              _drawerItem(Icons.home, 'Cambiar a pasajero', () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const PrincipalUsuario()));
+              }),
+              _drawerItem(Icons.logout, 'Cerrar sesión', () {
+                _confirmarCerrarSesion(context);
+              }, color: Colors.red),
             ],
           ),
         ),
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                const SizedBox(height: 32),
-                Center(
-                  child: Image.asset('assets/SplashScreen.png', height: 180),
-                ),
-                const SizedBox(height: 24),
-                const Text(
+                const SizedBox(height: 10),
+                Image.asset('assets/SplashScreen.png', height: 140),
+                const SizedBox(height: 20),
+                Text(
                   'Bienvenido al servicio de conductor de RaiTec',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 40),
-                buildButton('Mi información', () {
-                  Navigator.push(
+                const SizedBox(height: 30),
+                _cardOpcion(
+                  icono: Icons.person,
+                  texto: 'Mi información',
+                  onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => InfoUsuario()),
-                  );
-                }),
-                const SizedBox(height: 24),
-                buildButton('Mi vehículo', () {
-                  Navigator.push(
+                    MaterialPageRoute(builder: (_) => InfoUsuario()),
+                  ),
+                ),
+                _cardOpcion(
+                  icono: Icons.directions_car,
+                  texto: 'Mi vehículo',
+                  onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => InfoVehiculo()),
-                  );
-                }),
-                const SizedBox(height: 24),
-                buildButton('Mis rutas', () {
-                  Navigator.push(
+                    MaterialPageRoute(builder: (_) => InfoVehiculo()),
+                  ),
+                ),
+                _cardOpcion(
+                  icono: Icons.map,
+                  texto: 'Mis rutas',
+                  onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => MisRutas()),
-                  );
-                }),
-                const SizedBox(height: 24),
-                buildButton('Historial de viajes', () {
-                  Navigator.push(
+                    MaterialPageRoute(builder: (_) => MisRutas()),
+                  ),
+                ),
+                _cardOpcion(
+                  icono: Icons.history,
+                  texto: 'Historial de viajes',
+                  onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const HistorialViajes()),
-                  );
-                }),
-                const SizedBox(height: 40),
-                buildButton('CERRAR SESIÓN', () {
-                  _confirmarCerrarSesion(context);
-                }, color: Colors.red),
+                    MaterialPageRoute(builder: (_) => const HistorialViajes()),
+                  ),
+                ),
+                _cardOpcion(
+                  icono: Icons.logout,
+                  texto: 'Cerrar sesión',
+                  color: Colors.red,
+                  onTap: () => _confirmarCerrarSesion(context),
+                ),
                 const SizedBox(height: 40),
               ],
             ),
@@ -166,57 +144,71 @@ class PrincipalConductor extends StatelessWidget {
     );
   }
 
-  Widget buildButton(String text, VoidCallback onPressed, {Color color = Colors.blue}) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 4,
-        ),
-        child: Text(
-          text,
-          style: const TextStyle(
+  Widget _cardOpcion({
+    required IconData icono,
+    required String texto,
+    required VoidCallback onTap,
+    Color color = Colors.blue,
+  }) {
+    return Card(
+      color: Colors.grey[850],
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ListTile(
+        onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        leading: Icon(icono, color: color, size: 28),
+        title: Text(
+          texto,
+          style: GoogleFonts.poppins(
             color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
           ),
         ),
+        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
       ),
+    );
+  }
+
+  Widget _drawerItem(IconData icon, String text, VoidCallback onTap, {Color? color}) {
+    return ListTile(
+      leading: Icon(icon, color: color ?? Colors.white),
+      title: Text(
+        text,
+        style: GoogleFonts.poppins(color: color ?? Colors.white),
+      ),
+      onTap: onTap,
     );
   }
 
   void _confirmarCerrarSesion(BuildContext context) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Confirmación"),
-          content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("Cancelar"),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: const Text("Aceptar"),
-              onPressed: () {
-                SessionManager().setNumControl('');
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const InicioSesion()),
-                      (Route<dynamic> route) => false,
-                );
-              },
-            ),
-          ],
-        );
-      },
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: const Text("Cerrar sesión", style: TextStyle(color: Colors.white)),
+        content: const Text("¿Estás seguro de que quieres cerrar sesión?",
+            style: TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(
+            child: const Text("Cancelar", style: TextStyle(color: Colors.blue)),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: const Text("Aceptar", style: TextStyle(color: Colors.red)),
+            onPressed: () {
+              SessionManager().setNumControl('');
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const InicioSesion()),
+                    (route) => false,
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }

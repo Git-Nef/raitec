@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:raitec/pages/seleccionarUbicacion.dart';
 import 'package:raitec/pages/sesion.dart';
@@ -16,17 +17,10 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
   final TextEditingController _nombreRutaController = TextEditingController();
   final TextEditingController _asientosController = TextEditingController();
   LatLng? origenSeleccionado;
-  final LatLng destinoFijo =
-  const LatLng(24.03265897848829, -104.64678790491564);
+  final LatLng destinoFijo = const LatLng(24.03265897848829, -104.64678790491564);
 
   final List<String> dias = [
-    'Lunes',
-    'Martes',
-    'Miércoles',
-    'Jueves',
-    'Viernes',
-    'Sábado',
-    'Domingo'
+    'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'
   ];
 
   Map<String, bool> diasActivos = {};
@@ -47,9 +41,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
       MaterialPageRoute(builder: (context) => const SeleccionarUbicacion()),
     );
     if (resultado != null && resultado is LatLng) {
-      setState(() {
-        origenSeleccionado = resultado;
-      });
+      setState(() => origenSeleccionado = resultado);
     }
   }
 
@@ -59,9 +51,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
       initialTime: horaInicio[dia]!,
     );
     if (seleccionada != null) {
-      setState(() {
-        horaInicio[dia] = seleccionada;
-      });
+      setState(() => horaInicio[dia] = seleccionada);
     }
   }
 
@@ -72,9 +62,7 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
         clave == null ||
         clave.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'Por favor completa todos los campos y selecciona una ubicación')),
+        const SnackBar(content: Text('Completa todos los campos y selecciona una ubicación')),
       );
       return;
     }
@@ -93,16 +81,14 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
       return;
     }
 
-    final docRef = FirebaseFirestore.instance
-        .collection('usuarios')
-        .doc(clave)
-        .collection('rutas')
-        .doc('info');
-
     try {
       final int asientos = int.parse(_asientosController.text);
-
-      await docRef.set({
+      await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(clave)
+          .collection('rutas')
+          .doc('info')
+          .set({
         'nombreRuta': _nombreRutaController.text.trim(),
         'lugaresDisponibles': asientos,
         'lugaresTotales': asientos,
@@ -140,30 +126,33 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Capturar horario de ruta')),
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Text('Capturar Horario de Ruta',
+            style: GoogleFonts.poppins(color: Colors.white)),
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
+        centerTitle: true,
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              TextFormField(
+              _inputTexto(
                 controller: _nombreRutaController,
-                decoration: const InputDecoration(
-                    labelText: 'Nombre de la ruta (Ejemplo: Jardines)'),
-                validator: (value) =>
-                value!.isEmpty ? 'Escribe un nombre para la ruta' : null,
+                label: 'Nombre de la ruta (Ej. Jardines)',
+                validator: (v) => v!.isEmpty ? 'Escribe un nombre para la ruta' : null,
               ),
               const SizedBox(height: 12),
-              TextFormField(
+              _inputTexto(
                 controller: _asientosController,
-                decoration: const InputDecoration(
-                    labelText: 'Asientos traseros disponibles'),
+                label: 'Asientos traseros disponibles',
                 keyboardType: TextInputType.number,
-                validator: (value) =>
-                value!.isEmpty ? 'Escribe los asientos' : null,
+                validator: (v) => v!.isEmpty ? 'Escribe los asientos' : null,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               Expanded(
                 child: ListView(
                   children: dias.map((dia) {
@@ -171,50 +160,98 @@ class _CapturarHorarioRutaState extends State<CapturarHorarioRuta> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SwitchListTile(
-                          title: Text(dia),
+                          title: Text(
+                            dia,
+                            style: GoogleFonts.poppins(color: Colors.white),
+                          ),
                           value: diasActivos[dia]!,
-                          onChanged: (bool value) {
-                            setState(() {
-                              diasActivos[dia] = value;
-                            });
+                          onChanged: (value) {
+                            setState(() => diasActivos[dia] = value);
                           },
+                          activeColor: const Color(0xFF0D66D0),
                         ),
                         if (diasActivos[dia]!)
                           Padding(
-                            padding:
-                            const EdgeInsets.symmetric(horizontal: 16.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Row(
                               children: [
-                                const Text('Hora de entrada:'),
+                                Text('Hora de entrada:',
+                                    style: GoogleFonts.poppins(color: Colors.white70)),
                                 const SizedBox(width: 10),
                                 TextButton(
                                   onPressed: () => _seleccionarHora(dia),
-                                  child: Text(horaInicio[dia]!.format(context)),
+                                  child: Text(
+                                    horaInicio[dia]!.format(context),
+                                    style: GoogleFonts.poppins(color: const Color(0xFF0D66D0)),
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                        const Divider(),
+                        const Divider(color: Colors.white12),
                       ],
                     );
                   }).toList(),
                 ),
               ),
-              const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: _seleccionarUbicacion,
-                icon: const Icon(Icons.location_pin),
-                label: Text(origenSeleccionado == null
-                    ? 'Seleccionar punto de partida'
-                    : 'Ubicación seleccionada'),
+                icon: const Icon(Icons.location_pin, color: Colors.white),
+                label: Text(
+                  origenSeleccionado == null
+                      ? 'Seleccionar punto de partida'
+                      : 'Ubicación seleccionada',
+                  style: GoogleFonts.poppins(color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0D66D0),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: _guardarRuta,
-                child: const Text('Guardar ruta'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0D66D0),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                child: Text(
+                  'Guardar ruta',
+                  style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
+                ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _inputTexto({
+    required TextEditingController controller,
+    required String label,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      validator: validator,
+      style: GoogleFonts.poppins(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: GoogleFonts.poppins(color: Colors.white70),
+        filled: true,
+        fillColor: Colors.grey[850],
+        enabledBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Colors.white24),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: const BorderSide(color: Color(0xFF0D66D0)),
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:raitec/pages/sesion.dart';
 import 'package:raitec/pages/verRutaConductor.dart';
 
@@ -31,8 +32,7 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
   }
 
   Future<void> _buscarSolicitud() async {
-    final snapshotUsuarios =
-    await FirebaseFirestore.instance.collection('usuarios').get();
+    final snapshotUsuarios = await FirebaseFirestore.instance.collection('usuarios').get();
 
     for (var user in snapshotUsuarios.docs) {
       final ref = FirebaseFirestore.instance
@@ -56,15 +56,11 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
         final destino = rutaDoc['destino'];
 
         try {
-          final origenPlacemark =
-          await placemarkFromCoordinates(origen['lat'], origen['lng']);
-          final destinoPlacemark =
-          await placemarkFromCoordinates(destino['lat'], destino['lng']);
+          final origenPlacemark = await placemarkFromCoordinates(origen['lat'], origen['lng']);
+          final destinoPlacemark = await placemarkFromCoordinates(destino['lat'], destino['lng']);
 
-          direccionOrigen =
-          '${origenPlacemark.first.street}, ${origenPlacemark.first.locality}';
-          direccionDestino =
-          '${destinoPlacemark.first.street}, ${destinoPlacemark.first.locality}';
+          direccionOrigen = '${origenPlacemark.first.street}, ${origenPlacemark.first.locality}';
+          direccionDestino = '${destinoPlacemark.first.street}, ${destinoPlacemark.first.locality}';
         } catch (_) {
           direccionOrigen = 'Dirección no disponible';
           direccionDestino = 'Dirección no disponible';
@@ -79,7 +75,6 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
           datosConductor = user.data();
           uidConductor = user.id;
         });
-
         break;
       }
     }
@@ -121,7 +116,9 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Solicitud cancelada')),
+      SnackBar(
+        content: Text('Solicitud cancelada', style: GoogleFonts.poppins()),
+      ),
     );
   }
 
@@ -141,14 +138,14 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
 
   Widget _iconoEstado(String estado) {
     if (estado == 'aceptado') {
-      return const Icon(Icons.check_circle, color: Colors.green, size: 50);
+      return const Icon(Icons.check_circle, color: Colors.green, size: 40);
     } else if (estado == 'rechazado') {
-      return const Icon(Icons.cancel, color: Colors.red, size: 50);
+      return const Icon(Icons.cancel, color: Colors.red, size: 40);
     } else {
       return const SizedBox(
-        height: 50,
-        width: 50,
-        child: CircularProgressIndicator(color: Colors.orange, strokeWidth: 4),
+        height: 40,
+        width: 40,
+        child: CircularProgressIndicator(color: Colors.orange, strokeWidth: 3),
       );
     }
   }
@@ -161,7 +158,7 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
         : 'Sin horario';
 
     return Card(
-      elevation: 6,
+      color: Colors.grey[900],
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
@@ -169,8 +166,8 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Tu solicitud actual',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Tu solicitud actual',
+                style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -178,7 +175,7 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
                 const SizedBox(width: 12),
                 Text(
                   'Estado: $estado',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     color: estado == 'aceptado'
                         ? Colors.green
@@ -189,16 +186,16 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
                 ),
               ],
             ),
-            const Divider(height: 30),
-            Text('Conductor: ${datosConductor!['nombre']}'),
-            Text('Teléfono: ${datosConductor!['telefono']}'),
-            Text('Correo: ${datosConductor!['email']}'),
+            const Divider(height: 30, color: Colors.white24),
+            Text('Conductor: ${datosConductor!['nombre']}', style: GoogleFonts.poppins(color: Colors.white70)),
+            Text('Teléfono: ${datosConductor!['telefono']}', style: GoogleFonts.poppins(color: Colors.white70)),
+            Text('Correo: ${datosConductor!['email']}', style: GoogleFonts.poppins(color: Colors.white70)),
             const SizedBox(height: 10),
-            Text('Origen: $direccionOrigen'),
-            Text('Destino: $direccionDestino'),
-            Text('Horarios: $horarioTexto'),
+            Text('Origen: $direccionOrigen', style: GoogleFonts.poppins(color: Colors.white70)),
+            Text('Destino: $direccionDestino', style: GoogleFonts.poppins(color: Colors.white70)),
+            Text('Horarios: $horarioTexto', style: GoogleFonts.poppins(color: Colors.white70)),
             const SizedBox(height: 10),
-            Text('Método de pago: $metodoPago'),
+            Text('Método de pago: $metodoPago', style: GoogleFonts.poppins(color: Colors.white70)),
             const SizedBox(height: 20),
             if (estado == 'pendiente')
               Center(
@@ -209,10 +206,8 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
               )
@@ -222,14 +217,12 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
                   icon: const Icon(Icons.map),
                   label: const Text('Ver ruta del conductor'),
                   onPressed: () async {
-                    final disponible =
-                    await _verificarUbicacionConductorDisponible();
+                    final disponible = await _verificarUbicacionConductorDisponible();
 
                     if (!disponible) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(
-                                'Ubicación del conductor no disponible aún.')),
+                        SnackBar(content: Text('Ubicación del conductor no disponible aún.',
+                            style: GoogleFonts.poppins())),
                       );
                       return;
                     }
@@ -247,10 +240,8 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
               ),
@@ -274,12 +265,12 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
         }
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Center(
+          return Center(
             child: Padding(
-              padding: EdgeInsets.only(top: 60),
+              padding: const EdgeInsets.only(top: 60),
               child: Text(
                 'No hay solicitudes todavía 🕊️',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
+                style: GoogleFonts.poppins(fontSize: 18, color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -293,8 +284,8 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Historial de solicitudes',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('Historial de solicitudes',
+                  style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
               const SizedBox(height: 10),
               ...docs.map((doc) {
                 final data = doc.data() as Map<String, dynamic>;
@@ -303,10 +294,10 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
                 final fecha = (data['fecha'] as Timestamp).toDate();
 
                 return Card(
+                  color: Colors.grey[850],
                   elevation: 4,
                   margin: const EdgeInsets.only(bottom: 10),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   child: ListTile(
                     leading: Icon(
                       estado == 'aceptado'
@@ -320,8 +311,10 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
                           ? Colors.red
                           : Colors.orange,
                     ),
-                    title: Text('Conductor: $conductor'),
-                    subtitle: Text('Estado: $estado\n${fecha.toLocal()}'),
+                    title: Text('Conductor: $conductor',
+                        style: GoogleFonts.poppins(color: Colors.white)),
+                    subtitle: Text('Estado: $estado\n${fecha.toLocal()}',
+                        style: GoogleFonts.poppins(color: Colors.white70)),
                   ),
                 );
               }).toList(),
@@ -335,8 +328,12 @@ class _MisSolicitudesState extends State<MisSolicitudes> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Mi Solicitud de Rait'),
+        backgroundColor: Colors.black,
+        elevation: 0,
+        title: Text('Mi Solicitud de Rait', style: GoogleFonts.poppins(color: Colors.white)),
+        centerTitle: true,
       ),
       body: solicitudEncontrada
           ? SingleChildScrollView(

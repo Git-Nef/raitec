@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
@@ -58,9 +59,23 @@ class _SeleccionarUbicacionState extends State<SeleccionarUbicacion> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Selecciona tu punto de partida')),
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: Text(
+          'Selecciona tu punto de partida',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
       body: _ubicacionSeleccionada == null
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: Colors.white))
           : Stack(
         children: [
           GoogleMap(
@@ -75,19 +90,34 @@ class _SeleccionarUbicacionState extends State<SeleccionarUbicacion> {
               Marker(
                 markerId: const MarkerId('origen'),
                 position: _ubicacionSeleccionada!,
-                infoWindow: const InfoWindow(title: 'Tu punto de partida'),
+                infoWindow:
+                const InfoWindow(title: 'Tu punto de partida'),
               ),
             }
                 : {},
           ),
           Positioned(
-            bottom: 20,
+            bottom: 30,
             left: 20,
             right: 20,
             child: ElevatedButton.icon(
               onPressed: _confirmarUbicacion,
-              icon: const Icon(Icons.check),
-              label: const Text('Confirmar ubicación'),
+              icon: const Icon(Icons.check, color: Colors.white),
+              label: Text(
+                'Confirmar ubicación',
+                style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 8,
+              ),
             ),
           ),
         ],

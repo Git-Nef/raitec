@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class InfoCostos extends StatelessWidget {
   const InfoCostos({super.key});
@@ -6,9 +7,9 @@ class InfoCostos extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: Colors.black,
       bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
+        color: Colors.grey[900],
         elevation: 10,
         shape: const CircularNotchedRectangle(),
         child: Padding(
@@ -17,20 +18,18 @@ class InfoCostos extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new,
-                    size: 28, color: Colors.blueGrey),
+                icon: const Icon(Icons.arrow_back_ios_new, size: 28, color: Colors.white),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.home_filled,
-                    size: 30, color: Colors.blueAccent),
+                icon: const Icon(Icons.home_filled, size: 30, color: Colors.white),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
-              const SizedBox(width: 28), // Reemplazo del avatar eliminado
+              const SizedBox(width: 28),
             ],
           ),
         ),
@@ -39,7 +38,6 @@ class InfoCostos extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // Logo
             Center(
               child: Image.asset(
                 'assets/SplashScreen.png',
@@ -47,23 +45,19 @@ class InfoCostos extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Título
-            const Text(
+            Text(
               'INFORMACIÓN DE COSTOS',
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                 fontWeight: FontWeight.bold,
                 fontSize: 22,
-                color: Colors.blueGrey,
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 20),
-
-            // Tarjeta con info de costos
             Card(
+              color: Colors.grey[850],
               elevation: 4,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -72,11 +66,11 @@ class InfoCostos extends StatelessWidget {
                     filaInfo('Costo por kilómetro:', '\$2.00'),
                     filaInfo('Costo por minuto:', '\$0.30'),
                     const SizedBox(height: 20),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Text(
                         'El costo por kilómetros, minutos y tarifa base está sujeto a cambios sin previo aviso.\n\nTe recomendamos estar atento a nuestras actualizaciones y comunicados para conocer cualquier modificación en nuestras tarifas.',
-                        style: TextStyle(fontSize: 14, color: Colors.black87),
+                        style: GoogleFonts.poppins(fontSize: 14, color: Colors.white70),
                         textAlign: TextAlign.justify,
                       ),
                     ),
@@ -99,14 +93,21 @@ class InfoCostos extends StatelessWidget {
             flex: 2,
             child: Text(
               label,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+                color: Colors.white,
+              ),
             ),
           ),
           Expanded(
             flex: 1,
             child: Text(
               valor,
-              style: const TextStyle(fontSize: 16),
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                color: Colors.white70,
+              ),
               textAlign: TextAlign.right,
             ),
           ),

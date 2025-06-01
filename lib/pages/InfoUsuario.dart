@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:raitec/pages/sesion.dart'; // Asegúrate de que SessionManager esté aquí
+import 'package:google_fonts/google_fonts.dart';
+import 'package:raitec/pages/sesion.dart';
 
 class InfoUsuario extends StatelessWidget {
   const InfoUsuario({super.key});
@@ -9,19 +10,16 @@ class InfoUsuario extends StatelessWidget {
     String? clave = SessionManager().numControl;
     if (clave == null) return null;
 
-    final doc = await FirebaseFirestore.instance
-        .collection('usuarios')
-        .doc(clave)
-        .get();
+    final doc = await FirebaseFirestore.instance.collection('usuarios').doc(clave).get();
     return doc.data();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: Colors.black,
       bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
+        color: Colors.grey[900],
         elevation: 10,
         shape: const CircularNotchedRectangle(),
         child: Padding(
@@ -30,8 +28,7 @@ class InfoUsuario extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new,
-                    size: 28, color: Colors.blueGrey),
+                icon: const Icon(Icons.arrow_back_ios_new, size: 28, color: Colors.white),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -44,12 +41,16 @@ class InfoUsuario extends StatelessWidget {
         future: obtenerDatosUsuario(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: Colors.white));
           }
 
           if (!snapshot.hasData || snapshot.data == null) {
-            return const Center(
-                child: Text('No se encontraron datos del usuario.'));
+            return Center(
+              child: Text(
+                'No se encontraron datos del usuario.',
+                style: GoogleFonts.poppins(color: Colors.white70),
+              ),
+            );
           }
 
           final data = snapshot.data!;
@@ -57,20 +58,19 @@ class InfoUsuario extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                Center(
-                  child: Image.asset('assets/logoAppbar.png', height: 120),
-                ),
+                Image.asset('assets/logoAppbar.png', height: 120),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'INFORMACIÓN DE USUARIO',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold,
                     fontSize: 22,
-                    color: Colors.blueGrey,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 20),
                 Card(
+                  color: Colors.grey[850],
                   elevation: 4,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -86,8 +86,7 @@ class InfoUsuario extends StatelessWidget {
                         filaInfo('Dirección', data['direccion']),
                         filaInfo('Teléfono', data['telefono']),
                         filaInfo('Nacionalidad', data['nacionalidad']),
-                        filaInfo(
-                            'Fecha de Nacimiento', data['fechaNacimiento']),
+                        filaInfo('Fecha de Nacimiento', data['fechaNacimiento']),
                         filaInfo('Tel. Emergencia', data['telefonoEmergencia']),
                         filaInfo('Email', data['email']),
                         const SizedBox(height: 16),
@@ -129,14 +128,21 @@ class InfoUsuario extends StatelessWidget {
             flex: 2,
             child: Text(
               label,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: Colors.white,
+              ),
             ),
           ),
           Expanded(
             flex: 3,
             child: Text(
               valor,
-              style: const TextStyle(fontSize: 16),
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                color: Colors.white70,
+              ),
             ),
           ),
         ],
@@ -146,10 +152,14 @@ class InfoUsuario extends StatelessWidget {
 
   Widget columnaImagen({required String label, required String imageUrl}) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           label,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 8),
         ClipRRect(

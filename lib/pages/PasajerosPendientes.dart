@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:raitec/pages/sesion.dart';
 import 'package:raitec/pages/SeguimientoViaje.dart';
 
@@ -16,8 +17,14 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
   @override
   Widget build(BuildContext context) {
     if (uidConductor.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Inicia sesión como conductor')),
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Text(
+            'Inicia sesión como conductor',
+            style: GoogleFonts.poppins(color: Colors.white),
+          ),
+        ),
       );
     }
 
@@ -29,8 +36,16 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
         .collection('pasajeros');
 
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Solicitudes de Pasajeros'),
+        backgroundColor: Colors.black,
+        elevation: 0,
+        title: Text(
+          'Solicitudes de Pasajeros',
+          style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        centerTitle: true,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: pasajerosRef.snapshots(),
@@ -42,7 +57,12 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
           final docs = snapshot.data!.docs;
 
           if (docs.isEmpty) {
-            return const Center(child: Text('No hay pasajeros registrados.'));
+            return Center(
+              child: Text(
+                'No hay pasajeros registrados.',
+                style: GoogleFonts.poppins(color: Colors.white70),
+              ),
+            );
           }
 
           return ListView.builder(
@@ -60,47 +80,69 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
                     .get(),
                 builder: (context, snapshotUser) {
                   if (!snapshotUser.hasData) {
-                    return const ListTile(title: Text("Cargando pasajero..."));
+                    return ListTile(
+                      title: Text(
+                        "Cargando pasajero...",
+                        style: GoogleFonts.poppins(color: Colors.white),
+                      ),
+                    );
                   }
 
-                  final userData =
-                  snapshotUser.data!.data() as Map<String, dynamic>?;
+                  final userData = snapshotUser.data!.data() as Map<String, dynamic>?;
 
                   if (userData == null) {
                     return ListTile(
-                        title: Text("Pasajero no encontrado ($uidPasajero)"));
+                      title: Text("Pasajero no encontrado ($uidPasajero)",
+                          style: GoogleFonts.poppins(color: Colors.white)),
+                    );
                   }
 
                   final nombre = userData['nombre'] ?? 'Sin nombre';
                   final foto = userData['fotografiaUrl'] ?? null;
 
                   return Card(
-                    margin:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    color: Colors.grey[900],
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 4,
                     child: ListTile(
-                      contentPadding: const EdgeInsets.all(12),
+                      contentPadding: const EdgeInsets.all(16),
                       leading: CircleAvatar(
                         radius: 28,
-                        backgroundColor: Colors.grey.shade200,
+                        backgroundColor: Colors.grey.shade800,
                         backgroundImage: (foto != null && foto != '')
                             ? NetworkImage(foto)
                             : null,
                         child: (foto == null || foto == '')
                             ? const Icon(Icons.person,
-                            size: 28, color: Colors.grey)
+                            size: 28, color: Colors.white)
                             : null,
                       ),
-                      title: Text(nombre,
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('No. Control: $uidPasajero'),
-                          Text('Método de pago: $metodoPago'),
-                          Text('Estado: $estado'),
-                        ],
+                      title: Text(
+                        nombre,
+                        style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.white),
+                      ),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('No. Control: $uidPasajero',
+                                style: GoogleFonts.poppins(
+                                    color: Colors.white70, fontSize: 13)),
+                            Text('Método de pago: $metodoPago',
+                                style: GoogleFonts.poppins(
+                                    color: Colors.white70, fontSize: 13)),
+                            Text('Estado: $estado',
+                                style: GoogleFonts.poppins(
+                                    color: Colors.white70, fontSize: 13)),
+                          ],
+                        ),
                       ),
                       trailing: estado == 'pendiente'
                           ? Row(
@@ -148,9 +190,15 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
             ),
           );
         },
-        label: const Text('Comenzar Viaje'),
-        icon: const Icon(Icons.directions_car),
-        backgroundColor: Colors.green,
+        label: Text(
+          'Comenzar viaje',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        icon: const Icon(Icons.navigation, color: Colors.white),
+        backgroundColor: Colors.blueAccent, // 🔵 ¡Aquí está el cambio!
       ),
     );
   }
@@ -185,7 +233,10 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Pasajero $nuevoEstado')),
+      SnackBar(
+        content: Text('Pasajero $nuevoEstado',
+            style: GoogleFonts.poppins()),
+      ),
     );
   }
 
@@ -204,7 +255,6 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
         .get();
     final nombreConductor = conductorDoc.data()?['nombre'] ?? 'Desconocido';
 
-    // Guardar en historial del pasajero
     await FirebaseFirestore.instance
         .collection('usuarios')
         .doc(uidPasajero)
@@ -219,7 +269,10 @@ class _PasajerosPendientesState extends State<PasajerosPendientes> {
     await pasajeroRef.delete();
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Pasajero rechazado y archivado')),
+      SnackBar(
+        content: Text('Pasajero rechazado y archivado',
+            style: GoogleFonts.poppins()),
+      ),
     );
   }
 }

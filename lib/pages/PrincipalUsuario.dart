@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:raitec/pages/InfoCostos.dart';
 import 'package:raitec/pages/InfoUsuario.dart';
 import 'package:raitec/pages/InicioSesion.dart';
@@ -41,22 +42,27 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => false, // 🚫 Bloquea retroceso físico
+      onWillPop: () async => false,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 2,
-          automaticallyImplyLeading: false, // 🚫 Quita la flecha
+          backgroundColor: Colors.black,
+          elevation: 0,
+          automaticallyImplyLeading: false,
           leading: Builder(
             builder: (context) => IconButton(
-              icon: const Icon(Icons.menu, color: Colors.black),
+              icon: const Icon(Icons.menu, color: Colors.white),
               onPressed: () => Scaffold.of(context).openDrawer(),
             ),
           ),
           centerTitle: true,
+          title: Text(
+            'RaiTec',
+            style: GoogleFonts.poppins(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
+          ),
         ),
         drawer: Drawer(
+          backgroundColor: Colors.grey[900],
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
@@ -65,117 +71,96 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Menú',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text('Menú',
+                        style: GoogleFonts.poppins(
+                            color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
-                    Image.asset('assets/LogoPantallas.png', height: 60),
+                    Image.asset('assets/LogoPantallas.png', height: 50),
                   ],
                 ),
               ),
-              ListTile(
-                leading: const Icon(Icons.account_circle),
-                title: const Text('Mi Información'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => InfoUsuario()),
-                  );
-                },
-              ),
+              _drawerItem(Icons.account_circle, 'Mi Información', () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => InfoUsuario()));
+              }),
               if (esConductor)
-                ListTile(
-                  leading: const Icon(Icons.directions_car),
-                  title: const Text('Cambiar a vista conductor'),
-                  onTap: () {
-                    String clave = SessionManager().numControl ?? '';
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (_) => PrincipalConductor(numControl: clave)),
-                    );
-                  },
-                ),
-              ListTile(
-                leading: const Icon(Icons.exit_to_app),
-                title: const Text('Cerrar sesión'),
-                onTap: () {
-                  _confirmarCerrarSesion(context);
-                },
-              ),
+                _drawerItem(Icons.directions_car, 'Vista Conductor', () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PrincipalConductor(numControl: numControl ?? ''),
+                    ),
+                  );
+                }),
+              _drawerItem(Icons.logout, 'Cerrar sesión', () {
+                _confirmarCerrarSesion(context);
+              }, color: Colors.red),
             ],
           ),
         ),
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            padding: const EdgeInsets.all(20),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 10),
-                Center(
-                  child: Image.asset(
-                    'assets/SplashScreen.png',
-                    height: 180,
-                  ),
+                Image.asset('assets/SplashScreen.png', height: 140),
+                const SizedBox(height: 20),
+                Text(
+                  'Bienvenido a RaiTec',
+                  style: GoogleFonts.poppins(
+                      fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                const SizedBox(height: 12),
-                const Text(
-                  'BIENVENIDO A RaiTec',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+                const SizedBox(height: 30),
+                _cardOpcion(
+                  icono: Icons.search,
+                  texto: 'Buscar una ruta',
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => RutasOfrecidas()));
+                  },
                 ),
-                const SizedBox(height: 24),
-                buildBoton('BUSCAR UNA RUTA', onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RutasOfrecidas()),
-                  );
-                }),
-                const SizedBox(height: 16),
-                buildBoton('COSTOS', onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => InfoCostos()),
-                  );
-                }),
-                const SizedBox(height: 16),
-                buildBoton('MI INFORMACIÓN', onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => InfoUsuario()),
-                  );
-                }),
-                const SizedBox(height: 24),
+                _cardOpcion(
+                  icono: Icons.attach_money,
+                  texto: 'Costos',
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => InfoCostos()));
+                  },
+                ),
+                _cardOpcion(
+                  icono: Icons.person_outline,
+                  texto: 'Mi información',
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => InfoUsuario()));
+                  },
+                ),
                 if (!esConductor) ...[
-                  const Align(
+                  const SizedBox(height: 24),
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       '¿Quieres ser conductor?',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.poppins(
+                          color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  buildBoton('Elaborar Petición', onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Aspirar(numControl: numControl ?? ''),
-                      ),
-                    );
-                  }),
+                  const SizedBox(height: 12),
+                  _cardOpcion(
+                    icono: Icons.assignment,
+                    texto: 'Elaborar petición',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => Aspirar(numControl: numControl ?? '')),
+                      );
+                    },
+                  ),
                 ],
                 const SizedBox(height: 30),
-                buildBoton('CERRAR SESIÓN', color: Colors.red, onPressed: () {
-                  _confirmarCerrarSesion(context);
-                }),
+                _cardOpcion(
+                  icono: Icons.logout,
+                  texto: 'Cerrar sesión',
+                  onTap: () => _confirmarCerrarSesion(context),
+                  color: Colors.red,
+                ),
                 const SizedBox(height: 40),
               ],
             ),
@@ -185,56 +170,70 @@ class _PrincipalUsuarioState extends State<PrincipalUsuario> {
     );
   }
 
-  void _confirmarCerrarSesion(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Confirmación"),
-          content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("Cancelar"),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              child: const Text("Aceptar"),
-              onPressed: () {
-                SessionManager().setNumControl('');
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const InicioSesion()),
-                      (Route<dynamic> route) => false,
-                );
-              },
-            ),
-          ],
-        );
-      },
+  Widget _cardOpcion({
+    required IconData icono,
+    required String texto,
+    required VoidCallback onTap,
+    Color color = Colors.blue,
+  }) {
+    return Card(
+      color: Colors.grey[850],
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ListTile(
+        onTap: onTap,
+        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+        leading: Icon(icono, color: color, size: 28),
+        title: Text(
+          texto,
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+      ),
     );
   }
 
-  Widget buildBoton(String texto, {Color color = Colors.blue, VoidCallback? onPressed}) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onPressed ?? () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+  Widget _drawerItem(IconData icon, String text, VoidCallback onTap, {Color? color}) {
+    return ListTile(
+      leading: Icon(icon, color: color ?? Colors.white),
+      title: Text(
+        text,
+        style: GoogleFonts.poppins(color: color ?? Colors.white, fontSize: 15),
+      ),
+      onTap: onTap,
+    );
+  }
+
+  void _confirmarCerrarSesion(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: const Text("Cerrar sesión", style: TextStyle(color: Colors.white)),
+        content: const Text("¿Estás seguro de que quieres cerrar sesión?",
+            style: TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(
+            child: const Text("Cancelar", style: TextStyle(color: Colors.blue)),
+            onPressed: () => Navigator.of(context).pop(),
           ),
-          elevation: 3,
-        ),
-        child: Text(
-          texto,
-          style: const TextStyle(
-            fontSize: 16,
-            letterSpacing: 1.5,
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+          TextButton(
+            child: const Text("Aceptar", style: TextStyle(color: Colors.red)),
+            onPressed: () {
+              SessionManager().setNumControl('');
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const InicioSesion()),
+                    (route) => false,
+              );
+            },
           ),
-        ),
+        ],
       ),
     );
   }
