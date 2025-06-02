@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class RegistrarVehiculo extends StatefulWidget {
   final String numControl;
@@ -96,19 +97,26 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
         'fotoUrl': fotoUrl ?? '',
       });
 
-      // Cambiar el campo esConductor a true
       await FirebaseFirestore.instance
           .collection('usuarios')
           .doc(widget.numControl)
           .update({'esConductor': true});
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vehículo guardado correctamente')),
+        SnackBar(
+          content: Text('Vehículo guardado correctamente',
+              style: GoogleFonts.poppins(color: Colors.white)),
+          backgroundColor: Colors.green,
+        ),
       );
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al guardar: $e')),
+        SnackBar(
+          content:
+          Text('Error al guardar: $e', style: GoogleFonts.poppins()),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -133,11 +141,19 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
       child: TextField(
         controller: controller,
         onChanged: (_) => actualizarEstado(),
+        style: GoogleFonts.poppins(color: Colors.white),
         decoration: InputDecoration(
           labelText: label,
+          labelStyle: GoogleFonts.poppins(color: Colors.white70),
           filled: true,
-          fillColor: Colors.grey[200],
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          fillColor: Colors.grey[850],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Colors.blueAccent),
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );
@@ -146,60 +162,90 @@ class _RegistrarVehiculoState extends State<RegistrarVehiculo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Registrar Vehículo')),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _input('Marca', _marca),
-                _input('Modelo', _modelo),
-                _input('Año', _anio),
-                _input('Matrícula', _matricula),
-                _input('Color', _color),
-                _input('Seguro', _seguro),
-                _input('Número de Asientos', _asientos),
-                _input('Características', _caracteristicas),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.camera_alt),
-                        label: const Text('Tomar Foto'),
-                        onPressed: () => _seleccionarFoto(true),
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        title: Text('Registrar Vehículo',
+            style: GoogleFonts.poppins(
+                color: Colors.white, fontWeight: FontWeight.w600)),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _input('Marca', _marca),
+                  _input('Modelo', _modelo),
+                  _input('Año', _anio),
+                  _input('Matrícula', _matricula),
+                  _input('Color', _color),
+                  _input('Seguro', _seguro),
+                  _input('Número de Asientos', _asientos),
+                  _input('Características', _caracteristicas),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.camera_alt, color: Colors.white),
+                          label: Text('Tomar Foto',
+                              style: GoogleFonts.poppins(color: Colors.white)),
+                          onPressed: () => _seleccionarFoto(true),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey[800],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.photo_library, color: Colors.white),
+                          label: Text('Galería',
+                              style: GoogleFonts.poppins(color: Colors.white)),
+                          onPressed: () => _seleccionarFoto(false),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey[800],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (fotoUrl != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(fotoUrl!, height: 180),
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.photo_library),
-                        label: const Text('Galería'),
-                        onPressed: () => _seleccionarFoto(false),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: camposCompletos ? guardarVehiculo : null,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor:
+                      camposCompletos ? const Color(0xFF0D66D0) : Colors.grey[800],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                  ],
-                ),
-                if (fotoUrl != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Image.network(fotoUrl!, height: 160),
+                    child: Text(
+                      'GUARDAR VEHÍCULO',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.1,
+                      ),
+                    ),
                   ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: camposCompletos ? guardarVehiculo : null,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor:
-                        camposCompletos ? Colors.blue : Colors.grey,
-                  ),
-                  child: const Text('GUARDAR VEHÍCULO',
-                      style: TextStyle(color: Colors.white)),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

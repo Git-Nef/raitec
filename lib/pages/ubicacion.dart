@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -68,12 +69,10 @@ class _UbicacionState extends State<Ubicacion> {
 
   void _inicializarNotificaciones() async {
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initializationSettings = InitializationSettings(
-      android: androidInit,
-    );
+    const initializationSettings = InitializationSettings(android: androidInit);
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (response) {},
+      onDidReceiveNotificationResponse: (_) {},
     );
   }
 
@@ -88,55 +87,42 @@ class _UbicacionState extends State<Ubicacion> {
       enableLights: true,
       color: Colors.blue,
     );
-
     const notificationDetails = NotificationDetails(android: androidDetails);
-
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      titulo,
-      cuerpo,
-      notificationDetails,
-    );
+    await flutterLocalNotificationsPlugin.show(0, titulo, cuerpo, notificationDetails);
   }
 
   Future<void> _cargarRutaDesde(LatLng origen) async {
-    PolylinePoints polylinePoints = PolylinePoints();
-    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+    final result = await PolylinePoints().getRouteBetweenCoordinates(
       request: PolylineRequest(
         origin: PointLatLng(origen.latitude, origen.longitude),
-        destination:
-            PointLatLng(widget.destino.latitude, widget.destino.longitude),
+        destination: PointLatLng(widget.destino.latitude, widget.destino.longitude),
         mode: TravelMode.driving,
       ),
       googleApiKey: "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI",
     );
 
     if (result.points.isNotEmpty) {
-      _puntosRuta =
-          result.points.map((p) => LatLng(p.latitude, p.longitude)).toList();
+      _puntosRuta = result.points.map((p) => LatLng(p.latitude, p.longitude)).toList();
 
       setState(() {
         _polilineas = {
           Polyline(
             polylineId: const PolylineId("ruta"),
-            color: Colors.blue,
+            color: Colors.blueAccent,
             width: 5,
             points: _puntosRuta,
           )
         };
-
         _marcadores = {
           Marker(
             markerId: const MarkerId("origen"),
             position: widget.origen,
-            icon:
-            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
           ),
           Marker(
             markerId: const MarkerId("destino"),
             position: widget.destino,
-            icon:
-            BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
           ),
         };
       });
@@ -176,22 +162,31 @@ class _UbicacionState extends State<Ubicacion> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Información del Conductor"),
+        backgroundColor: Colors.grey[900],
+        title: Text("Información del Conductor", style: GoogleFonts.poppins(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (conductorDoc.data()?['fotografiaUrl'] != null)
-              Image.network(conductorDoc['fotografiaUrl'], height: 80),
-            Text('Nombre: ${conductorDoc['nombre']}'),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(conductorDoc['fotografiaUrl'], height: 80),
+              ),
             const SizedBox(height: 8),
-            Text('Vehículo: ${vehiculoDoc['marca']} ${vehiculoDoc['modelo']}'),
-            Text('Placas: ${vehiculoDoc['matricula']}'),
+            Text('Nombre: ${conductorDoc['nombre']}',
+                style: GoogleFonts.poppins(color: Colors.white)),
+            Text(
+              'Vehículo: ${vehiculoDoc['marca']} ${vehiculoDoc['modelo']}',
+              style: GoogleFonts.poppins(color: Colors.white70),
+            ),
+            Text('Placas: ${vehiculoDoc['matricula']}',
+                style: GoogleFonts.poppins(color: Colors.white70)),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar'),
+            child: const Text('Cerrar', style: TextStyle(color: Colors.blue)),
           )
         ],
       ),
@@ -214,27 +209,16 @@ class _UbicacionState extends State<Ubicacion> {
   Future<void> _calcularPrecioDesdeParada() async {
     if (_paradaSeleccionada == null) return;
 
-    PolylinePoints polylinePoints = PolylinePoints();
-    await polylinePoints.getRouteBetweenCoordinates(
-      request: PolylineRequest(
-        origin: PointLatLng(
-            _paradaSeleccionada!.latitude, _paradaSeleccionada!.longitude),
-        destination:
-            PointLatLng(widget.destino.latitude, widget.destino.longitude),
-        mode: TravelMode.driving,
-      ),
-      googleApiKey: "AIzaSyCgGWvcgY0m3zfrswye5jZfdVz5BK4scWI",
-    );
-
     final distanciaTotal = Geolocator.distanceBetween(
       _paradaSeleccionada!.latitude,
       _paradaSeleccionada!.longitude,
       widget.destino.latitude,
       widget.destino.longitude,
     );
+
     setState(() {
       _distanciaKm = distanciaTotal / 1000;
-      const velocidadKmH = 40.0; // Puedes cambiarlo si quieres simular tráfico
+      const velocidadKmH = 40.0;
       _tiempoMin = ((_distanciaKm! / velocidadKmH) * 60).round();
       _costoCalculado = (_distanciaKm! * 5).clamp(10, 100);
     });
@@ -243,7 +227,11 @@ class _UbicacionState extends State<Ubicacion> {
   Future<void> _pedirRait() async {
     if (_paradaSeleccionada == null || !_paradaEsValida) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecciona una parada válida')),
+        SnackBar(
+          backgroundColor: Colors.red[400],
+          content: Text('Selecciona una parada válida',
+              style: GoogleFonts.poppins(color: Colors.white)),
+        ),
       );
       return;
     }
@@ -272,19 +260,30 @@ class _UbicacionState extends State<Ubicacion> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('¡Petición enviada al conductor!')),
+      SnackBar(
+        backgroundColor: Colors.black87,
+        content: Text('¡Petición enviada al conductor!',
+            style: GoogleFonts.poppins(color: Colors.white)),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.nombreRuta)),
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: Text(widget.nombreRuta,
+            style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
+        centerTitle: true,
+      ),
       body: Stack(
         children: [
           GoogleMap(
-            initialCameraPosition:
-                CameraPosition(target: widget.origen, zoom: 14),
+            initialCameraPosition: CameraPosition(target: widget.origen, zoom: 14),
             onMapCreated: (controller) => _mapController = controller,
             markers: {
               ..._marcadores,
@@ -307,16 +306,12 @@ class _UbicacionState extends State<Ubicacion> {
                 _paradaSeleccionada = pos;
                 _paradaEsValida = valido;
               });
-
-              if (valido) {
-                await _calcularPrecioDesdeParada();
-              } else {
-                setState(() {
-                  _distanciaKm = null;
-                  _tiempoMin = null;
-                  _costoCalculado = null;
-                });
-              }
+              if (valido) await _calcularPrecioDesdeParada();
+              else setState(() {
+                _distanciaKm = null;
+                _tiempoMin = null;
+                _costoCalculado = null;
+              });
             },
           ),
           if (_mostrarOpciones)
@@ -324,36 +319,42 @@ class _UbicacionState extends State<Ubicacion> {
               bottom: 0,              left: 0,
               right: 0,
               child: Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (_distanciaKm != null)
                       Column(
                         children: [
-                          Text(
-                              'Distancia: ${_distanciaKm!.toStringAsFixed(2)} km'),
-                          Text('Tiempo: $_tiempoMin min'),
-                          Text(
-                              'Precio: \$${_costoCalculado!.toStringAsFixed(2)} MXN'),
+                          Text('Distancia: ${_distanciaKm!.toStringAsFixed(2)} km',
+                              style: GoogleFonts.poppins()),
+                          Text('Tiempo: $_tiempoMin min',
+                              style: GoogleFonts.poppins()),
+                          Text('Precio: \$${_costoCalculado!.toStringAsFixed(2)} MXN',
+                              style: GoogleFonts.poppins()),
                           const SizedBox(height: 10),
                         ],
                       ),
-                    const Text('Selecciona tu método de pago'),
+                    Text('Selecciona tu método de pago',
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 10),
                     _metodoPagoOption('Efectivo'),
                     _metodoPagoOption('Tarjeta'),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
                     ElevatedButton.icon(
                       onPressed: (_paradaEsValida && _costoCalculado != null)
                           ? _pedirRait
                           : null,
                       icon: const Icon(Icons.send),
-                      label: const Text('Pedir Rait'),
+                      label: Text('Pedir Rait', style: GoogleFonts.poppins()),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueAccent,
                         minimumSize: const Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                     )
                   ],
@@ -364,11 +365,11 @@ class _UbicacionState extends State<Ubicacion> {
       ),
       floatingActionButton: !_mostrarOpciones
           ? FloatingActionButton.extended(
-              onPressed: () => setState(() => _mostrarOpciones = true),
-              label: const Text('PEDIR RAIT'),
-              icon: const Icon(Icons.directions_car),
-              backgroundColor: Colors.blueAccent,
-            )
+        onPressed: () => setState(() => _mostrarOpciones = true),
+        label: Text('PEDIR RAIT', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        icon: const Icon(Icons.directions_car),
+        backgroundColor: Colors.blueAccent,
+      )
           : null,
     );
   }
@@ -380,16 +381,14 @@ class _UbicacionState extends State<Ubicacion> {
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: _metodoPago == metodo
-              ? Colors.blue.shade100
-              : Colors.grey.shade200,
+          color: _metodoPago == metodo ? Colors.blue.shade100 : Colors.grey.shade200,
           border: Border.all(
-              color: _metodoPago == metodo ? Colors.blue : Colors.grey,
-              width: 1.5),
+              color: _metodoPago == metodo ? Colors.blue : Colors.grey, width: 1.5),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
-          child: Text(metodo, style: const TextStyle(fontSize: 16)),
+          child: Text(metodo,
+              style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500)),
         ),
       ),
     );

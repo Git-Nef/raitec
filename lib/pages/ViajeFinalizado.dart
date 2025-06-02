@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:raitec/pages/PrincipalConductor.dart';
 import 'package:raitec/pages/sesion.dart';
 
@@ -52,7 +53,7 @@ class _ViajeFinalizadoState extends State<ViajeFinalizado> {
           .get();
 
       final List<Map<String, dynamic>> listaPasajeros = [];
-      int totalPasajeros = 0;
+      final totalPasajeros = pasajerosSnapshot.docs.length;
 
       for (var p in pasajerosSnapshot.docs) {
         final data = p.data();
@@ -84,8 +85,6 @@ class _ViajeFinalizadoState extends State<ViajeFinalizado> {
           'destino': rutaDoc['destino'],
           'nombreRuta': rutaDoc['nombreRuta'],
         });
-
-        totalPasajeros++;
       }
 
       await FirebaseFirestore.instance
@@ -100,11 +99,53 @@ class _ViajeFinalizadoState extends State<ViajeFinalizado> {
         'pasajeros': listaPasajeros,
       });
 
+      final rutaRef = FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(widget.uidConductor)
+          .collection('rutas')
+          .doc(widget.rutaId);
+
+      final rutaSnapshot = await rutaRef.get();
+      final lugaresTotales =
+          rutaSnapshot['lugaresTotales'] ?? rutaSnapshot['lugaresDisponibles'];
+
+      await rutaRef.update({'lugaresDisponibles': lugaresTotales});
+
+      final pasajerosCollection = FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(widget.uidConductor)
+          .collection('rutas')
+          .doc(widget.rutaId)
+          .collection('pasajeros');
+
+      for (var doc in pasajerosSnapshot.docs) {
+        await pasajerosCollection.doc(doc.id).delete();
+      }
+
+      final buffer = StringBuffer();
+      buffer.writeln('Resumen del viaje');
+      buffer.writeln('--------------------------');
+      buffer.writeln('Ruta: ${rutaDoc['nombreRuta']}');
+      buffer.writeln('Total de pasajeros: $totalPasajeros\n');
+
+      for (final p in listaPasajeros) {
+        buffer.writeln('• ${p['nombre']}');
+        buffer.writeln('  Método de pago: ${p['metodoPago']}');
+        buffer.writeln('  Costo: \$${p['precio']}\n');
+      }
+
       setState(() {
         _guardando = false;
-        _mensajeResumen =
-        'Ruta "${rutaDoc['nombreRuta']}" finalizada. Total de pasajeros: $totalPasajeros';
+        _mensajeResumen = buffer.toString();
       });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Los asientos ya están disponibles para nuevas solicitudes.',
+          ),
+        ),
+      );
     } catch (e) {
       setState(() {
         _guardando = false;
@@ -116,57 +157,75 @@ class _ViajeFinalizadoState extends State<ViajeFinalizado> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Viaje Finalizado'),
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.black,
+        title: Text(
+          'Viaje Finalizado',
+          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
+        ),
+        centerTitle: true,
       ),
       body: Center(
         child: _guardando
             ? Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Guardando historial del viaje...')
+          children: [
+            const CircularProgressIndicator(color: Colors.white),
+            const SizedBox(height: 16),
+            Text(
+              'Guardando historial del viaje...',
+              style: GoogleFonts.poppins(color: Colors.white70),
+            ),
           ],
         )
-            : Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.check_circle,
-                color: Colors.green, size: 80),
-            const SizedBox(height: 20),
-            Text(
-              _mensajeResumen ?? 'Viaje finalizado con éxito.',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => PrincipalConductor(
-                      numControl: widget.uidConductor,
-                    ),
-                  ),
-                      (route) => false,
-                );
-              },
-              icon: const Icon(Icons.home),
-              label: const Text('Volver al inicio'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 30, vertical: 14),
-                textStyle: const TextStyle(fontSize: 16),
+            : Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.check_circle, color: Colors.greenAccent, size: 80),
+              const SizedBox(height: 20),
+              Text(
+                _mensajeResumen ?? 'Viaje finalizado con éxito.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 30),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PrincipalConductor(
+                        numControl: widget.uidConductor,
+                      ),
+                    ),
+                        (route) => false,
+                  );
+                },
+                icon: const Icon(Icons.home, color: Colors.white),
+                label: Text(
+                  'Volver al inicio',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0D66D0),
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

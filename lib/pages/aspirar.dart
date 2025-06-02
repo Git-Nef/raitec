@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:raitec/pages/RegistrarVehiculo.dart';
 import 'package:raitec/pages/FirestoreService.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Aspirar extends StatefulWidget {
   final String numControl;
@@ -34,29 +35,37 @@ class _AspirarState extends State<Aspirar> {
     await firestore.subirDocumento(widget.numControl, tipo, url);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Documento "$tipo" subido correctamente')),
+      SnackBar(
+        backgroundColor: Colors.green,
+        content: Text('Documento "$tipo" subido correctamente',
+            style: GoogleFonts.poppins(color: Colors.white)),
+      ),
     );
   }
 
   void _mostrarOpcionesImagen(String tipo) {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.grey[900],
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (BuildContext context) {
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               ListTile(
-                leading: const Icon(Icons.photo_camera),
-                title: const Text('Tomar foto'),
+                leading: const Icon(Icons.photo_camera, color: Colors.white),
+                title: Text('Tomar foto', style: GoogleFonts.poppins(color: Colors.white)),
                 onTap: () {
                   Navigator.pop(context);
                   _subirArchivo(tipo, true);
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Elegir de galería'),
+                leading: const Icon(Icons.photo_library, color: Colors.white),
+                title: Text('Elegir de galería', style: GoogleFonts.poppins(color: Colors.white)),
                 onTap: () {
                   Navigator.pop(context);
                   _subirArchivo(tipo, false);
@@ -72,7 +81,7 @@ class _AspirarState extends State<Aspirar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.black,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -80,18 +89,14 @@ class _AspirarState extends State<Aspirar> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  'assets/SplashScreen.png',
-                  height: 260,
-                ),
-                const SizedBox(height: 40),
-                const Icon(Icons.download, size: 60, color: Colors.grey),
+                Image.asset('assets/SplashScreen.png', height: 220),
+                const SizedBox(height: 30),
+                const Icon(Icons.file_upload_rounded, size: 64, color: Colors.white),
                 const SizedBox(height: 20),
                 _uploadButton('SUBIR HORARIO', 'horario'),
                 _uploadButton('SUBIR KARDEX', 'kardex'),
                 _uploadButton('SUBIR LICENCIA DE CONDUCIR', 'licencia'),
-                _uploadButton(
-                    'SUBIR COMPROBANTE DE DOMICILIO', 'comprobante_domicilio'),
+                _uploadButton('SUBIR COMPROBANTE DE DOMICILIO', 'comprobante_domicilio'),
                 const SizedBox(height: 30),
                 SizedBox(
                   width: double.infinity,
@@ -100,25 +105,25 @@ class _AspirarState extends State<Aspirar> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              RegistrarVehiculo(numControl: widget.numControl),
+                          builder: (_) => RegistrarVehiculo(numControl: widget.numControl),
                         ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[700],
+                      backgroundColor: const Color(0xFF0D66D0),
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'CONTINUAR A INFORMACIÓN DEL VEHÍCULO',
-                      style: TextStyle(
-                        fontSize: 18,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
-                        letterSpacing: 1.2,
+                        letterSpacing: 1.1,
                       ),
                     ),
                   ),
@@ -135,17 +140,15 @@ class _AspirarState extends State<Aspirar> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              icon: const Icon(Icons.arrow_back, size: 32),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
             ),
             ElevatedButton(
               onPressed: () {
                 // Acción de ayuda
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue[400],
+                backgroundColor: Colors.grey[800],
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -164,20 +167,21 @@ class _AspirarState extends State<Aspirar> {
       padding: const EdgeInsets.only(bottom: 16.0),
       child: SizedBox(
         width: double.infinity,
-        child: ElevatedButton(
+        child: ElevatedButton.icon(
           onPressed: () => _mostrarOpcionesImagen(tipo),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey[300],
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
+          icon: const Icon(Icons.upload_file, color: Colors.white),
+          label: Text(
+            texto,
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          child: Text(
-            texto,
-            style: const TextStyle(
-              color: Colors.black87,
-              fontWeight: FontWeight.w500,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.grey[850],
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
             ),
           ),
         ),
