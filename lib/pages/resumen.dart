@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:raitec/pages/PrincipalUsuario.dart';
 
 class ResumenYCalificacion extends StatefulWidget {
   final String uidConductor;
@@ -31,6 +32,13 @@ class _ResumenYCalificacionState extends State<ResumenYCalificacion> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('¡Gracias por tu calificación!')),
+    );
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const PrincipalUsuario()),
     );
   }
 
@@ -63,7 +71,9 @@ class _ResumenYCalificacionState extends State<ResumenYCalificacion> {
               const SizedBox(height: 20),
               Slider(
                 value: _calificacion,
-                onChanged: _enviado ? null : (valor) {
+                onChanged: _enviado
+                    ? null
+                    : (valor) {
                   setState(() {
                     _calificacion = valor;
                   });
